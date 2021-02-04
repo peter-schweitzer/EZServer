@@ -1,2 +1,2 @@
 # EZServer
-simplified version of express with no dependencies
+simplified version of express without dependencies
