@@ -1,7 +1,7 @@
 {
-  "name": "file_server",
+  "name": "EZServer",
   "version": "1.0.0",
-  "description": "",
+  "description": "EZServer Template",
   "main": "index.js",
   "scripts": {
     "start": "node ./src/index.js"
