@@ -1,8 +1,21 @@
-let { App } = require('./EZServer');
+const { App } = require('./EZServer');
 
-let app = new App('8080');
+const app = new App('8080');
 
-app.addResolver('/404', (req, res) => {
-  console.log(req.url);
-  app.fetchFS('./html/404.html', res);
+app.addResolver('/', (req, res) => {
+  fetchFS('./html/home.html', res);
 });
+
+app.addEndpoint('/img/', (req, res) => {
+  fetchFS(`.${req.url}.png`, res);
+});
+
+app.createGroup('myGroup', (req, res) => {
+  console.log('myGroup:');
+  console.log(req.url);
+});
+
+app.addEndpointToGroup('/endpoint1/', 'myGroup');
+app.addEndpointToGroup('/endpoint2/', 'myGroup');
+app.addEndpointToGroup('/endpoint3/', 'myGroup');
+app.addEndpointToGroup('/endpoint4/', 'myGroup');
