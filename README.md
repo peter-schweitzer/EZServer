@@ -1,2 +1,2 @@
 # EZServer
-simplified version of express without dependencies
+simple ultra light weight express-like node-module without extra dependencies
