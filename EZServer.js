@@ -7,7 +7,7 @@ class EZServerApp {
    */
   constructor(port) {
     this.resolvers = {};
-    this.endoints = [];
+    this.endpoints = [];
     this.groupResFunctions = {};
 
     /**
@@ -16,7 +16,7 @@ class EZServerApp {
      */
     this.throw404 = (req, res) => {
       console.log(`404 on "${req.url}"`);
-      this.fetchFromFs('./html/404.html', res);
+      fetchFromFs('./html/404.html', res);
     };
 
     /**
@@ -32,7 +32,7 @@ class EZServerApp {
      * @param {function} resFunction function to resolve the request
      */
     this.addEndpoint = (url, resFunction) => {
-      this.endpoints.push([url, resFunction]);
+      this.endpoints.push({ pth: url, fn: resFunction });
     };
 
     /**
@@ -56,41 +56,44 @@ class EZServerApp {
      * @returns {function} resFunction function to resolve request
      */
     this.getResFromEndpoints = (req) => {
-      for (const endpoint of this.endPoints) {
-        if (req.url.substr(0, endpoint[0].length) == endPoint[0]) return endPoint[1];
-      }
-      return undefined;
-    };
-
-    /**
-     * @param {string} filePath path of file
-     * @param {ServerResponse} res Response from Server
-     */
-    this.fetchFromFs = (filePath, res) => {
-      readFile(filePath, (err, data) => {
-        if (err) {
-          res.writeHead(500, { 'Content-Type': 'text/plain' });
-          res.end(`error while loading file from fs:\n${err}`);
-          return;
-        }
-        if (filePath == './html/404.html') {
-          res.writeHead(404, 'text/html');
-        } else {
-          res.writeHead(200, getType(filePath));
-        }
-        console.log(`data: "${data}"`);
-        res.write(data);
-        res.end();
-      });
+      for (const { pth, fn } of this.endpoints) if (req.url.startsWith(pth)) return fn;
     };
 
     this.httpServer = createServer((req, res) => {
-      let resolver = this.resolvers[req.url] || this.getResFromEndpoints(req) || this.throw404;
-      resolver(req, res);
+      let ep_fn = this.getResFromEndpoints(req);
+      let resFn = this.resolvers[req.url] || ep_fn || this.throw404;
+      resFn(req, res);
     });
+
     this.httpServer.listen(port);
   }
 }
+
+/**
+ * @param {string} filePath path of file
+ * @param {ServerResponse} res Response from Server
+ */
+const fetchFromFs = (filePath, res) => {
+  readFile(filePath, (err, data) => {
+    let header;
+
+    if (err) {
+      header = { code: 500, mime: 'text/plain' };
+    } else if (filePath === './html/404.html') {
+      header = { code: 404, mime: 'text/html' };
+    } else {
+      header = { code: 200, mime: getType(filePath) };
+    }
+
+    buildRes(res, data || `error while loading file from fs:\n${err}`, header);
+  });
+};
+
+const buildRes = (res, data, { code, mime }) => {
+  res.writeHead(code, { 'Content-Type': mime });
+  res.write(data);
+  res.end();
+};
 
 const mimeTypes = {
   html: 'text/html',
@@ -108,4 +111,4 @@ const getType = (filePath) => {
   return mimeTypes[filePath.split('.').pop()];
 };
 
-module.exports = { App: EZServerApp };
+module.exports = { App: EZServerApp, fetchFromFS: fetchFromFs };
