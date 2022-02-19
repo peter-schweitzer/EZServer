@@ -10,62 +10,61 @@ class EZServerApp {
     this.endpoints = [];
     this.groupResFunctions = {};
 
-    /**
-     * @param {IncomingMessage} req Request from the client
-     * @param {ServerResponse} res Respnose from the server
-     */
-    this.throw404 = (req, res) => {
-      console.log(`404 on "${req.url}"`);
-      fetchFromFs('./html/404.html', res);
-    };
-
-    /**
-     * @param {string} reqPath path of requested URL
-     * @param {function} resFunction function to resolve the request
-     */
-    this.addResolver = (reqPath, resFunction) => {
-      this.resolvers[reqPath] = resFunction;
-    };
-
-    /**
-     * @param {String} url pattern of requested URL
-     * @param {function} resFunction function to resolve the request
-     */
-    this.addEndpoint = (url, resFunction) => {
-      this.endpoints.push({ pth: url, fn: resFunction });
-    };
-
-    /**
-     * @param {string} groupName name of the new group
-     * @param {function} resFunction function to resolve the requests
-     */
-    this.createGroup = (groupName, resFunction) => {
-      this.groups[groupName] = resFunction;
-    };
-
-    /**
-     * @param {String} url pattern of requested URL
-     * @param {string} groupName name of the group
-     * */
-    this.addEndpointToGroup = (url, groupName) => {
-      this.addEndpoint(url, this.groupResFunctions[groupName]);
-    };
-
-    /**
-     * @param {IncomingMessage} req request from the client
-     * @returns {function} resFunction function to resolve request
-     */
-    this.getResFromEndpoints = (req) => {
-      for (const { pth, fn } of this.endpoints) if (req.url.startsWith(pth)) return fn;
-    };
-
     this.httpServer = createServer((req, res) => {
-      let ep_fn = this.getResFromEndpoints(req);
-      let resFn = this.resolvers[req.url] || ep_fn || this.throw404;
-      resFn(req, res);
+      (this.resolvers[req.url] || this.getResFromEndpoints(req) || this.throw404)(req, res);
     });
 
     this.httpServer.listen(port);
+  }
+
+  /**
+   * @param {string} reqPath path of requested URL
+   * @param {function} resFunction function to resolve the request
+   */
+  addResolver(reqPath, resFunction) {
+    this.resolvers[reqPath] = resFunction;
+  }
+
+  /**
+   * @param {String} url pattern of requested URL
+   * @param {function} resFunction function to resolve the request
+   */
+  addEndpoint(url, resFunction) {
+    console.log('addet endpoint', url);
+    this.endpoints.push({ pth: url, fn: resFunction });
+  }
+
+  /**
+   * @param {string} groupName name of the new group
+   * @param {function} resFunction function to resolve the requests
+   */
+  createGroup(groupName, resFunction) {
+    this.groups[groupName] = resFunction;
+  }
+
+  /**
+   * @param {String} url pattern of requested URL
+   * @param {string} groupName name of the group
+   * */
+  addEndpointToGroup(url, groupName) {
+    this.addEndpoint(url, this.groupResFunctions[groupName]);
+  }
+
+  /**
+   * @param {IncomingMessage} req request from the client
+   * @returns {function} resFunction function to resolve request
+   */
+  getResFromEndpoints(req) {
+    for (const { pth, fn } of this.endpoints) if (req.url.startsWith(pth)) return fn;
+  }
+
+  /**
+   * @param {IncomingMessage} req Request from the client
+   * @param {ServerResponse} res Respnose from the server
+   */
+  throw404(req, res) {
+    console.log('404 on', req.url);
+    fetchFromFs('./html/404.html', res);
   }
 }
 
@@ -74,6 +73,7 @@ class EZServerApp {
  * @param {ServerResponse} res Response from Server
  */
 const fetchFromFs = (filePath, res) => {
+  console.log('reading file from FS:', filePath);
   readFile(filePath, (err, data) => {
     let header;
 
