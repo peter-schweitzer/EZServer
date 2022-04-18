@@ -1,5 +1,5 @@
-const createServer = require('http').createServer;
-const readFile = require('fs').readFile;
+const { createServer } = require('http');
+const { readFile } = require('fs');
 
 class EZServerApp {
   /**
@@ -68,6 +68,13 @@ class EZServerApp {
   }
 }
 
+
+const buildRes = (res, data, { code, mime }) => {
+  res.writeHead(code, { 'Content-Type': mime });
+  res.write(data);
+  res.end();
+};
+
 /**
  * @param {string} filePath path of file
  * @param {ServerResponse} res Response from Server
@@ -87,12 +94,6 @@ const fetchFromFs = (filePath, res) => {
 
     buildRes(res, data || `error while loading file from fs:\n${err}`, header);
   });
-};
-
-const buildRes = (res, data, { code, mime }) => {
-  res.writeHead(code, { 'Content-Type': mime });
-  res.write(data);
-  res.end();
 };
 
 const mimeTypes = {
