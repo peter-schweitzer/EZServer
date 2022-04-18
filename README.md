@@ -1,2 +1,2 @@
 # EZServer
-simple ultra light weight express-like node-module with 0 dependencies
+simple ultra light weight node template with 0 dependencies to bootstrap simple file hosting
