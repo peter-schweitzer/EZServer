@@ -1,3 +1,5 @@
+import mimeTypes from './mimeTypes.json' assert { type: 'json' };
+
 const { createServer } = require('http');
 const { readFile } = require('fs');
 
@@ -96,20 +98,12 @@ const fetchFromFs = (filePath, res) => {
   });
 };
 
-const mimeTypes = {
-  html: 'text/html',
-  css: 'text/css',
-  js: 'text/javascript',
-  json: 'application/json',
-  png: 'image/png',
-};
-
 /**
  * @param {string} filePath Path of file
  * @returns {string} mimeType fo the file
  */
-const getType = (filePath) => {
-  return mimeTypes[filePath.split('.').pop()];
-};
+function getType(filePath) {
+  return mimeTypes[filePath.split('.').pop()] || console.warn('mime-type not found') || 'text/plain';
+}
 
 module.exports = { App: EZServerApp, fetchFromFS: fetchFromFs };
