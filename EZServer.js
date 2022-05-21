@@ -28,7 +28,7 @@ class EZServerApp {
   }
 
   /**
-   * @param {String} url pattern of requested URL
+   * @param {string} url pattern of requested URL
    * @param {function} resFunction function to resolve the request
    */
   addEndpoint(url, resFunction) {
@@ -69,7 +69,6 @@ class EZServerApp {
     fetchFromFs('./html/404.html', res);
   }
 }
-
 
 const buildRes = (res, data, { code, mime }) => {
   res.writeHead(code, { 'Content-Type': mime });
