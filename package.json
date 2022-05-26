@@ -1,5 +1,5 @@
 {
-  "name": "EZServer",
+  "name": "ezserver",
   "version": "1.0.0",
   "description": "EZServer Template",
   "main": "index.js",
@@ -9,6 +9,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-  }
+  "dependencies": {}
 }
+

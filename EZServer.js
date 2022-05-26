@@ -1,4 +1,4 @@
-import mimeTypes from './mimeTypes.json' assert { type: 'json' };
+const mimeTypes = require('./mimeTypes.json');
 
 const { createServer } = require('http');
 const { readFile } = require('fs');
@@ -41,7 +41,7 @@ class EZServerApp {
    * @param {function} resFunction function to resolve the requests
    */
   createGroup(groupName, resFunction) {
-    this.groups[groupName] = resFunction;
+    this.groupResFunctions[groupName] = resFunction;
   }
 
   /**
@@ -66,21 +66,21 @@ class EZServerApp {
    */
   throw404(req, res) {
     console.log('404 on', req.url);
-    fetchFromFs('./html/404.html', res);
+    serveFromFS('./html/404.html', res);
   }
 }
 
-const buildRes = (res, data, { code, mime }) => {
+function buildRes(res, data, { code, mime }) {
   res.writeHead(code, { 'Content-Type': mime });
   res.write(data);
   res.end();
-};
+}
 
 /**
  * @param {string} filePath path of file
  * @param {ServerResponse} res Response from Server
  */
-const fetchFromFs = (filePath, res) => {
+function serveFromFS(filePath, res) {
   console.log('reading file from FS:', filePath);
   readFile(filePath, (err, data) => {
     let header;
@@ -95,7 +95,7 @@ const fetchFromFs = (filePath, res) => {
 
     buildRes(res, data || `error while loading file from fs:\n${err}`, header);
   });
-};
+}
 
 /**
  * @param {string} filePath Path of file
@@ -105,4 +105,5 @@ function getType(filePath) {
   return mimeTypes[filePath.split('.').pop()] || console.warn('mime-type not found') || 'text/plain';
 }
 
-module.exports = { App: EZServerApp, fetchFromFS: fetchFromFs };
+module.exports = { App: EZServerApp, serveFromFS };
+
