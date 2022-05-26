@@ -8,8 +8,11 @@ class EZServerApp {
    * @param {string} port port the server is hosted on
    */
   constructor(port) {
-    this.resolvers = {};
+    /** @type {endpoint[]} */
     this.endpoints = [];
+    /** @type {Object<string, function>} */
+    this.resolvers = {};
+    /** @type {Object<string, function>} */
     this.groupResFunctions = {};
 
     this.httpServer = createServer((req, res) => {
@@ -33,7 +36,7 @@ class EZServerApp {
    */
   addEndpoint(url, resFunction) {
     console.log('addet endpoint', url);
-    this.endpoints.push({ pth: url, fn: resFunction });
+    this.endpoints.push(new endpoint(url, resFunction));
   }
 
   /**
@@ -106,4 +109,20 @@ function getType(filePath) {
 }
 
 module.exports = { App: EZServerApp, serveFromFS };
+
+class endpoint {
+  /**@type {string} */
+  pth;
+  /**@type {function} */
+  fn;
+
+  /**
+   * @param {string} pth
+   * @param {function} fn
+   */
+  constructor(pth, fn) {
+    this.pth = pth;
+    this.fn = fn;
+  }
+}
 
