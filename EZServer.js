@@ -60,7 +60,7 @@ class EZServerApp {
    * @returns {function} resFunction function to resolve request
    */
   getResFromEndpoints(req) {
-    for (const { pth, fn } of this.endpoints) if (req.url.startsWith(pth)) return fn;
+    for (const { url: pth, fn } of this.endpoints) if (req.url.startsWith(pth)) return fn;
   }
 
   /**
@@ -119,16 +119,16 @@ function getType(filePath) {
 
 class endpoint {
   /**@type {string} */
-  pth;
+  url;
   /**@type {function} */
   fn;
 
   /**
-   * @param {string} pth
+   * @param {string} url
    * @param {function} fn
    */
-  constructor(pth, fn) {
-    this.pth = pth;
+  constructor(url, fn) {
+    this.url = url;
     this.fn = fn;
   }
 }
@@ -146,43 +146,43 @@ class rest_endpoints {
   PATCH = [];
 
   /**
-   * @param {string} pth
+   * @param {string} url
    * @param {function} fn
    */
-  get(pth, fn) {
-    this.GET.push(new endpoint(pth, fn));
+  get(url, fn) {
+    this.GET.push(new endpoint(url, fn));
   }
 
   /**
-   * @param {string} pth
+   * @param {string} url
    * @param {function} fn
    */
-  post(pth, fn) {
-    this.POST.push(new endpoint(pth, fn));
+  post(url, fn) {
+    this.POST.push(new endpoint(url, fn));
   }
 
   /**
-   * @param {string} pth
+   * @param {string} url
    * @param {function} fn
    */
-  put(pth, fn) {
-    this.PUT.push(new endpoint(pth, fn));
+  put(url, fn) {
+    this.PUT.push(new endpoint(url, fn));
   }
 
   /**
-   * @param {string} pth
+   * @param {string} url
    * @param {function} fn
    */
-  delete(pth, fn) {
-    this.DELETE.push(new endpoint(pth, fn));
+  delete(url, fn) {
+    this.DELETE.push(new endpoint(url, fn));
   }
 
   /**
-   * @param {string} pth
+   * @param {string} url
    * @param {function} fn
    */
-  patch(pth, fn) {
-    this.PATCH.push(new endpoint(pth, fn));
+  patch(url, fn) {
+    this.PATCH.push(new endpoint(url, fn));
   }
 
   /**
