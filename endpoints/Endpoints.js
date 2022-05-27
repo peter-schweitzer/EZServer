@@ -1,9 +1,9 @@
-const { endpoint, getRes } = require('../types/endpoint');
+const { getRes } = require('./index');
 
 class Endpoints {
-  /** @type {endpoint[]} */
-  endpoints = [];
-  /**@type {Object<string, function>}*/
+  /** @type {import('./index').resolvers} */
+  endpoints = {};
+  /**@type {import('./index').resolvers}*/
   groups = {};
 
   /**
@@ -12,7 +12,7 @@ class Endpoints {
    */
   add(url, fn) {
     console.log('addet endpoint', url);
-    this.endpoints.add(new endpoint(url, fn));
+    this.endpoints[url] = fn;
   }
 
   /**
@@ -29,8 +29,9 @@ class Endpoints {
    * @param {string} groupName name of the group
    */
   addToGroup(url, groupName) {
-    console.log(`addet endpoint ${url} to group ${groupName}`);
-    this.endpoints.push(url, this.groups[groupName]);
+    console.log(`adding endpoint ${url} to group ${groupName}`);
+    if (!this.groups[groupName]) return console.log('  invalid groupname') || false;
+    this.endpoints[url] = this.groups[groupName];
   }
 
   /**

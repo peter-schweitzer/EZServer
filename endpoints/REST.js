@@ -1,16 +1,16 @@
-const { endpoint, getRes } = require('../types/endpoint');
+const { getRes } = require('./index');
 
 class REST {
-  /** @type {endpoint[]} */
-  GET = [];
-  /** @type {endpoint[]} */
-  POST = [];
-  /** @type {endpoint[]} */
-  PUT = [];
-  /** @type {endpoint[]} */
-  DELETE = [];
-  /** @type {endpoint[]} */
-  PATCH = [];
+  /** @type {import('./index').resolvers} */
+  GET = {};
+  /** @type {import('./index').resolvers} */
+  POST = {};
+  /** @type {import('./index').resolvers} */
+  PUT = {};
+  /** @type {import('./index').resolvers} */
+  DELETE = {};
+  /** @type {import('./index').resolvers} */
+  PATCH = {};
 
   /**
    * @param {string} url URL of the endpoint
@@ -18,7 +18,7 @@ class REST {
    */
   get(url, fn) {
     console.log('addet REST.get()', url);
-    this.GET.push(new endpoint(url, fn));
+    this.GET[url] = fn;
   }
 
   /**
@@ -27,7 +27,7 @@ class REST {
    */
   post(url, fn) {
     console.log('addet REST.post()', url);
-    this.POST.push(new endpoint(url, fn));
+    this.POST[url] = fn;
   }
 
   /**
@@ -36,7 +36,7 @@ class REST {
    */
   put(url, fn) {
     console.log('addet REST.put()', url);
-    this.PUT.push(new endpoint(url, fn));
+    this.PUT[url] = fn;
   }
 
   /**
@@ -45,7 +45,7 @@ class REST {
    */
   delete(url, fn) {
     console.log('addet REST.delete()', url);
-    this.DELETE.push(new endpoint(url, fn));
+    this.DELETE[url] = fn;
   }
 
   /**
@@ -54,7 +54,7 @@ class REST {
    */
   patch(url, fn) {
     console.log('addet REST.patch()', url);
-    this.PATCH.push(new endpoint(url, fn));
+    this.PATCH[url] = fn;
   }
 
   /**
@@ -71,7 +71,7 @@ class REST {
     this.post(url, POST || noop);
     this.put(url, PUT || noop);
     this.delete(url, DELETE || noop);
-    this.pathch(url, PATCH || noop);
+    this.patch(url, PATCH || noop);
   }
 
   /**
