@@ -1,10 +1,12 @@
-const { getRes } = require('./index');
+import { getRes } from './index.js';
 
 class Endpoints {
   /** @type {import('./index').resolvers} */
   endpoints = {};
   /**@type {import('./index').resolvers}*/
   groups = {};
+
+  constructor() {}
 
   /**
    * @param {string} url pattern of requested URL
@@ -42,5 +44,5 @@ class Endpoints {
   }
 }
 
-module.exports = { Endpoints };
+export { Endpoints };
 

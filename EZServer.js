@@ -1,8 +1,7 @@
-const { createServer } = require('http');
-const { readFile } = require('fs');
+import { createServer } from 'http';
+import { readFile } from 'fs';
 
-const { Endpoints } = require('./endpoints/Endpoints');
-const { REST } = require('./endpoints/REST');
+import { Endpoints, REST } from './endpoints/index.js';
 
 class EZServerApp {
   /**
@@ -63,9 +62,9 @@ function serveFromFS(filePath, res) {
   });
 }
 
-module.exports = { App: EZServerApp, serveFromFS };
+export { EZServerApp as App, serveFromFS };
 
-const mimeTypes = require('./mimeTypes.json');
+import * as mimeTypes from './mimeTypes.json' assert { type: 'json' };
 
 /**
  * @param {ServerResponse} res Respnose from the server

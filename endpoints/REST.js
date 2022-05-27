@@ -1,4 +1,4 @@
-const { getRes } = require('./index');
+import { getRes } from './index.js';
 
 class REST {
   /** @type {import('./index').resolvers} */
@@ -94,5 +94,5 @@ class REST {
   }
 }
 
-module.exports = { REST };
+export { REST };
 
