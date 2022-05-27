@@ -56,6 +56,24 @@ class REST {
     console.log('addet REST.patch()', url);
     this.PATCH.push(new endpoint(url, fn));
   }
+
+  /**
+   * @param {string} url URL of the endpoint
+   * @param {Object<string, function>} functions functions for resolving the different methods { GET, POST, PUT, DELETE, PATCH }
+   */
+  addMulti(url, functions) {
+    console.log('REST.addMulti', url);
+    let { GET, POST, PUT, DELETE, PATCH } = functions;
+
+    let noop = () => console.log('REST multi noop');
+
+    this.get(url, GET || noop);
+    this.post(url, POST || noop);
+    this.put(url, PUT || noop);
+    this.delete(url, DELETE || noop);
+    this.pathch(url, PATCH || noop);
+  }
+
   /**
    * @returns {(function|false)}
    */
