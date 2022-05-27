@@ -15,8 +15,10 @@ class EZServerApp {
     /** @type {Object<string, function>} */
     this.groupResFunctions = {};
 
+    this.REST = new rest_endpoints();
+
     this.httpServer = createServer((req, res) => {
-      (this.resolvers[req.url] || this.getResFromEndpoints(req) || this.throw404)(req, res);
+      (this.resolvers[req.url] || this.getResFromEndpoints(req) || this.REST.getRes(req) || this.throw404)(req, res);
     });
 
     this.httpServer.listen(port);
@@ -123,6 +125,84 @@ class endpoint {
   constructor(pth, fn) {
     this.pth = pth;
     this.fn = fn;
+  }
+}
+
+class rest_endpoints {
+  /** @type {endpoint[]} */
+  GET = [];
+  /** @type {endpoint[]} */
+  POST = [];
+  /** @type {endpoint[]} */
+  PUT = [];
+  /** @type {endpoint[]} */
+  DELETE = [];
+  /** @type {endpoint[]} */
+  PATCH = [];
+
+  /**
+   * @param {string} pth
+   * @param {function} fn
+   */
+  get(pth, fn) {
+    this.GET.push(new endpoint(pth, fn));
+  }
+
+  /**
+   * @param {string} pth
+   * @param {function} fn
+   */
+  post(pth, fn) {
+    this.POST.push(new endpoint(pth, fn));
+  }
+
+  /**
+   * @param {string} pth
+   * @param {function} fn
+   */
+  put(pth, fn) {
+    this.PUT.push(new endpoint(pth, fn));
+  }
+
+  /**
+   * @param {string} pth
+   * @param {function} fn
+   */
+  delete(pth, fn) {
+    this.DELETE.push(new endpoint(pth, fn));
+  }
+
+  /**
+   * @param {string} pth
+   * @param {function} fn
+   */
+  patch(pth, fn) {
+    this.PATCH.push(new endpoint(pth, fn));
+  }
+
+  /**
+   * @returns {(function|false)}
+   */
+  getRes(req) {
+    switch (req.method) {
+      case 'GET':
+        for (ep in this.GET) if (req.url.startsWith(ep.pth)) return ep.fn;
+        break;
+      case 'POST':
+        for (ep in this.POST) if (req.url.startsWith(ep.pth)) return ep.fn;
+        break;
+      case 'PUT':
+        for (ep in this.PUT) if (req.url.startsWith(ep.pth)) return ep.fn;
+        break;
+      case 'DELETE':
+        for (ep in this.DELETE) if (req.url.startsWith(ep.pth)) return ep.fn;
+        break;
+      case 'PATCH':
+        for (ep in this.PATCH) if (req.url.startsWith(ep.pth)) return ep.fn;
+        break;
+      default:
+        return false;
+    }
   }
 }
 
