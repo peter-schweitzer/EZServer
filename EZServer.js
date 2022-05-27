@@ -1,5 +1,3 @@
-const mimeTypes = require('./mimeTypes.json');
-
 const { createServer } = require('http');
 const { readFile } = require('fs');
 
@@ -75,15 +73,9 @@ class EZServerApp {
   }
 }
 
-function buildRes(res, data, { code, mime }) {
-  res.writeHead(code, { 'Content-Type': mime });
-  res.write(data);
-  res.end();
-}
-
 /**
  * @param {string} filePath path of file
- * @param {ServerResponse} res Response from Server
+ * @param {ServerResponse} res Response the from Server
  */
 function serveFromFS(filePath, res) {
   console.log('reading file from FS:', filePath);
@@ -102,6 +94,21 @@ function serveFromFS(filePath, res) {
   });
 }
 
+module.exports = { App: EZServerApp, serveFromFS };
+
+const mimeTypes = require('./mimeTypes.json');
+
+/**
+ * @param {ServerResponse} res Respnose from the server
+ * @param {any} data data of the response
+ * @param {number} code http status code
+ */
+function buildRes(res, data, { code, mime }) {
+  res.writeHead(code, { 'Content-Type': mime });
+  res.write(data);
+  res.end();
+}
+
 /**
  * @param {string} filePath Path of file
  * @returns {string} mimeType fo the file
@@ -109,8 +116,6 @@ function serveFromFS(filePath, res) {
 function getType(filePath) {
   return mimeTypes[filePath.split('.').pop()] || console.warn('mime-type not found') || 'text/plain';
 }
-
-module.exports = { App: EZServerApp, serveFromFS };
 
 class endpoint {
   /**@type {string} */
