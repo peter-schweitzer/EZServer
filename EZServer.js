@@ -150,6 +150,7 @@ class rest_endpoints {
    * @param {function} fn
    */
   get(url, fn) {
+    console.log('addet REST.get()', url);
     this.GET.push(new endpoint(url, fn));
   }
 
@@ -158,6 +159,7 @@ class rest_endpoints {
    * @param {function} fn
    */
   post(url, fn) {
+    console.log('addet REST.post()', url);
     this.POST.push(new endpoint(url, fn));
   }
 
@@ -166,6 +168,7 @@ class rest_endpoints {
    * @param {function} fn
    */
   put(url, fn) {
+    console.log('addet REST.put()', url);
     this.PUT.push(new endpoint(url, fn));
   }
 
@@ -174,6 +177,7 @@ class rest_endpoints {
    * @param {function} fn
    */
   delete(url, fn) {
+    console.log('addet REST.delete()', url);
     this.DELETE.push(new endpoint(url, fn));
   }
 
@@ -182,6 +186,7 @@ class rest_endpoints {
    * @param {function} fn
    */
   patch(url, fn) {
+    console.log('addet REST.patch()', url);
     this.PATCH.push(new endpoint(url, fn));
   }
 
