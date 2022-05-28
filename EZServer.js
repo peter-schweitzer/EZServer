@@ -60,10 +60,6 @@ function serveFromFS(filePath, res) {
   });
 }
 
-export { EZServerApp as App, serveFromFS };
-
-import * as mimeTypes from './mimeTypes.json' assert { type: 'json' };
-
 /**
  * @param {ServerResponse} res Respnose from the server
  * @param {any} data data of the response
@@ -75,6 +71,8 @@ function buildRes(res, data, { code, mime }) {
   res.end();
 }
 
+import * as mimeTypes from './mimeTypes.json' assert { type: 'json' };
+
 /**
  * @param {string} filePath Path of file
  * @returns {string} mimeType fo the file
@@ -82,4 +80,6 @@ function buildRes(res, data, { code, mime }) {
 function getType(filePath) {
   return mimeTypes[filePath.split('.').pop()] || console.warn('mime-type not found') || 'text/plain';
 }
+
+export { EZServerApp as App, serveFromFS, buildRes, getType };
 

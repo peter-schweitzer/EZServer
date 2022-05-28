@@ -14,6 +14,6 @@ export function getRes(req, resolvers) {
   return false;
 }
 
-export { Endpoints as Endpoints } from './Endpoints.js';
-export { REST as REST } from './REST.js';
+export { Endpoints } from './Endpoints.js';
+export { REST } from './REST.js';
 
