@@ -10,8 +10,6 @@ class EZServerApp {
   constructor(port) {
     /** @type {Object<string, function>} */
     this.resolvers = {};
-    /** @type {Object<string, function>} */
-    this.groupResFunctions = {};
 
     this.endpoints = new Endpoints();
     this.rest = new REST();
