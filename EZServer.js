@@ -3,6 +3,9 @@ import { readFile } from 'fs';
 
 import { Endpoints, REST } from './endpoints/index.js';
 
+const LOG = console.log;
+const WARN = console.warn;
+
 class EZServerApp {
   /**
    * @param {string} port port the server is hosted on
@@ -34,7 +37,7 @@ class EZServerApp {
    * @param {ServerResponse} res Respnose from the server
    */
   throw404(req, res) {
-    console.log('404 on', req.url);
+    LOG('404 on', req.url);
     serveFromFS('./html/404.html', res);
   }
 }
@@ -44,7 +47,7 @@ class EZServerApp {
  * @param {ServerResponse} res Response the from Server
  */
 function serveFromFS(filePath, res) {
-  console.log('reading file from FS:', filePath);
+  LOG('reading file from FS:', filePath);
   readFile(filePath, (err, data) => {
     let header;
 
@@ -78,7 +81,7 @@ import * as mimeTypes from './mimeTypes.json' assert { type: 'json' };
  * @returns {string} mimeType fo the file
  */
 function getType(filePath) {
-  return mimeTypes[filePath.split('.').pop()] || console.warn('mime-type not found') || 'text/plain';
+  return mimeTypes[filePath.split('.').pop()] || WARN('mime-type not found') || 'text/plain';
 }
 
 export { EZServerApp as App, serveFromFS, buildRes, getType };
