@@ -10,8 +10,11 @@
 export function getRes(req, resolvers) {
   /** @type {string[]} */
   let ss = req.url.split('/');
-  while (ss.length > 0) if (!!resolvers[ss.join('/')]) return resolvers[ss.join('/')];
-  return false;
+  let res = false;
+  while (ss.length > 0)
+    if (!!(res = resolvers[ss.join('/')])) break;
+    else ss.pop();
+  return res;
 }
 
 export { Endpoints } from './Endpoints.js';
