@@ -37,19 +37,19 @@ app.rest.patch('/api/patch', (req, res) => {
 });
 
 let _get = (req, res) => {
-  console.log('rest.multi get -> req.body:', !!req.body || false);
+  console.log('rest.multi get -> req.headers:', !!req.headers || false);
 };
 let _post = (req, res) => {
-  console.log('rest.multi post -> req.body:', !!req.body || false);
+  console.log('rest.multi post -> req.headers:', !!req.headers || false);
 };
 let _put = (req, res) => {
-  console.log('rest.multi put -> req.body:', !!req.body || false);
+  console.log('rest.multi put -> req.headers:', !!req.headers || false);
 };
 let _delete = (req, res) => {
-  console.log('rest.multi delete -> req.body:', !!req.body || false);
+  console.log('rest.multi delete -> req.headers:', !!req.headers || false);
 };
 let _patch = (req, res) => {
-  console.log('rest.multi patch -> req.body:', !!req.body || false);
+  console.log('rest.multi patch -> req.headers:', !!req.headers || false);
 };
 
 app.rest.addMulti('/api/multi', { PUT: _put, POST: _post, PATHCH: _patch, GET: _get, DELETE: _delete });
