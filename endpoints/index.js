@@ -1,11 +1,19 @@
+import { IncomingMessage, ServerResponse } from 'http';
+
 /**
- * @typedef {Object.<string, function>} resolvers
+ * @callback resfunction
+ * @param {IncomingMessage} req
+ * @param {ServerResponse} res
+ */
+
+/**
+ * @typedef {Object.<string, resfunction>} resolvers
  */
 
 /**
  * @param {IncomingMessage} req request from the client
  * @param {resolvers} resolvers the array of endpoints to traverse
- * @returns {(function|false)} resFunction function to resolve request
+ * @returns {(resfunction|false)} resFunction function to resolve request
  */
 export function getRes(req, resolvers) {
   /** @type {string[]} */

@@ -11,14 +11,14 @@ class EZServerApp {
    * @param {string} port port the server is hosted on
    */
   constructor(port) {
-    /** @type {Object<string, function>} */
+    /** @type {Object<string, resfunction>} */
     this.resolvers = {};
 
     this.endpoints = new Endpoints();
     this.rest = new REST();
 
     this.httpServer = createServer((req, res) => {
-      (this.resolvers[req.url] || this.endpoints.getRes(req) || this.rest.getRes(req) || this.throw404)(req, res);
+      (this.resolvers[req.url] || this.rest.getRes(req) || this.endpoints.getRes(req) || this.throw404)(req, res);
     });
 
     this.httpServer.listen(port);
@@ -26,7 +26,7 @@ class EZServerApp {
 
   /**
    * @param {string} reqPath path of requested URL
-   * @param {function} resFunction function to resolve the request
+   * @param {resfunction} resFunction function to resolve the request
    */
   addResolver(reqPath, resFunction) {
     this.resolvers[reqPath] = resFunction;
@@ -85,4 +85,10 @@ function getType(filePath) {
 }
 
 export { EZServerApp as App, serveFromFS, buildRes, getType };
+
+/**
+ * @callback resfunction
+ * @param {IncomingMessage} req
+ * @param {ServerResponse} res
+ */
 

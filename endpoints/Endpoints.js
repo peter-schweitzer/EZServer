@@ -1,5 +1,13 @@
 import { getRes } from './index.js';
 
+import { IncomingMessage, ServerResponse } from 'http';
+
+/**
+ * @callback resfunction
+ * @param {IncomingMessage} req
+ * @param {ServerResponse} res
+ */
+
 class Endpoints {
   /** @type {import('./index').resolvers} */
   endpoints = {};
@@ -10,7 +18,7 @@ class Endpoints {
 
   /**
    * @param {string} url pattern of requested URL
-   * @param {function} fn function to resolve the request
+   * @param {resfunction} fn function to resolve the request
    */
   add(url, fn) {
     console.log('addet endpoint', url);
@@ -19,7 +27,7 @@ class Endpoints {
 
   /**
    * @param {string} groupName name of the new group
-   * @param {function} fn function to resolve the requests
+   * @param {resfunction} fn function to resolve the requests
    */
   createGroup(groupName, fn) {
     console.log('created group', groupName);
@@ -37,7 +45,8 @@ class Endpoints {
   }
 
   /**
-   * @returns {(function|false)}
+   * @param {IncomingMessage} req
+   * @returns {(resfunction|false)}
    */
   getRes(req) {
     return getRes(req, this.endpoints);

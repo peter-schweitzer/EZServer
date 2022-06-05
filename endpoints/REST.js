@@ -1,4 +1,12 @@
+import { IncomingMessage, ServerResponse } from 'http';
+
 import { getRes } from './index.js';
+
+/**
+ * @callback resfunction
+ * @param {IncomingMessage} req
+ * @param {ServerResponse} res
+ */
 
 class REST {
   /** @type {import('./index').resolvers} */
@@ -14,7 +22,7 @@ class REST {
 
   /**
    * @param {string} url URL of the endpoint
-   * @param {function} fn
+   * @param {resfunction} fn
    */
   get(url, fn) {
     console.log('addet REST.get()', url);
@@ -23,7 +31,7 @@ class REST {
 
   /**
    * @param {string} url URL of the endpoint
-   * @param {function} fn
+   * @param {resfunction} fn
    */
   post(url, fn) {
     console.log('addet REST.post()', url);
@@ -32,7 +40,7 @@ class REST {
 
   /**
    * @param {string} url URL of the endpoint
-   * @param {function} fn
+   * @param {resfunction} fn
    */
   put(url, fn) {
     console.log('addet REST.put()', url);
@@ -41,7 +49,7 @@ class REST {
 
   /**
    * @param {string} url URL of the endpoint
-   * @param {function} fn
+   * @param {resfunction} fn
    */
   delete(url, fn) {
     console.log('addet REST.delete()', url);
@@ -50,7 +58,7 @@ class REST {
 
   /**
    * @param {string} url URL of the endpoint
-   * @param {function} fn
+   * @param {resfunction} fn
    */
   patch(url, fn) {
     console.log('addet REST.patch()', url);
@@ -59,7 +67,7 @@ class REST {
 
   /**
    * @param {string} url URL of the endpoint
-   * @param {Object<string, function>} functions functions for resolving the different methods { GET, POST, PUT, DELETE, PATCH }
+   * @param {Object<string, resfunction>} functions functions for resolving the different methods { GET, POST, PUT, DELETE, PATCH }
    */
   addMulti(url, functions) {
     console.log('REST.addMulti', url);
@@ -75,7 +83,7 @@ class REST {
   }
 
   /**
-   * @returns {(function|false)}
+   * @returns {(resfunction|false)}
    */
   getRes(req) {
     switch (req.method) {
