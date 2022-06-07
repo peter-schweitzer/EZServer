@@ -1,6 +1,6 @@
 # EZServer
 
-simple ultra light weight node template with 0 dependencies to bootstrap simple file hosting
+simple, ultra light weight node.js template with 0 dependencies to bootstrap simple file hosting and RESTfull API development
 
 ## Resolving reqests
 
