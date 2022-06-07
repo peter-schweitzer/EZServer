@@ -83,34 +83,33 @@ class REST {
 
 /**
  * @param {IncomingMessage} req
- * @param {ServerResponse} res
- * @return {Object<string, any> || false}
+ * @return {{json: Object<string, any>, http_code: number}}
  */
-function getBodyJSON(req, res) {
+function getBodyJSON(req) {
   return new Promise((resolve) => {
     let buff = '';
+
     req.on('data', (chunk) => {
       buff += chunk;
     });
 
     req.on('end', () => {
-      let data = false;
-      let http_code = 500; // internal server error as fallback; should always be overwritten
+      let json = { value: null };
+      let resCode = 500; // internal server error as fallback; should always be overwritten
 
       try {
-        data = JSON.parse(buff);
-        http_code = req.method === 'PUT' ? 201 : 200;
+        json = JSON.parse(buff);
+        resCode = req.method === 'PUT' ? 201 : 200;
       } catch (e) {
         console.warn('error while parsing request body; sending code 400');
         console.error(e);
-        http_code = 400;
+        resCode = 400;
       }
 
-      res.writeHead(http_code);
-      res.end();
-      resolve(data);
+      resolve({ json: json, http_code: resCode });
     });
   });
 }
 
 export { REST, getBodyJSON };
+
