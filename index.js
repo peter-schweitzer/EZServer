@@ -36,6 +36,7 @@ app.rest.patch('/api/patch', (req, res) => {
   console.log('rest.patch -> req.body:', !!req.body || false);
 });
 
+/** @type {import('./endpoints/index.js').resfunction} */
 let _get = (req, res) => {
   console.log('rest.multi get -> req.headers:', !!req.headers || false);
 };

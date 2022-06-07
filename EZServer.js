@@ -3,6 +3,8 @@ import { readFile } from 'fs';
 
 import { Endpoints, REST } from './endpoints/index.js';
 
+/** @typedef {import('./endpoints/index.js').resfunction} resfunction */
+
 const LOG = console.log;
 const WARN = console.warn;
 
@@ -85,10 +87,3 @@ function getType(filePath) {
 }
 
 export { EZServerApp as App, serveFromFS, buildRes, getType };
-
-/**
- * @callback resfunction
- * @param {IncomingMessage} req
- * @param {ServerResponse} res
- */
-

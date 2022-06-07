@@ -2,11 +2,7 @@ import { IncomingMessage, ServerResponse } from 'http';
 
 import { getRes } from './index.js';
 
-/**
- * @callback resfunction
- * @param {IncomingMessage} req
- * @param {ServerResponse} res
- */
+/** @typedef {import('./index.js').resfunction} resfunction */
 
 class REST {
   /** @type {import('./index').resolvers} */

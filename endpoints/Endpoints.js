@@ -2,11 +2,7 @@ import { getRes } from './index.js';
 
 import { IncomingMessage, ServerResponse } from 'http';
 
-/**
- * @callback resfunction
- * @param {IncomingMessage} req
- * @param {ServerResponse} res
- */
+/** @typedef {import('./index.js').resfunction} resfunction */
 
 class Endpoints {
   /** @type {import('./index').resolvers} */
