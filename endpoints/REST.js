@@ -83,7 +83,7 @@ class REST {
 
 /**
  * @param {IncomingMessage} req
- * @return {{json: Object<string, any>, http_code: number}}
+ * @return {Promise<{json: Object<string, any>, http_code: number}>}
  */
 function getBodyJSON(req) {
   return new Promise((resolve) => {
