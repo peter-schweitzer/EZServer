@@ -2,8 +2,6 @@ const { IncomingMessage } = require('http');
 
 const { getRes } = require('./getRes');
 
-/** @typedef {import('./index.js').resfunction} resfunction */
-
 class REST {
   /** @type {import('./index').resolvers} */
   GET = {};
@@ -18,7 +16,7 @@ class REST {
 
   /**
    * @param {string} url URL of the endpoint
-   * @param {resfunction} fn
+   * @param {resFunction} fn
    */
   get(url, fn) {
     console.log('addet REST.get()', url);
@@ -27,7 +25,7 @@ class REST {
 
   /**
    * @param {string} url URL of the endpoint
-   * @param {resfunction} fn
+   * @param {resFunction} fn
    */
   post(url, fn) {
     console.log('addet REST.post()', url);
@@ -36,7 +34,7 @@ class REST {
 
   /**
    * @param {string} url URL of the endpoint
-   * @param {resfunction} fn
+   * @param {resFunction} fn
    */
   put(url, fn) {
     console.log('addet REST.put()', url);
@@ -45,7 +43,7 @@ class REST {
 
   /**
    * @param {string} url URL of the endpoint
-   * @param {resfunction} fn
+   * @param {resFunction} fn
    */
   delete(url, fn) {
     console.log('addet REST.delete()', url);
@@ -54,7 +52,7 @@ class REST {
 
   /**
    * @param {string} url URL of the endpoint
-   * @param {resfunction} fn
+   * @param {resFunction} fn
    */
   patch(url, fn) {
     console.log('addet REST.patch()', url);
@@ -62,7 +60,7 @@ class REST {
   }
 
   /**
-   * @returns {(resfunction|false)}
+   * @returns {(resFunction|false)}
    */
   getRes(req) {
     switch (req.method) {
@@ -110,6 +108,8 @@ function getBodyJSON(req) {
     });
   });
 }
+
+/** @typedef {import('./index.js').resFunction} resFunction */
 
 module.exports = { REST, getBodyJSON };
 

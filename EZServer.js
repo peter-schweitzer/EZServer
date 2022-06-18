@@ -3,8 +3,6 @@ const { readFile } = require('fs');
 
 const { Endpoints, REST } = require('./endpoints/index.js');
 
-/** @typedef {import('./endpoints/index.js').resfunction} resfunction */
-
 const LOG = console.log;
 const WARN = console.warn;
 
@@ -28,7 +26,7 @@ class EZServerApp {
 
   /**
    * @param {string} reqPath path of requested URL
-   * @param {resfunction} resFunction function to resolve the request
+   * @param {resFunction} resFunction function to resolve the request
    */
   addResolver(reqPath, resFunction) {
     this.resolvers[reqPath] = resFunction;
@@ -79,3 +77,6 @@ function getType(filePath) {
 }
 
 module.exports = { App: EZServerApp, serveFromFS, buildRes, getType };
+
+/** @typedef {import('./endpoints/index.js').resFunction} resFunction */
+

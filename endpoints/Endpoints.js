@@ -2,8 +2,6 @@ const { IncomingMessage } = require('http');
 
 const { getRes } = require('./getRes');
 
-/** @typedef {import('./index.js').resfunction} resfunction */
-
 class Endpoints {
   /** @type {import('./index').resolvers} */
   endpoints = {};
@@ -14,7 +12,7 @@ class Endpoints {
 
   /**
    * @param {string} url pattern of requested URL
-   * @param {resfunction} fn function to resolve the request
+   * @param {resFunction} fn function to resolve the request
    */
   add(url, fn) {
     console.log('addet endpoint', url);
@@ -23,7 +21,7 @@ class Endpoints {
 
   /**
    * @param {string} groupName name of the new group
-   * @param {resfunction} fn function to resolve the requests
+   * @param {resFunction} fn function to resolve the requests
    */
   createGroup(groupName, fn) {
     console.log('created group', groupName);
@@ -42,12 +40,14 @@ class Endpoints {
 
   /**
    * @param {IncomingMessage} req
-   * @returns {(resfunction|false)}
+   * @returns {(resFunction|false)}
    */
   getRes(req) {
     return getRes(req, this.endpoints);
   }
 }
+
+/** @typedef {import('./index.js').resFunction} resFunction */
 
 module.exports = { Endpoints };
 
