@@ -39,28 +39,20 @@ class EZServerApp {
    * @param {ServerResponse} res Respnose from the server
    */
   throw404(req, res) {
-    LOG('404 on', req.url);
-    serveFromFS('./html/404.html', res);
+    WARN('404 on', req.url);
+    serveFromFS('./html/404.html', res, 404);
   }
 }
 
 /**
  * @param {string} filePath path of file
  * @param {ServerResponse} res Response the from Server
+ * @param {number} statusCode a custom status code to over-write the standard 200
  */
-function serveFromFS(filePath, res) {
+function serveFromFS(filePath, res, statusCode = 200) {
   LOG('reading file from FS:', filePath);
   readFile(filePath, (err, data) => {
-    let header;
-
-    if (err) {
-      header = { code: 500, mime: 'text/plain' };
-    } else if (filePath === './html/404.html') {
-      header = { code: 404, mime: 'text/html' };
-    } else {
-      header = { code: 200, mime: getType(filePath) };
-    }
-
+    const header = !err ? { code: statusCode, mime: getType(filePath) } : { code: 500, mime: 'text/plain' };
     buildRes(res, data || `error while loading file from fs:\n${err}`, header);
   });
 }
