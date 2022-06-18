@@ -36,22 +36,3 @@ app.rest.patch('/api/patch', (req, res) => {
   console.log('rest.patch -> req.body:', !!req.body || false);
 });
 
-/** @type {import('./endpoints/index.js').resfunction} */
-let _get = (req, res) => {
-  console.log('rest.multi get -> req.headers:', !!req.headers || false);
-};
-let _post = (req, res) => {
-  console.log('rest.multi post -> req.headers:', !!req.headers || false);
-};
-let _put = (req, res) => {
-  console.log('rest.multi put -> req.headers:', !!req.headers || false);
-};
-let _delete = (req, res) => {
-  console.log('rest.multi delete -> req.headers:', !!req.headers || false);
-};
-let _patch = (req, res) => {
-  console.log('rest.multi patch -> req.headers:', !!req.headers || false);
-};
-
-app.rest.addMulti('/api/multi', { PUT: _put, POST: _post, PATHCH: _patch, GET: _get, DELETE: _delete });
-
