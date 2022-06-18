@@ -15,48 +15,48 @@ class REST {
   PATCH = {};
 
   /**
-   * @param {string} url URL of the endpoint
+   * @param {string} route URL of the endpoint
    * @param {resFunction} fn
    */
-  get(url, fn) {
-    console.log('addet REST.get()', url);
-    this.GET[url] = fn;
+  get(route, fn) {
+    console.log('addet REST.get()', route);
+    this.GET[route] = fn;
   }
 
   /**
-   * @param {string} url URL of the endpoint
+   * @param {string} route URL of the endpoint
    * @param {resFunction} fn
    */
-  post(url, fn) {
-    console.log('addet REST.post()', url);
-    this.POST[url] = fn;
+  post(route, fn) {
+    console.log('addet REST.post()', route);
+    this.POST[route] = fn;
   }
 
   /**
-   * @param {string} url URL of the endpoint
+   * @param {string} route URL of the endpoint
    * @param {resFunction} fn
    */
-  put(url, fn) {
-    console.log('addet REST.put()', url);
-    this.PUT[url] = fn;
+  put(route, fn) {
+    console.log('addet REST.put()', route);
+    this.PUT[route] = fn;
   }
 
   /**
-   * @param {string} url URL of the endpoint
+   * @param {string} route URL of the endpoint
    * @param {resFunction} fn
    */
-  delete(url, fn) {
-    console.log('addet REST.delete()', url);
-    this.DELETE[url] = fn;
+  delete(route, fn) {
+    console.log('addet REST.delete()', route);
+    this.DELETE[route] = fn;
   }
 
   /**
-   * @param {string} url URL of the endpoint
+   * @param {string} route URL of the endpoint
    * @param {resFunction} fn
    */
-  patch(url, fn) {
-    console.log('addet REST.patch()', url);
-    this.PATCH[url] = fn;
+  patch(route, fn) {
+    console.log('addet REST.patch()', route);
+    this.PATCH[route] = fn;
   }
 
   /**

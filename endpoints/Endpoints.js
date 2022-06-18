@@ -14,9 +14,9 @@ class Endpoints {
    * @param {string} url pattern of requested URL
    * @param {resFunction} fn function to resolve the request
    */
-  add(url, fn) {
-    console.log('addet endpoint', url);
-    this.endpoints[url] = fn;
+  add(route, fn) {
+    console.log('addet endpoint', route);
+    this.endpoints[route] = fn;
   }
 
   /**
