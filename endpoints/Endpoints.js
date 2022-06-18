@@ -1,6 +1,6 @@
-import { getRes } from './index.js';
+const { IncomingMessage } = require('http');
 
-import { IncomingMessage, ServerResponse } from 'http';
+const { getRes } = require('./getRes');
 
 /** @typedef {import('./index.js').resfunction} resfunction */
 
@@ -49,5 +49,5 @@ class Endpoints {
   }
 }
 
-export { Endpoints };
+module.exports = { Endpoints };
 

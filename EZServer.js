@@ -1,7 +1,7 @@
-import { createServer } from 'http';
-import { readFile } from 'fs';
+const { createServer } = require('http');
+const { readFile } = require('fs');
 
-import { Endpoints, REST } from './endpoints/index.js';
+const { Endpoints, REST } = require('./endpoints/index.js');
 
 /** @typedef {import('./endpoints/index.js').resfunction} resfunction */
 
@@ -13,7 +13,7 @@ class EZServerApp {
    * @param {string} port port the server is hosted on
    */
   constructor(port) {
-    /** @type {Object<string, resfunction>} */
+    /** @type {Object<string, resFunction>} */
     this.resolvers = {};
 
     this.endpoints = new Endpoints();
@@ -76,7 +76,7 @@ function buildRes(res, data, { code, mime }) {
   res.end();
 }
 
-import * as mimeTypes from './mimeTypes.json' assert { type: 'json' };
+const mimeTypes = require('./mimeTypes.json');
 
 /**
  * @param {string} filePath Path of file
@@ -86,4 +86,4 @@ function getType(filePath) {
   return mimeTypes[filePath.split('.').pop()] || WARN('mime-type not found') || 'text/plain';
 }
 
-export { EZServerApp as App, serveFromFS, buildRes, getType };
+module.exports = { App: EZServerApp, serveFromFS, buildRes, getType };

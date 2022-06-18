@@ -1,4 +1,4 @@
-import { App, serveFromFS } from './EZServer.js';
+const { App, serveFromFS } = require('./EZServer.js');
 
 const app = new App('8080');
 

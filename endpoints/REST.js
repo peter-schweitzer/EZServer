@@ -1,6 +1,6 @@
-import { IncomingMessage, ServerResponse } from 'http';
+const { IncomingMessage } = require('http');
 
-import { getRes } from './index.js';
+const { getRes } = require('./getRes');
 
 /** @typedef {import('./index.js').resfunction} resfunction */
 
@@ -111,5 +111,5 @@ function getBodyJSON(req) {
   });
 }
 
-export { REST, getBodyJSON };
+module.exports = { REST, getBodyJSON };
 
