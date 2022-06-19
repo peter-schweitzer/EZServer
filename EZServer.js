@@ -45,7 +45,7 @@ class EZServerApp {
 /**
  * @param {string} filePath path of file
  * @param {ServerResponse} res Response the from Server
- * @param {number} statusCode a custom status code to over-write the standard 200
+ * @param {number} statusCode status code of the response (default 200)
  */
 function serveFromFS(filePath, res, statusCode = 200) {
   LOG('reading file from FS:', filePath);
@@ -58,7 +58,9 @@ function serveFromFS(filePath, res, statusCode = 200) {
 /**
  * @param {ServerResponse} res Respnose from the server
  * @param {any} data data of the response
- * @param {number} code http status code
+ * @param {object} options options
+ * @param {number} options.code status code of the response
+ * @param {string} options.mime mime type of the response
  */
 function buildRes(res, data, { code, mime }) {
   res.writeHead(code, { 'Content-Type': mime });
