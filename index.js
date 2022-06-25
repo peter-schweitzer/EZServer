@@ -1,7 +1,7 @@
 const { createServer } = require('http');
 const { readFile } = require('fs');
 
-const { Endpoints, REST } = require('./endpoints/index.js');
+const { Endpoints, REST } = require('./src/endpoints/');
 
 const LOG = console.log;
 const WARN = console.warn;
@@ -68,7 +68,7 @@ function buildRes(res, data, { code, mime }) {
   res.end();
 }
 
-const mimeTypes = require('./mimeTypes.json');
+const mimeTypes = require('./src/mimeTypes.json');
 
 /**
  * @param {string} filePath Path of file
