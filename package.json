@@ -6,9 +6,9 @@
   "scripts": {
     "start": "node index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Peter Schweitzer",
+  "homepage": "https://github.com/peter-sxhweitzer/EZServer",
+  "license": "CC-BY-NC-SA-4.0",
   "dependencies": {}
 }
 
