@@ -78,7 +78,7 @@ function getType(filePath) {
   return mimeTypes[filePath.split('.').pop()] || WARN('mime-type not found') || 'text/plain';
 }
 
-module.exports = { App: EZServerApp, serveFromFS, buildRes, getType };
+module.exports = { App: EZServerApp, serveFromFS, buildRes, getType, getBodyJSON: require('./src/endpoints/REST').getBodyJSON };
 
 /** @typedef {import('./endpoints/index.js').resFunction} resFunction */
 

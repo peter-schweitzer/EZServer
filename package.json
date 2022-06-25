@@ -1,6 +1,6 @@
 {
   "name": "@peter-schweitzer/ezserver",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "npm module for fast backend/REST-API development with no (exactly 0!) dependencies, inspired by the express framework",
   "scripts": {
     "example": "node $npm_package_directories_example"
