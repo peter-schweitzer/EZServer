@@ -1,14 +1,33 @@
 {
-  "name": "ezserver",
+  "name": "@peter-schweitzer/ezserver",
   "version": "1.0.0",
-  "description": "EZServer Template",
-  "main": "index.js",
+  "description": "npm module for fast backend/REST-API development with no (exactly 0!) dependencies, inspired by the express framework",
+  "main": "src/index.js",
   "scripts": {
-    "start": "node index.js"
+    "example": "node $npm_package_directories_example"
   },
+  "keywords": [
+    "simle",
+    "http",
+    "server",
+    "http-server",
+    "rest-api",
+    "server-side",
+    "backend",
+    "framework"
+  ],
   "author": "Peter Schweitzer",
   "homepage": "https://github.com/peter-sxhweitzer/EZServer",
   "license": "CC-BY-NC-SA-4.0",
-  "dependencies": {}
+  "directories": {
+    "example": "example"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/peter-schweitzer/EZServer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/peter-schweitzer/EZServer/issues"
+  }
 }
 
