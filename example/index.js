@@ -1,6 +1,6 @@
-const { App, serveFromFS } = require('./EZServer.js');
+const { App, serveFromFS } = require('../src/EZServer.js');
 
-/** @typedef {import('./endpoints/index.js').resFunction} resFunction */
+/** @typedef {import('../endpoints/index.js').resFunction} resFunction */
 
 const app = new App('8080');
 
