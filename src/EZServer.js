@@ -7,9 +7,7 @@ const LOG = console.log;
 const WARN = console.warn;
 
 class EZServerApp {
-  /**
-   * @param {string} port port the server is hosted on
-   */
+  /** @param {string} port port the server is hosted on */
   constructor(port) {
     /** @type {Object<string, resFunction>} */
     this.resolvers = {};
@@ -80,5 +78,9 @@ function getType(filePath) {
 
 module.exports = { App: EZServerApp, serveFromFS, buildRes, getType };
 
-/** @typedef {import('./endpoints/index.js').resFunction} resFunction */
+/**
+ * @typedef {import('./endpoints').resFunction} resFunction
+ * @typedef {import('http').IncomingMessage} IncomingMessage
+ * @typedef {import('http').ServerResponse} ServerResponse
+ */
 
