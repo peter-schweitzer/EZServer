@@ -12,7 +12,7 @@ const app = new App('8080');
 // - Resolvers have the highest specificity, so they over-write Endpoints
 
 app.addResolver('/', (req, res) => {
-  serveFromFS('./html/home.html', res);
+  serveFromFS(res, './html/home.html');
 });
 
 /**
@@ -24,7 +24,7 @@ app.addResolver('/', (req, res) => {
 /**
  * This resolves all routes matching the specified route || uses the most specific endpoint */
 app.endpoints.add('/img/', (req, res) => {
-  serveFromFS(`.${req.url}.png`, res);
+  serveFromFS(res, `.${req.url}.png`);
 });
 
 // This creates a group, identified by it's name, containing a [resolv-function]{@link resFunction}.

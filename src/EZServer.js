@@ -41,11 +41,11 @@ class EZServerApp {
 }
 
 /**
+ * @param {ServerResponse} res response the from Server
  * @param {string} filePath path of file
- * @param {ServerResponse} res Response the from Server
  * @param {number} statusCode status code of the response (default 200)
  */
-function serveFromFS(filePath, res, statusCode = 200) {
+function serveFromFS(res, filePath, statusCode = 200) {
   LOG('reading file from FS:', filePath);
   readFile(filePath, (err, data) => {
     const header = !err ? { code: statusCode, mime: getType(filePath) } : { code: 500, mime: 'text/plain' };
