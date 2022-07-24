@@ -6,7 +6,7 @@
     "example": "cd example && node ."
   },
   "keywords": [
-    "simle",
+    "simple",
     "http",
     "server",
     "http-server",

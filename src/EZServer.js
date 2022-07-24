@@ -31,8 +31,8 @@ class EZServerApp {
   }
 
   /**
-   * @param {IncomingMessage} req Request from the client
-   * @param {ServerResponse} res Respnose from the server
+   * @param {IncomingMessage} req request from the client
+   * @param {ServerResponse} res respnose from the server
    */
   throw404(req, res) {
     WARN('404 on', req.url);
@@ -54,7 +54,7 @@ function serveFromFS(res, filePath, statusCode = 200) {
 }
 
 /**
- * @param {ServerResponse} res Respnose from the server
+ * @param {ServerResponse} res respnose from the server
  * @param {any} data data of the response
  * @param {object} options options
  * @param {number} options.code status code of the response
@@ -69,7 +69,7 @@ function buildRes(res, data, { code, mime }) {
 const mimeTypes = require('./mimeTypes.json');
 
 /**
- * @param {string} filePath Path of file
+ * @param {string} filePath path of file
  * @returns {string} mimeType fo the file
  */
 function getType(filePath) {
