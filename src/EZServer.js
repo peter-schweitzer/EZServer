@@ -36,7 +36,7 @@ class EZServerApp {
    */
   throw404(req, res) {
     WARN('404 on', req.url);
-    serveFromFS('./html/404.html', res, 404);
+    serveFromFS(res, './html/404.html', 404);
   }
 }
 

@@ -19,6 +19,7 @@
   "woff": "font/woff",
   "woff2": "font/woff2",
 
+  "ico": "image/x-icon",
   "bmp": "image/bmp",
   "gif": "image/gif",
   "jpeg": "image/jpeg",
