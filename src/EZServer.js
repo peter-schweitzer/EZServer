@@ -7,16 +7,16 @@ const LOG = console.log;
 const WARN = console.warn;
 
 class EZServerApp {
+  /** @type {Object<string, import('./endpoints/index').resFunction>} */
+  resolvers = {};
+
+  endpoints = new Endpoints();
+  rest = new REST();
+
   /** @param {string} port port the server is hosted on */
   constructor(port) {
-    /** @type {Object<string, resFunction>} */
-    this.resolvers = {};
-
-    this.endpoints = new Endpoints();
-    this.rest = new REST();
-
     this.httpServer = createServer((req, res) => {
-      (this.resolvers[req.url] || this.rest.getRes(req) || this.endpoints.getRes(req) || this.throw404)(req, res);
+      (this.resolvers[req.url] || this.rest.getResFunction(req) || this.endpoints.getResFunction(req) || this.throw404)(req, res);
     });
 
     this.httpServer.listen(port);
@@ -24,15 +24,15 @@ class EZServerApp {
 
   /**
    * @param {string} reqPath path of requested URL
-   * @param {resFunction} resFunction function to resolve the request
+   * @param {import('./endpoints/index').resFunction} resFunction function to resolve the request
    */
   addResolver(reqPath, resFunction) {
     this.resolvers[reqPath] = resFunction;
   }
 
   /**
-   * @param {IncomingMessage} req request from the client
-   * @param {ServerResponse} res respnose from the server
+   * @param {import('http').IncomingMessage} req request from the client
+   * @param {import('http').ServerResponse} res response from the server
    */
   throw404(req, res) {
     WARN('404 on', req.url);
@@ -41,7 +41,7 @@ class EZServerApp {
 }
 
 /**
- * @param {ServerResponse} res response the from Server
+ * @param {import('http').ServerResponse} res response the from Server
  * @param {string} filePath path of file
  * @param {number} statusCode status code of the response (default 200)
  */
@@ -54,7 +54,7 @@ function serveFromFS(res, filePath, statusCode = 200) {
 }
 
 /**
- * @param {ServerResponse} res respnose from the server
+ * @param {import('http').ServerResponse} res respnose from the server
  * @param {any} data data of the response
  * @param {object} options options
  * @param {number} options.code status code of the response
@@ -77,10 +77,4 @@ function getType(filePath) {
 }
 
 module.exports = { App: EZServerApp, serveFromFS, buildRes, getType };
-
-/**
- * @typedef {import('./endpoints').resFunction} resFunction
- * @typedef {import('http').IncomingMessage} IncomingMessage
- * @typedef {import('http').ServerResponse} ServerResponse
- */
 

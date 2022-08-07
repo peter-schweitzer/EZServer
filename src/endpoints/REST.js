@@ -1,6 +1,6 @@
-const { IncomingMessage } = require('http');
+const { getResFunction } = require('./getResFunction');
 
-const { getRes } = require('./getRes');
+const LOG = console.log;
 
 class REST {
   /** @type {import('./index').resolvers} */
@@ -16,7 +16,7 @@ class REST {
 
   /**
    * @param {string} route URL of the endpoint
-   * @param {resFunction} fn
+   * @param {import('./index.js').resFunction} fn
    */
   get(route, fn) {
     console.log('addet REST.get()', route);
@@ -25,7 +25,7 @@ class REST {
 
   /**
    * @param {string} route URL of the endpoint
-   * @param {resFunction} fn
+   * @param {import('./index.js').resFunction} fn
    */
   post(route, fn) {
     console.log('addet REST.post()', route);
@@ -34,7 +34,7 @@ class REST {
 
   /**
    * @param {string} route URL of the endpoint
-   * @param {resFunction} fn
+   * @param {import('./index.js').resFunction} fn
    */
   put(route, fn) {
     console.log('addet REST.put()', route);
@@ -43,7 +43,7 @@ class REST {
 
   /**
    * @param {string} route URL of the endpoint
-   * @param {resFunction} fn
+   * @param {import('./index.js').resFunction} fn
    */
   delete(route, fn) {
     console.log('addet REST.delete()', route);
@@ -52,7 +52,7 @@ class REST {
 
   /**
    * @param {string} route URL of the endpoint
-   * @param {resFunction} fn
+   * @param {import('./index.js').resFunction} fn
    */
   patch(route, fn) {
     console.log('addet REST.patch()', route);
@@ -60,9 +60,10 @@ class REST {
   }
 
   /**
-   * @returns {(resFunction|false)}
+   * @param {import('http').IncomingMessage} req
+   * @returns {(import('./index.js').resFunction|false)}
    */
-  getRes(req) {
+  getResFunction(req) {
     switch (req.method) {
       case 'GET':
         return getRes(req, this.GET);
@@ -80,7 +81,7 @@ class REST {
 }
 
 /**
- * @param {IncomingMessage} req
+ * @param {import('http').IncomingMessage} req
  * @return {Promise<{json: Object<string, any>, http_code: number}>}
  */
 function getBodyJSON(req) {
@@ -108,8 +109,6 @@ function getBodyJSON(req) {
     });
   });
 }
-
-/** @typedef {import('./index.js').resFunction} resFunction */
 
 module.exports = { REST, getBodyJSON };
 
