@@ -64,19 +64,9 @@ class REST {
    * @returns {(import('./index.js').resFunction|false)}
    */
   getResFunction(req) {
-    switch (req.method) {
-      case 'GET':
-        return getRes(req, this.GET);
-      case 'POST':
-        return getRes(req, this.POST);
-      case 'PUT':
-        return getRes(req, this.PUT);
-      case 'DELETE':
-        return getRes(req, this.DELETE);
-      case 'PATCH':
-        return getRes(req, this.PATCH);
-    }
-    return false;
+    if (!req.method) return LOG('request mathod is undefined');
+    if (!'GET POST PUT DELETE PATCH'.includes(method)) return LOG('invalid request method') || false;
+    return getResFunction(req, this[req.method]);
   }
 }
 
