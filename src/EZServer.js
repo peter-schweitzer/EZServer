@@ -7,7 +7,7 @@ const LOG = console.log;
 const WARN = console.warn;
 
 class EZServerApp {
-  /** @type {Object<string, import('./endpoints/index').resFunction>} */
+  /** @type {import('./endpoints/index').resolvers} */
   resolvers = {};
 
   endpoints = new Endpoints();
