@@ -1,7 +1,7 @@
 const { createServer } = require('http');
 const { readFile } = require('fs');
 
-const { Endpoints, REST } = require('./endpoints/index.js');
+const { REST, Endpoints } = require('./endpoints/index.js');
 
 const LOG = console.log;
 const WARN = console.warn;
@@ -33,6 +33,7 @@ class EZServerApp {
   /**
    * @param {import('http').IncomingMessage} req request from the client
    * @param {import('http').ServerResponse} res response from the server
+   * @returns {void}
    */
   throw404(req, res) {
     WARN('404 on', req.url);
@@ -44,6 +45,7 @@ class EZServerApp {
  * @param {import('http').ServerResponse} res response the from Server
  * @param {string} filePath path of file
  * @param {number} statusCode status code of the response (default 200)
+ * @returns {void}
  */
 function serveFromFS(res, filePath, statusCode = 200) {
   LOG('reading file from FS:', filePath);
@@ -59,6 +61,7 @@ function serveFromFS(res, filePath, statusCode = 200) {
  * @param {object} options options
  * @param {number} options.code status code of the response
  * @param {string} options.mime mime type of the response
+ * @returns {void}
  */
 function buildRes(res, data, { code, mime }) {
   res.writeHead(code, { 'Content-Type': mime });

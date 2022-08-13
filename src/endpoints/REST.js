@@ -17,6 +17,7 @@ class REST {
   /**
    * @param {string} route URL of the endpoint
    * @param {import('./index.js').resFunction} fn
+   * @returns {void}
    */
   get(route, fn) {
     console.log('addet REST.get()', route);
@@ -26,6 +27,7 @@ class REST {
   /**
    * @param {string} route URL of the endpoint
    * @param {import('./index.js').resFunction} fn
+   * @returns {void}
    */
   post(route, fn) {
     console.log('addet REST.post()', route);
@@ -35,6 +37,7 @@ class REST {
   /**
    * @param {string} route URL of the endpoint
    * @param {import('./index.js').resFunction} fn
+   * @returns {void}
    */
   put(route, fn) {
     console.log('addet REST.put()', route);
@@ -44,6 +47,7 @@ class REST {
   /**
    * @param {string} route URL of the endpoint
    * @param {import('./index.js').resFunction} fn
+   * @returns {void}
    */
   delete(route, fn) {
     console.log('addet REST.delete()', route);
@@ -53,6 +57,7 @@ class REST {
   /**
    * @param {string} route URL of the endpoint
    * @param {import('./index.js').resFunction} fn
+   * @returns {void}
    */
   patch(route, fn) {
     console.log('addet REST.patch()', route);
