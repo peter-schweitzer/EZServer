@@ -65,7 +65,7 @@ class REST {
    */
   getResFunction(req) {
     if (!req.method) return LOG('request mathod is undefined');
-    if (!'GET POST PUT DELETE PATCH'.includes(method)) return LOG('invalid request method') || false;
+    if (!['GET', 'POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) return LOG('invalid request method') || false;
     return getResFunction(req, this[req.method]);
   }
 }
