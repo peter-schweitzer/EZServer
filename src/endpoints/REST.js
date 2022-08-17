@@ -69,9 +69,8 @@ class REST {
    * @returns {(import('./index.js').resFunction|false)}
    */
   getResFunction(req) {
-    if (!req.method) return LOG('request mathod is undefined');
-    if (!['GET', 'POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) return LOG('invalid request method') || false;
-    return getResFunction(req, this[req.method]);
+    const methods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'];
+    return methods.includes(req.method || '0') ? getResFunction(req, this[req.method]) : LOG('invalid request method') || false;
   }
 }
 
