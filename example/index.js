@@ -9,7 +9,7 @@ const app = new App('8080');
 // - A Resolver resolves a single route.
 // - Resolvers have the highest specificity, so they can over-write Endpoints
 
-app.addResolver('/', (req, res) => {
+app.resolvers.add('/', (req, res) => {
   serveFromFS(res, './html/home.html');
 });
 

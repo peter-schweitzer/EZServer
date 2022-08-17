@@ -1,33 +1,23 @@
 const { createServer } = require('http');
 const { readFile } = require('fs');
 
-const { REST, Endpoints } = require('./endpoints/index.js');
+const { Resolvers, REST, Endpoints } = require('./endpoints/index.js');
 
 const LOG = console.log;
 const WARN = console.warn;
 
 class EZServerApp {
-  /** @type {import('./endpoints/index').resolvers} */
-  resolvers = {};
-
-  endpoints = new Endpoints();
+  resolvers = new Resolvers();
   rest = new REST();
+  endpoints = new Endpoints();
 
   /** @param {string} port port the server is hosted on */
   constructor(port) {
     this.httpServer = createServer((req, res) => {
-      (this.resolvers[req.url] || this.rest.getResFunction(req) || this.endpoints.getResFunction(req) || this.throw404)(req, res);
+      (this.resolvers.getResFunction(req) || this.rest.getResFunction(req) || this.endpoints.getResFunction(req) || this.throw404)(req, res);
     });
 
     this.httpServer.listen(port);
-  }
-
-  /**
-   * @param {string} reqPath path of requested URL
-   * @param {import('./endpoints/index').resFunction} resFunction function to resolve the request
-   */
-  addResolver(reqPath, resFunction) {
-    this.resolvers[reqPath] = resFunction;
   }
 
   /**

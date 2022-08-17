@@ -1,7 +1,8 @@
-const { Endpoints } = require('./Endpoints');
+const { Resolvers } = require('./Resolvers');
 const { REST } = require('./REST');
+const { Endpoints } = require('./Endpoints');
 
-module.exports = { REST, Endpoints };
+module.exports = { Resolvers, REST, Endpoints };
 
 /**
  * @callback resFunction
