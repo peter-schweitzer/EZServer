@@ -1,4 +1,4 @@
-const { getResFunction } = require('./getResFunction');
+const { getResFunction: _getResFunction } = require('./getResFunction');
 
 const LOG = console.log;
 
@@ -70,7 +70,7 @@ class REST {
    */
   getResFunction(req) {
     const methods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'];
-    return methods.includes(req.method || '0') ? getResFunction(req, this[req.method]) : LOG('invalid request method') || false;
+    return methods.includes(req.method || ' ') ? _getResFunction(req, this[req.method]) : LOG('invalid request method') || false;
   }
 }
 

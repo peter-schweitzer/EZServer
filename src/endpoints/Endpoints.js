@@ -1,4 +1,4 @@
-const { getResFunction } = require('./getResFunction');
+const { getResFunction: _getResFunction } = require('./getResFunction');
 
 class Endpoints {
   /** @type {import('./index').resolvers} */
@@ -44,7 +44,7 @@ class Endpoints {
    * @returns {(import('./index.js').resFunction|false)}
    */
   getResFunction(req) {
-    return getResFunction(req, this.endpoints);
+    return _getResFunction(req, this.endpoints);
   }
 }
 

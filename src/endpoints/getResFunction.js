@@ -5,11 +5,11 @@
  */
 function getResFunction(req, resolvers) {
   let ss = req.url.split('/');
-  let res;
   while (ss.length > 0)
-    if (!!(res = resolvers[ss.join('/')])) break;
+    if (!!resolvers['/' + ss.join('/')]) break;
     else ss.pop();
-  return res || false;
+
+  return resolvers['/' + ss.join('/')] || false;
 }
 
 module.exports = { getResFunction };
