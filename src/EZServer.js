@@ -14,6 +14,7 @@ class EZServerApp {
   /** @param {string} port port the server is hosted on */
   constructor(port) {
     this.httpServer = createServer((req, res) => {
+      req.url = decodeURIComponent(req.url);
       (this.resolvers.getResFunction(req) || this.rest.getResFunction(req) || this.endpoints.getResFunction(req) || this.throw404)(req, res);
     });
 
