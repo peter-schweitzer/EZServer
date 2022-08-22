@@ -1,4 +1,4 @@
-const { App, serveFromFS } = require('../src/EZServer.js');
+const { App, serveFromFS } = require('../index');
 
 const app = new App('8080');
 

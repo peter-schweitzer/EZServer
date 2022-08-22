@@ -1,3 +1,5 @@
+const LOG = console.log;
+
 class REST {
   /** @type {import('../RequestHandlers').resolvers} */
   GET = {};
@@ -71,3 +73,4 @@ class REST {
 }
 
 module.exports = REST;
+
