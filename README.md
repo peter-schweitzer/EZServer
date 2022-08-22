@@ -1,5 +1,7 @@
 # EZServer
 
+<span style="color: #ff2020">EZServer is still in development, and won't be `'stable'` / `'production-ready'` until release 2.x.y<span>
+
 simple, ultra light weight node.js module with 0 dependencies for simple backend/REST-API development
 
 > EZServer is developed on current node version (v18)
