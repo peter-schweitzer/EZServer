@@ -1,5 +1,5 @@
-const { App, serveFromFS, buildRes, getType } = require('./src/EZServer');
-const { getBodyJSON } = require('./src/endpoints/REST');
+const App = require('./src/App');
+const { buildRes, getType, serveFromFS, getBodyJSON } = require('./src/utils');
 
-module.exports = { App, serveFromFS, buildRes, getType, getBodyJSON };
+module.exports = { App, buildRes, getType, serveFromFS, getBodyJSON };
 

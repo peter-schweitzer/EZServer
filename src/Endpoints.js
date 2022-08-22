@@ -1,30 +1,30 @@
-const { getResFunction: _getResFunction } = require('./getResFunction');
+const { getResFunction: _getResFunction } = require('./utils');
+
+const LOG = console.log;
 
 class Endpoints {
-  /** @type {import('./index').resolvers} */
+  /** @type {import('./Endpoints').resolvers} */
   endpoints = {};
-  /**@type {import('./index').resolvers}*/
+  /**@type {import('./Endpoints').resolvers}*/
   groups = {};
-
-  constructor() {}
 
   /**
    * @param {string} url pattern of requested URL
-   * @param {import('./index.js').resFunction} fn function to resolve the request
+   * @param {import('./Endpoints.js').resFunction} fn function to resolve the request
    * @returns {void}
    */
   add(route, fn) {
-    console.log('addet endpoint', route);
+    LOG('addet endpoint', route);
     this.endpoints[route] = fn;
   }
 
   /**
    * @param {string} groupName name of the new group
-   * @param {import('./index.js').resFunction} fn function to resolve the requests
+   * @param {import('./Endpoints.js').resFunction} fn function to resolve the requests
    * @returns {void}
    */
   createGroup(groupName, fn) {
-    console.log('created group', groupName);
+    LOG('created group', groupName);
     this.groups[groupName] = fn;
   }
 
@@ -34,19 +34,19 @@ class Endpoints {
    * @returns {void}
    */
   addToGroup(url, groupName) {
-    console.log(`adding endpoint ${url} to group ${groupName}`);
-    if (!this.groups[groupName]) return console.log('  invalid groupname') || false;
+    LOG(`adding endpoint ${url} to group ${groupName}`);
+    if (!this.groups[groupName]) return LOG('  invalid groupname') || false;
     this.endpoints[url] = this.groups[groupName];
   }
 
   /**
    * @param {import('http').IncomingMessage} req
-   * @returns {(import('./index.js').resFunction|false)}
+   * @returns {(import('./utils.js').resFunction|false)}
    */
   getResFunction(req) {
     return _getResFunction(req, this.endpoints);
   }
 }
 
-module.exports = { Endpoints };
+module.exports = Endpoints;
 

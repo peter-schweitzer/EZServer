@@ -1,5 +1,3 @@
-const { getResFunction } = require('./getResFunction');
-
 class Resolvers {
   /** @type {import('./').resolvers} */
   resolvers = {};
@@ -22,5 +20,5 @@ class Resolvers {
   }
 }
 
-module.exports = { Resolvers };
+module.exports = Resolvers;
 
