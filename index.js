@@ -43,6 +43,9 @@ class App {
   m_routs = {};
   //#endregion
 
+  /**@type {resolvers}*/
+  m_genericFunctions = {};
+
   constructor() {
     this.m_httpServer = createServer((req, res) => {
       req.url = decodeURIComponent(req.url);
@@ -164,6 +167,27 @@ class App {
     return getResFunction(req, this.m_routs);
   }
   //#endregion
+
+  /**
+   * @param {string} functionName name of the functioin
+   * @param {resFunction} fn function to resolve the requests
+   * @returns {void}
+   */
+  addGenericFunction(functionName, fn) {
+    this.m_genericFunctions[functionName] = fn;
+  }
+
+  /**
+   * @param {string} url URL of the endpoint
+   * @param {string} functionName name of the functioin
+   * @param {boolean} isRoute
+   * @returns {void}
+   */
+  useGenericFunction(url, functionName, isRoute = false) {
+    const fn = this.m_genericFunctions[functionName];
+    if (!fn) return WARN('invalid function name');
+    isRoute ? (this.m_routs[url] = fn) : (this.m_endpoints[url] = fn);
+  }
 }
 
 /**
