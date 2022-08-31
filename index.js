@@ -43,8 +43,23 @@ class App {
   m_routs = {};
   //#endregion
 
+  //#region general functions
+  m_genericRestFunctions = {
+    /** @type {resolvers} */
+    GET: {},
+    /** @type {resolvers} */
+    POST: {},
+    /** @type {resolvers} */
+    PUT: {},
+    /** @type {resolvers} */
+    DELETE: {},
+    /** @type {resolvers} */
+    PATCH: {},
+  };
+
   /**@type {resolvers}*/
   m_genericFunctions = {};
+  //#endregion
 
   constructor() {
     this.m_httpServer = createServer((req, res) => {
@@ -168,6 +183,38 @@ class App {
   }
   //#endregion
 
+  //#region generic functions
+  /**
+   * @param {string} method http-method
+   * @param {string} functionName name of the new group
+   * @param {resFunction} fn function to resolve the requests
+   * @returns {void}
+   */
+  addGenericRestFunction(method, functionName, fn) {
+    const m = method.toUpperCase();
+    if (!this.m_methods.includes(m)) return WARN('invalid method', m);
+    if (!functionName) return WARN('invalid functionName', functionName);
+    this.m_genericRestFunctions[m][functionName] = fn;
+    LOG('added generic rest function for ' + method, functionName);
+  }
+
+  /**
+   * @param {string} method URL of the endpoint
+   * @param {string} functionName name of the functioin
+   * @param {string} url URL of the endpoint
+   * @param {boolean} isRoute
+   * @returns {void}
+   */
+  useGenericRestFunction(method, functionName, url, isRoute = false) {
+    const m = method.toUpperCase();
+    if (!this.m_methods.includes(m)) return WARN('invalid method', m);
+
+    const fn = this.m_genericRestFunctions[m][functionName];
+    if (!fn) return WARN('invalid function name');
+
+    isRoute ? (this.m_restRouts[m][url] = fn) : (this.m_restEndpoints[m][url] = fn);
+  }
+
   /**
    * @param {string} functionName name of the functioin
    * @param {resFunction} fn function to resolve the requests
@@ -188,6 +235,7 @@ class App {
     if (!fn) return WARN('invalid function name');
     isRoute ? (this.m_routs[url] = fn) : (this.m_endpoints[url] = fn);
   }
+  //#endregion
 }
 
 /**
