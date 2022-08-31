@@ -25,6 +25,9 @@ class App {
   m_endpoints = {};
   //#endregion
 
+  /** @type {resolvers} */
+  m_routs = {};
+
   constructor() {
     this.m_httpServer = createServer((req, res) => {
       req.url = decodeURIComponent(req.url);
@@ -106,6 +109,38 @@ class App {
     LOG('added:', route);
   }
   //#endregion
+
+  /**
+   * @param {string} url pattern of requested URL
+   * @param {resFunction} fn function to resolve the request
+   * @returns {void}
+   */
+  addRoute(route, fn) {
+    this.m_routs[route] = fn;
+    LOG('added route', route);
+  }
+
+  /**
+   * @param {IncomingMessage} req
+   * @returns {(resFunction|false)}
+   */
+  m_route(req) {
+    return getResFunction(req, this.m_routs);
+  }
+}
+
+/**
+ * @param {IncomingMessage} req
+ * @param {resolvers} resolvers
+ * @returns {resFunction}
+ */
+function getResFunction(req, resolvers) {
+  let ss = req.url.split('/');
+  for (; ss.length; ss.pop()) {
+    let path = ss.join('/');
+    if (resolvers.hasOwnProperty(path)) return resolvers[path];
+  }
+  return false;
 }
 
 /**
