@@ -25,8 +25,23 @@ class App {
   m_endpoints = {};
   //#endregion
 
+  //#region routs
+  m_restRouts = {
+    /** @type {resolvers} */
+    GET: {},
+    /** @type {resolvers} */
+    POST: {},
+    /** @type {resolvers} */
+    PUT: {},
+    /** @type {resolvers} */
+    DELETE: {},
+    /** @type {resolvers} */
+    PATCH: {},
+  };
+
   /** @type {resolvers} */
   m_routs = {};
+  //#endregion
 
   constructor() {
     this.m_httpServer = createServer((req, res) => {
@@ -110,6 +125,27 @@ class App {
   }
   //#endregion
 
+  //#region routs
+  /**
+   * @param {string} method http-method
+   * @param {string} route pattern of requested URL
+   * @param {resFunction} fn function to resolve the request
+   * @returns {void}
+   */
+  addRestRoute(method, route, fn) {
+    const m = method.toUpperCase();
+    return !!(this.m_methods.includes(m) ? (this.m_restRouts[m][route] = fn) : WARN('invalid method', m) && false);
+    LOG('added rest-route for' + m, route);
+  }
+
+  /**
+   * @param {IncomingMessage} req
+   * @returns {(resFunction|false)}
+   */
+  m_restRoute(req) {
+    return this.m_methods.includes(req.method) ? getResFunction(req, this.m_restRouts[req.method]) : WARN('invalid request method');
+  }
+
   /**
    * @param {string} url pattern of requested URL
    * @param {resFunction} fn function to resolve the request
@@ -127,6 +163,7 @@ class App {
   m_route(req) {
     return getResFunction(req, this.m_routs);
   }
+  //#endregion
 }
 
 /**
