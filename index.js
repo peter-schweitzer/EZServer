@@ -4,6 +4,9 @@ const LOG = console.log;
 const WARN = console.warn;
 
 class App {
+  /** @type {resolvers} */
+  m_endpoints = {};
+
   constructor() {
     this.m_httpServer = createServer((req, res) => {
       req.url = decodeURIComponent(req.url);
@@ -14,6 +17,16 @@ class App {
   /** @param {number|string} port port the server is hosted on */
   listen(port) {
     this.m_httpServer.listen(port);
+  }
+
+  /**
+   * @param {string} route path of requested URL
+   * @param {resFunction} fn function to resolve the request
+   * @returns {void}
+   */
+  add(route, fn) {
+    this.m_endpoints[route] = fn;
+    LOG('added:', route);
   }
 }
 
