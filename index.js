@@ -4,8 +4,26 @@ const LOG = console.log;
 const WARN = console.warn;
 
 class App {
+  /** @type {string[]} */
+  m_methods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'];
+
+  //#region endpoints
+  m_restEndpoints = {
+    /** @type {resolvers} */
+    GET: {},
+    /** @type {resolvers} */
+    POST: {},
+    /** @type {resolvers} */
+    PUT: {},
+    /** @type {resolvers} */
+    DELETE: {},
+    /** @type {resolvers} */
+    PATCH: {},
+  };
+
   /** @type {resolvers} */
   m_endpoints = {};
+  //#endregion
 
   constructor() {
     this.m_httpServer = createServer((req, res) => {
@@ -19,6 +37,65 @@ class App {
     this.m_httpServer.listen(port);
   }
 
+  //#region endpoints
+  /**
+   * @param {string} route URL of the endpoint
+   * @param {resFunction} fn
+   * @returns {void}
+   */
+  get(route, fn) {
+    this.m_restEndpoints.GET[route] = fn;
+    LOG('added get:', route);
+  }
+
+  /**
+   * @param {string} route URL of the endpoint
+   * @param {resFunction} fn
+   * @returns {void}
+   */
+  post(route, fn) {
+    this.m_restEndpoints.POST[route] = fn;
+    LOG('added post:', route);
+  }
+
+  /**
+   * @param {string} route URL of the endpoint
+   * @param {resFunction} fn
+   * @returns {void}
+   */
+  put(route, fn) {
+    this.m_restEndpoints.PUT[route] = fn;
+    LOG('added put:', route);
+  }
+
+  /**
+   * @param {string} route URL of the endpoint
+   * @param {resFunction} fn
+   * @returns {void}
+   */
+  delete(route, fn) {
+    this.m_restEndpoints.DELETE[route] = fn;
+    LOG('added delete:', route);
+  }
+
+  /**
+   * @param {string} route URL of the endpoint
+   * @param {resFunction} fn
+   * @returns {void}
+   */
+  patch(route, fn) {
+    this.m_restEndpoints.PATCH[route] = fn;
+    LOG('added patch:', route);
+  }
+
+  /**
+   * @param {IncomingMessage}
+   * @returns {(resFunction|false)}
+   */
+  m_restEndpoint({ url, method }) {
+    return this.m_methods.includes(method) ? this.m_restEndpoints[method][url] : WARN('invalid request method') && false;
+  }
+
   /**
    * @param {string} route path of requested URL
    * @param {resFunction} fn function to resolve the request
@@ -28,6 +105,7 @@ class App {
     this.m_endpoints[route] = fn;
     LOG('added:', route);
   }
+  //#endregion
 }
 
 /**
