@@ -230,7 +230,7 @@ class App {
    * @param {boolean} isRoute
    * @returns {void}
    */
-  useGenericFunction(url, functionName, isRoute = false) {
+  useGenericFunction(functionName, url, isRoute = false) {
     const fn = this.m_genericFunctions[functionName];
     if (!fn) return WARN('invalid function name');
     isRoute ? (this.m_routs[url] = fn) : (this.m_endpoints[url] = fn);

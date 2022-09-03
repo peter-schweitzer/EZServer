@@ -70,12 +70,12 @@ app.addGenericFunction('name', (req, res) => {
 });
 
 //supports endpoints
-app.useGenericRestFunction('get', '/generic/endpoint', 'name');
-app.useGenericFunction('/generic/rest-endpoint', 'name');
+app.useGenericRestFunction('get', 'name', '/generic/endpoint');
+app.useGenericFunction('name', '/generic/rest-endpoint');
 
 //supports routs
-app.useGenericRestFunction('/generic/endpoint', 'name', true);
-app.useGenericFunction('/generic/rest-endpoint', 'name', true);
+app.useGenericRestFunction('get', 'name', '/generic/route', true);
+app.useGenericFunction('name', '/generic/rest-route', true);
 
 /** @typedef {import('../index').resFunction} resFunction */
 
