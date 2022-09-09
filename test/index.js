@@ -2,9 +2,10 @@ const assert = require('assert');
 const { App, buildRes } = require('../index');
 
 const app = new App();
+app.listen('1234');
 
 const testFunction = (req, res) => {
-  buildRes(res, `method: ${req.method} | route: ${req.url}`);
+  buildRes(res, `method: ${req.method} | route: ${req.url}`, { code: 200, mime: 'text/plain' });
 };
 
 app.get('/get', testFunction);
@@ -35,31 +36,31 @@ assert(app.m_endpoints['/add'] === testFunction, "endpoint wasn't register");
 //*================*//
 //*================*//
 
-app.addRestRoute('/get', testFunction, 'get');
+app.addRestRoute('get', '/get', testFunction);
 assert(app.m_restRouts.GET['/get'] === testFunction, "get rest-route wasn't register");
-assert(app.m_restRoute({ url: '/get/route/test', method: 'GET' }) === testFunction, 'get-route');
+assert(app.m_restRoute({ url: '/get/route/route-test', method: 'GET' }) === testFunction, 'get-route');
 
-app.addRestRoute('/post', testFunction, 'post');
+app.addRestRoute('post', '/post', testFunction);
 assert(app.m_restRouts.POST['/post'] === testFunction, "post rest-route wasn't register");
-assert(app.m_restRoute({ url: '/post/route/test', method: 'POST' }) === testFunction, 'post-route');
+assert(app.m_restRoute({ url: '/post/route/route-test', method: 'POST' }) === testFunction, 'post-route');
 
-app.addRestRoute('/put', testFunction, 'put');
+app.addRestRoute('put', '/put', testFunction);
 assert(app.m_restRouts.PUT['/put'] === testFunction, "put rest-route wasn't register");
-assert(app.m_restRoute({ url: '/put/route/test', method: 'PUT' }) === testFunction, 'put-route');
+assert(app.m_restRoute({ url: '/put/route/route-test', method: 'PUT' }) === testFunction, 'put-route');
 
-app.addRestRoute('/delete', testFunction, 'delete');
+app.addRestRoute('delete', '/delete', testFunction);
 assert(app.m_restRouts.DELETE['/delete'] === testFunction, "delete rest-route wasn't register");
-assert(app.m_restRoute({ url: '/delete/route/test', method: 'DELETE' }) === testFunction, 'delete-route');
+assert(app.m_restRoute({ url: '/delete/route/route-test', method: 'DELETE' }) === testFunction, 'delete-route');
 
-app.addRestRoute('/patch', testFunction, 'patch');
+app.addRestRoute('patch', '/patch', testFunction);
 assert(app.m_restRouts.PATCH['/patch'] === testFunction, "patch rest-route wasn't register");
-assert(app.m_restRoute({ url: '/patch/route/test', method: 'PATCH' }) === testFunction, 'patch-route');
+assert(app.m_restRoute({ url: '/patch/route/route-test', method: 'PATCH' }) === testFunction, 'patch-route');
 
 //*================*//
 
 app.addRoute('/addRoute', testFunction);
 assert(app.m_routs['/addRoute'] === testFunction, "route wasn't register");
-assert(app.m_route({ url: '/addRoute/test' }) === testFunction, 'addRoute');
+assert(app.m_route({ url: '/addRoute/route-test' }) === testFunction, 'addRoute');
 
 //*================*//
 //*================*//
@@ -73,7 +74,7 @@ assert(app.m_restEndpoint({ url: '/get/generic/endpoint', method: 'GET' }) === t
 
 app.useGenericRestFunction('get', 'fn', '/get/generic', true);
 assert(app.m_restRouts.GET['/get/generic'] === testFunction, "generic get rest-route wasn't register");
-assert(app.m_restRoute({ url: '/get/generic/test', method: 'GET' }) === testFunction, 'generic get-route');
+assert(app.m_restRoute({ url: '/get/generic/route-test', method: 'GET' }) === testFunction, 'generic get-route');
 
 app.addGenericRestFunction('post', 'fn', testFunction);
 assert(app.m_genericRestFunctions.POST['fn'] === testFunction, "generic post function wasn't register");
@@ -84,7 +85,7 @@ assert(app.m_restEndpoint({ url: '/post/generic/endpoint', method: 'POST' }) ===
 
 app.useGenericRestFunction('post', 'fn', '/post/generic', true);
 assert(app.m_restRouts.POST['/post/generic'] === testFunction, "generic post rest-route wasn't register");
-assert(app.m_restRoute({ url: '/post/generic/test', method: 'POST' }) === testFunction, 'generic post-route');
+assert(app.m_restRoute({ url: '/post/generic/route-test', method: 'POST' }) === testFunction, 'generic post-route');
 
 app.addGenericRestFunction('put', 'fn', testFunction);
 assert(app.m_genericRestFunctions.PUT['fn'] === testFunction, "generic put function wasn't register");
@@ -95,7 +96,7 @@ assert(app.m_restEndpoint({ url: '/put/generic/endpoint', method: 'PUT' }) === t
 
 app.useGenericRestFunction('put', 'fn', '/put/generic', true);
 assert(app.m_restRouts.PUT['/put/generic'] === testFunction, "generic put rest-route wasn't register");
-assert(app.m_restRoute({ url: '/put/generic/test', method: 'PUT' }) === testFunction, 'generic put-route');
+assert(app.m_restRoute({ url: '/put/generic/route-test', method: 'PUT' }) === testFunction, 'generic put-route');
 
 app.addGenericRestFunction('delete', 'fn', testFunction);
 assert(app.m_genericRestFunctions.DELETE['fn'] === testFunction, "generic delete function wasn't register");
@@ -106,7 +107,7 @@ assert(app.m_restEndpoint({ url: '/delete/generic/endpoint', method: 'DELETE' })
 
 app.useGenericRestFunction('delete', 'fn', '/delete/generic', true);
 assert(app.m_restRouts.DELETE['/delete/generic'] === testFunction, "generic delete rest-route wasn't register");
-assert(app.m_restRoute({ url: '/delete/generic/test', method: 'DELETE' }) === testFunction, 'generic delete-route');
+assert(app.m_restRoute({ url: '/delete/generic/route-test', method: 'DELETE' }) === testFunction, 'generic delete-route');
 
 app.addGenericRestFunction('patch', 'fn', testFunction);
 assert(app.m_genericRestFunctions.PATCH['fn'] === testFunction, "generic patch function wasn't register");
@@ -117,16 +118,59 @@ assert(app.m_restEndpoint({ url: '/patch/generic/endpoint', method: 'PATCH' }) =
 
 app.useGenericRestFunction('patch', 'fn', '/patch/generic', true);
 assert(app.m_restRouts.PATCH['/patch/generic'] === testFunction, "generic patch rest-route wasn't register");
-assert(app.m_restRoute({ url: '/patch/generic/test', method: 'PATCH' }) === testFunction, 'generic patch-route');
+assert(app.m_restRoute({ url: '/patch/generic/route-test', method: 'PATCH' }) === testFunction, 'generic patch-route');
 
 //*================*//
 
 app.addGenericFunction('fn', testFunction);
 
-app.useGenericFunction('/generic', 'fn');
+app.useGenericFunction('fn', '/generic');
 assert(app.m_endpoints['/generic'] === testFunction, "generic endpoint wasn't register");
 
-app.useGenericFunction('/generic', 'fn', true);
+app.useGenericFunction('fn', '/generic', true);
 assert(app.m_routs['/generic'], "generic route wasn't register");
-assert(app.m_route({ url: '/generic/test' }) === testFunction, 'generic route');
+assert(app.m_route({ url: '/generic/route-test' }) === testFunction, 'generic route');
+
+///////////
+///////////
+
+[
+  ['/get', 'GET'],
+  ['/post', 'POST'],
+  ['/put', 'PUT'],
+  ['/delete', 'DELETE'],
+  ['/patch', 'PATCH'],
+  ['/add', 'GET'],
+  ['/get/route-test', 'GET'],
+  ['/post/route-test', 'POST'],
+  ['/put/route-test', 'PUT'],
+  ['/delete/route-test', 'DELETE'],
+  ['/patch/route-test', 'PATCH'],
+  ['/addRoute/route-test', 'GET'],
+  ['/get/generic/endpoint', 'GET'],
+  ['/get/generic/route-test', 'GET'],
+  ['/post/generic/endpoint', 'POST'],
+  ['/post/generic/route-test', 'POST'],
+  ['/put/generic/endpoint', 'PUT'],
+  ['/put/generic/route-test', 'PUT'],
+  ['/delete/generic/endpoint', 'DELETE'],
+  ['/delete/generic/route-test', 'DELETE'],
+  ['/patch/generic/endpoint', 'PATCH'],
+  ['/patch/generic/route-test', 'PATC'],
+  ['/generic/endpoint', 'GET'],
+  ['/generic/route-test', 'GET'],
+  ['', ''],
+].forEach(([u, m]) => {
+  if (!m && !u) process.exit(0);
+  else
+    fetch('http://127.0.0.1:1234' + u, { method: m })
+      .then((res) => res.text())
+      .then((txt) => {
+        console.log(m, u, txt);
+        assert(txt === `method: ${m} | route: ${u}`, u);
+      });
+});
+
+console.error('critical? ERROR');
+process.exit(1);
 
