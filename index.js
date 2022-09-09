@@ -64,7 +64,7 @@ class App {
   constructor() {
     this.m_httpServer = createServer((req, res) => {
       req.url = decodeURIComponent(req.url);
-      (this.m_restEndpoint(req) || this.m_endpoints[url] || this.m_restRoute(req) || this.m_route(req) || throw404)(req, res);
+      (this.m_restEndpoint(req) || this.m_endpoints[req.url] || this.m_restRoute(req) || this.m_route(req) || throw404)(req, res);
     });
   }
 
@@ -261,7 +261,7 @@ function getResFunction(req, resolvers) {
  * @returns {void}
  */
 function buildRes(res, data, { code, mime }) {
-  res.writeHead(code, { 'Content-Type': mime });
+  res.writeHead(code || 200, { 'Content-Type': mime || 'text/plain' });
   res.write(data);
   res.end();
 }
