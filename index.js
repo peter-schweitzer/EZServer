@@ -1,7 +1,9 @@
 const { createServer, IncomingMessage, ServerResponse } = require('http');
+const { readFile } = require('fs');
 
 const LOG = console.log;
 const WARN = console.warn;
+const ERR = console.error;
 
 class App {
   /** @type {string[]} */
@@ -245,11 +247,11 @@ class App {
  */
 function getResFunction(req, resolvers) {
   let ss = req.url.split('/');
-  for (; ss.length; ss.pop()) {
+  for (; ss.length > 1; ss.pop()) {
     let path = ss.join('/');
     if (resolvers.hasOwnProperty(path)) return resolvers[path];
   }
-  return false;
+  return resolvers['/'] || false;
 }
 
 /**
@@ -324,7 +326,7 @@ function getBodyJSON(req) {
         resCode = req.method === 'PUT' ? 201 : 200;
       } catch (e) {
         WARN('error while parsing request body; sending code 400');
-        console.error(e);
+        ERR(e);
         resCode = 400;
       }
 
