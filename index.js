@@ -77,53 +77,53 @@ class App {
 
   //#region endpoints
   /**
-   * @param {string} route URL of the endpoint
+   * @param {string} route
    * @param {resFunction} fn
-   * @returns {void}
+   * @returns {boolean}
    */
   get(route, fn) {
-    this.m_restEndpoints.GET[route] = fn;
     LOG('added get:', route);
+    return !!(this.m_restEndpoints.GET[route] = fn);
   }
 
   /**
-   * @param {string} route URL of the endpoint
+   * @param {string} route
    * @param {resFunction} fn
-   * @returns {void}
+   * @returns {boolean}
    */
   post(route, fn) {
-    this.m_restEndpoints.POST[route] = fn;
     LOG('added post:', route);
+    return !!(this.m_restEndpoints.POST[route] = fn);
   }
 
   /**
-   * @param {string} route URL of the endpoint
+   * @param {string} route
    * @param {resFunction} fn
-   * @returns {void}
+   * @returns {boolean}
    */
   put(route, fn) {
-    this.m_restEndpoints.PUT[route] = fn;
     LOG('added put:', route);
+    return !!(this.m_restEndpoints.PUT[route] = fn);
   }
 
   /**
-   * @param {string} route URL of the endpoint
+   * @param {string} route
    * @param {resFunction} fn
-   * @returns {void}
+   * @returns {boolean}
    */
   delete(route, fn) {
-    this.m_restEndpoints.DELETE[route] = fn;
     LOG('added delete:', route);
+    return !!(this.m_restEndpoints.DELETE[route] = fn);
   }
 
   /**
-   * @param {string} route URL of the endpoint
+   * @param {string} route
    * @param {resFunction} fn
-   * @returns {void}
+   * @returns {boolean}
    */
   patch(route, fn) {
-    this.m_restEndpoints.PATCH[route] = fn;
     LOG('added patch:', route);
+    return !!(this.m_restEndpoints.PATCH[route] = fn);
   }
 
   /**
@@ -131,17 +131,17 @@ class App {
    * @returns {(resFunction|false)}
    */
   m_restEndpoint({ url, method }) {
-    return this.m_methods.includes(method) ? this.m_restEndpoints[method][url] : WARN('invalid request method') && false;
+    return this.m_methods.includes(method) ? this.m_restEndpoints[method][url] : !!WARN('invalid request method');
   }
 
   /**
    * @param {string} route path of requested URL
    * @param {resFunction} fn function to resolve the request
-   * @returns {void}
+   * @returns {boolean}
    */
   add(route, fn) {
-    this.m_endpoints[route] = fn;
     LOG('added:', route);
+    return !!(this.m_endpoints[route] = fn);
   }
   //#endregion
 
@@ -150,12 +150,14 @@ class App {
    * @param {string} method http-method
    * @param {string} route pattern of requested URL
    * @param {resFunction} fn function to resolve the request
-   * @returns {void}
+   * @returns {boolean}
    */
   addRestRoute(method, route, fn) {
     const m = method.toUpperCase();
-    return !!(this.m_methods.includes(m) ? (this.m_restRouts[m][route] = fn) : WARN('invalid method', m) && false);
-    LOG('added rest-route for' + m, route);
+    if (!this.m_methods.includes(m)) return !!WARN('invalid method', m);
+
+    LOG('adding rest-route for method ' + m, route);
+    return !!(this.m_restRouts[m][route] = fn);
   }
 
   /**
@@ -163,17 +165,17 @@ class App {
    * @returns {(resFunction|false)}
    */
   m_restRoute(req) {
-    return this.m_methods.includes(req.method) ? getResFunction(req, this.m_restRouts[req.method]) : WARN('invalid request method');
+    return this.m_methods.includes(req.method) ? getResFunction(req, this.m_restRouts[req.method]) : !!WARN('invalid request method');
   }
 
   /**
    * @param {string} url pattern of requested URL
    * @param {resFunction} fn function to resolve the request
-   * @returns {void}
+   * @returns {boolean}
    */
   addRoute(route, fn) {
-    this.m_routs[route] = fn;
-    LOG('added route', route);
+    LOG('adding route', route);
+    return !!(this.m_routs[route] = fn);
   }
 
   /**
@@ -190,14 +192,13 @@ class App {
    * @param {string} method http-method
    * @param {string} functionName name of the new group
    * @param {resFunction} fn function to resolve the requests
-   * @returns {void}
+   * @returns {boolean}
    */
   addGenericRestFunction(method, functionName, fn) {
     const m = method.toUpperCase();
-    if (!this.m_methods.includes(m)) return WARN('invalid method', m);
-    if (!functionName) return WARN('invalid functionName', functionName);
-    this.m_genericRestFunctions[m][functionName] = fn;
-    LOG('added generic rest function for ' + method, functionName);
+    if (!this.m_methods.includes(m)) return !!WARN('invalid method', m);
+    if (!functionName) return !!WARN('invalid functionName', functionName);
+    return LOG('adding generic rest function for method ' + method, functionName) || !(this.m_genericRestFunctions[m][functionName] = fn);
   }
 
   /**
@@ -205,37 +206,39 @@ class App {
    * @param {string} functionName name of the functioin
    * @param {string} url URL of the endpoint
    * @param {boolean} isRoute
-   * @returns {void}
+   * @returns {boolean}
    */
   useGenericRestFunction(method, functionName, url, isRoute = false) {
     const m = method.toUpperCase();
-    if (!this.m_methods.includes(m)) return WARN('invalid method', m);
+    if (!this.m_methods.includes(m)) return !!WARN('invalid method', m);
 
     const fn = this.m_genericRestFunctions[m][functionName];
-    if (!fn) return WARN('invalid function name');
+    if (!fn) return !!WARN('invalid function name');
 
-    isRoute ? (this.m_restRouts[m][url] = fn) : (this.m_restEndpoints[m][url] = fn);
+    return !!(isRoute ? (this.m_restRouts[m][url] = fn) : (this.m_restEndpoints[m][url] = fn));
   }
 
   /**
    * @param {string} functionName name of the functioin
    * @param {resFunction} fn function to resolve the requests
-   * @returns {void}
+   * @returns {boolean}
    */
   addGenericFunction(functionName, fn) {
-    this.m_genericFunctions[functionName] = fn;
+    if (!functionName) return !!WARN('invalid functionName', functionName);
+    return !!(this.m_genericFunctions[functionName] = fn);
   }
 
   /**
    * @param {string} url URL of the endpoint
    * @param {string} functionName name of the functioin
    * @param {boolean} isRoute
-   * @returns {void}
+   * @returns {boolean}
    */
   useGenericFunction(functionName, url, isRoute = false) {
     const fn = this.m_genericFunctions[functionName];
-    if (!fn) return WARN('invalid function name');
-    isRoute ? (this.m_routs[url] = fn) : (this.m_endpoints[url] = fn);
+    if (!fn) return !!WARN('invalid function name');
+
+    return !!(isRoute ? (this.m_routs[url] = fn) : (this.m_endpoints[url] = fn));
   }
   //#endregion
 }
