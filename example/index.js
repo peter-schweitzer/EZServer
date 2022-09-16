@@ -1,7 +1,7 @@
 const { App, buildRes, serveFromFS } = require('../');
 
 const app = new App();
-
+app.listen('65535');
 /**
  ** ================ EZServer Supports Endopoints ===================
  */
