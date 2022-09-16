@@ -11,55 +11,55 @@ class App {
 
   //#region endpoints
   m_restEndpoints = {
-    /** @type {resolvers} */
+    /** @type {resolverLUT} */
     GET: {},
-    /** @type {resolvers} */
+    /** @type {resolverLUT} */
     POST: {},
-    /** @type {resolvers} */
+    /** @type {resolverLUT} */
     PUT: {},
-    /** @type {resolvers} */
+    /** @type {resolverLUT} */
     DELETE: {},
-    /** @type {resolvers} */
+    /** @type {resolverLUT} */
     PATCH: {},
   };
 
-  /** @type {resolvers} */
+  /** @type {resolverLUT} */
   m_endpoints = {};
   //#endregion
 
   //#region routs
   m_restRouts = {
-    /** @type {resolvers} */
+    /** @type {resolverLUT} */
     GET: {},
-    /** @type {resolvers} */
+    /**@type {resolverLUT} */
     POST: {},
-    /** @type {resolvers} */
+    /** @type {resolverLUT} */
     PUT: {},
-    /** @type {resolvers} */
+    /** @type {resolverLUT} */
     DELETE: {},
-    /** @type {resolvers} */
+    /**@type {resolverLUT} */
     PATCH: {},
   };
 
-  /** @type {resolvers} */
+  /** @type {resolverLUT} */
   m_routs = {};
   //#endregion
 
   //#region general functions
   m_genericRestFunctions = {
-    /** @type {resolvers} */
+    /** @type {resolverLUT} */
     GET: {},
-    /** @type {resolvers} */
+    /**@type {resolverLUT} */
     POST: {},
-    /** @type {resolvers} */
+    /** @type {resolverLUT} */
     PUT: {},
-    /** @type {resolvers} */
+    /** @type {resolverLUT} */
     DELETE: {},
-    /** @type {resolvers} */
+    /**@type {resolverLUT} */
     PATCH: {},
   };
 
-  /**@type {resolvers}*/
+  /**@type {resolverLUT}*/
   m_genericFunctions = {};
   //#endregion
 
@@ -242,7 +242,7 @@ class App {
 
 /**
  * @param {IncomingMessage} req
- * @param {resolvers} resolvers
+ * @param {resolverLUT} resolvers
  * @returns {resFunction}
  */
 function getResFunction(req, resolvers) {
@@ -344,5 +344,5 @@ module.exports = { App, buildRes, getType, serveFromFS, getBodyJSON };
  * @returns {void}
  */
 
-/** @typedef {Object.<string, resFunction>} resolvers */
+/** @typedef {Object.<string, resFunction>} resolverLUT */
 
