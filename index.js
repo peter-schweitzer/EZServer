@@ -7,18 +7,26 @@ const ERR = console.error;
 
 class App {
   /** @type {string[]} */
-  m_methods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'];
+  m_methods = ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH'];
 
   //#region endpoints
   m_restEndpoints = {
     /** @type {resolverLUT} */
     GET: {},
+    /**@type {resolverLUT} */
+    HEAD: {},
     /** @type {resolverLUT} */
     POST: {},
     /** @type {resolverLUT} */
     PUT: {},
     /** @type {resolverLUT} */
     DELETE: {},
+    /**@type {resolverLUT} */
+    CONNECT: {},
+    /**@type {resolverLUT} */
+    OPTIONS: {},
+    /**@type {resolverLUT} */
+    TRACE: {},
     /** @type {resolverLUT} */
     PATCH: {},
   };
@@ -32,12 +40,20 @@ class App {
     /** @type {resolverLUT} */
     GET: {},
     /**@type {resolverLUT} */
+    HEAD: {},
+    /** @type {resolverLUT} */
     POST: {},
     /** @type {resolverLUT} */
     PUT: {},
     /** @type {resolverLUT} */
     DELETE: {},
     /**@type {resolverLUT} */
+    CONNECT: {},
+    /**@type {resolverLUT} */
+    OPTIONS: {},
+    /**@type {resolverLUT} */
+    TRACE: {},
+    /** @type {resolverLUT} */
     PATCH: {},
   };
 
@@ -50,12 +66,20 @@ class App {
     /** @type {resolverLUT} */
     GET: {},
     /**@type {resolverLUT} */
+    HEAD: {},
+    /** @type {resolverLUT} */
     POST: {},
     /** @type {resolverLUT} */
     PUT: {},
     /** @type {resolverLUT} */
     DELETE: {},
     /**@type {resolverLUT} */
+    CONNECT: {},
+    /**@type {resolverLUT} */
+    OPTIONS: {},
+    /**@type {resolverLUT} */
+    TRACE: {},
+    /** @type {resolverLUT} */
     PATCH: {},
   };
 
@@ -91,6 +115,16 @@ class App {
    * @param {resFunction} fn
    * @returns {boolean}
    */
+  head(route, fn) {
+    LOG('added head:', route);
+    return !!(this.m_restEndpoints.HEAD[route] = fn);
+  }
+
+  /**
+   * @param {string} route
+   * @param {resFunction} fn
+   * @returns {boolean}
+   */
   post(route, fn) {
     LOG('added post:', route);
     return !!(this.m_restEndpoints.POST[route] = fn);
@@ -114,6 +148,36 @@ class App {
   delete(route, fn) {
     LOG('added delete:', route);
     return !!(this.m_restEndpoints.DELETE[route] = fn);
+  }
+
+  /**
+   * @param {string} route
+   * @param {resFunction} fn
+   * @returns {boolean}
+   */
+  connect(route, fn) {
+    LOG('added connect:', route);
+    return !!(this.m_restEndpoints.CONNECT[route] = fn);
+  }
+
+  /**
+   * @param {string} route
+   * @param {resFunction} fn
+   * @returns {boolean}
+   */
+  options(route, fn) {
+    LOG('added options:', route);
+    return !!(this.m_restEndpoints.OPTIONS[route] = fn);
+  }
+
+  /**
+   * @param {string} route
+   * @param {resFunction} fn
+   * @returns {boolean}
+   */
+  trace(route, fn) {
+    LOG('added trace:', route);
+    return !!(this.m_restEndpoints.TRACE[route] = fn);
   }
 
   /**
