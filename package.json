@@ -3,8 +3,7 @@
   "version": "2.0.4",
   "description": "npm module for fast backend/REST-API development with no (exactly 0!) dependencies (somewhat inspired by the express framework)",
   "scripts": {
-    "example": "cd example && node .",
-    "test": "cd test && node ."
+    "example": "cd example && node ."
   },
   "keywords": [
     "simple",
