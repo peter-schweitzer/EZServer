@@ -1,6 +1,8 @@
 const { createServer, IncomingMessage, ServerResponse } = require('http');
 const { readFile } = require('fs');
 
+const mimeTypes = require('./data/mimeTypes.json');
+
 const LOG = console.log;
 const WARN = console.warn;
 const ERR = console.error;
@@ -13,7 +15,7 @@ class App {
   m_restEndpoints = {
     /** @type {resolverLUT} */
     GET: {},
-    /**@type {resolverLUT} */
+    /** @type {resolverLUT} */
     HEAD: {},
     /** @type {resolverLUT} */
     POST: {},
@@ -21,11 +23,11 @@ class App {
     PUT: {},
     /** @type {resolverLUT} */
     DELETE: {},
-    /**@type {resolverLUT} */
+    /** @type {resolverLUT} */
     CONNECT: {},
-    /**@type {resolverLUT} */
+    /** @type {resolverLUT} */
     OPTIONS: {},
-    /**@type {resolverLUT} */
+    /** @type {resolverLUT} */
     TRACE: {},
     /** @type {resolverLUT} */
     PATCH: {},
@@ -39,7 +41,7 @@ class App {
   m_restRouts = {
     /** @type {resolverLUT} */
     GET: {},
-    /**@type {resolverLUT} */
+    /** @type {resolverLUT} */
     HEAD: {},
     /** @type {resolverLUT} */
     POST: {},
@@ -47,11 +49,11 @@ class App {
     PUT: {},
     /** @type {resolverLUT} */
     DELETE: {},
-    /**@type {resolverLUT} */
+    /** @type {resolverLUT} */
     CONNECT: {},
-    /**@type {resolverLUT} */
+    /** @type {resolverLUT} */
     OPTIONS: {},
-    /**@type {resolverLUT} */
+    /** @type {resolverLUT} */
     TRACE: {},
     /** @type {resolverLUT} */
     PATCH: {},
@@ -65,7 +67,7 @@ class App {
   m_genericRestFunctions = {
     /** @type {resolverLUT} */
     GET: {},
-    /**@type {resolverLUT} */
+    /** @type {resolverLUT} */
     HEAD: {},
     /** @type {resolverLUT} */
     POST: {},
@@ -73,36 +75,36 @@ class App {
     PUT: {},
     /** @type {resolverLUT} */
     DELETE: {},
-    /**@type {resolverLUT} */
+    /** @type {resolverLUT} */
     CONNECT: {},
-    /**@type {resolverLUT} */
+    /** @type {resolverLUT} */
     OPTIONS: {},
-    /**@type {resolverLUT} */
+    /** @type {resolverLUT} */
     TRACE: {},
     /** @type {resolverLUT} */
     PATCH: {},
   };
 
-  /**@type {resolverLUT}*/
+  /** @type {resolverLUT}*/
   m_genericFunctions = {};
   //#endregion
 
   constructor() {
     this.m_httpServer = createServer((req, res) => {
       req.url = decodeURIComponent(req.url);
-      (this.m_restEndpoint(req) || this.m_endpoints[req.url] || this.m_restRoute(req) || this.m_route(req) || throw404)(req, res);
+      (this.m_restEndpoint(req) || this.m_endpoints[req.url] || this.m_restRoute(req) || this.m_route(req) || this.m_404)(req, res);
     });
   }
 
-  /** @param {number|string} port port the server is hosted on */
+  /** @param {number|string} port port the server listens on */
   listen(port) {
     this.m_httpServer.listen(port);
   }
 
   //#region endpoints
   /**
-   * @param {string} route
-   * @param {resFunction} fn
+   * @param {string} route route to resolve
+   * @param {resFunction} fn function to resolve the request
    * @returns {boolean}
    */
   get(route, fn) {
@@ -111,8 +113,8 @@ class App {
   }
 
   /**
-   * @param {string} route
-   * @param {resFunction} fn
+   * @param {string} route route to resolve
+   * @param {resFunction} fn function to resolve the request
    * @returns {boolean}
    */
   head(route, fn) {
@@ -121,8 +123,8 @@ class App {
   }
 
   /**
-   * @param {string} route
-   * @param {resFunction} fn
+   * @param {string} route route to resolve
+   * @param {resFunction} fn function to resolve the request
    * @returns {boolean}
    */
   post(route, fn) {
@@ -131,8 +133,8 @@ class App {
   }
 
   /**
-   * @param {string} route
-   * @param {resFunction} fn
+   * @param {string} route route to resolve
+   * @param {resFunction} fn function to resolve the request
    * @returns {boolean}
    */
   put(route, fn) {
@@ -141,8 +143,8 @@ class App {
   }
 
   /**
-   * @param {string} route
-   * @param {resFunction} fn
+   * @param {string} route route to resolve
+   * @param {resFunction} fn function to resolve the request
    * @returns {boolean}
    */
   delete(route, fn) {
@@ -151,8 +153,8 @@ class App {
   }
 
   /**
-   * @param {string} route
-   * @param {resFunction} fn
+   * @param {string} route route to resolve
+   * @param {resFunction} fn function to resolve the request
    * @returns {boolean}
    */
   connect(route, fn) {
@@ -161,8 +163,8 @@ class App {
   }
 
   /**
-   * @param {string} route
-   * @param {resFunction} fn
+   * @param {string} route route to resolve
+   * @param {resFunction} fn function to resolve the request
    * @returns {boolean}
    */
   options(route, fn) {
@@ -171,8 +173,8 @@ class App {
   }
 
   /**
-   * @param {string} route
-   * @param {resFunction} fn
+   * @param {string} route route to resolve
+   * @param {resFunction} fn function to resolve the request
    * @returns {boolean}
    */
   trace(route, fn) {
@@ -181,8 +183,8 @@ class App {
   }
 
   /**
-   * @param {string} route
-   * @param {resFunction} fn
+   * @param {string} route route to resolve
+   * @param {resFunction} fn function to resolve the request
    * @returns {boolean}
    */
   patch(route, fn) {
@@ -199,7 +201,7 @@ class App {
   }
 
   /**
-   * @param {string} route path of requested URL
+   * @param {string} route route to resolve
    * @param {resFunction} fn function to resolve the request
    * @returns {boolean}
    */
@@ -211,8 +213,8 @@ class App {
 
   //#region routs
   /**
-   * @param {string} method http-method
-   * @param {string} route pattern of requested URL
+   * @param {string} method http-method of the request
+   * @param {string} route start of the route to resolve
    * @param {resFunction} fn function to resolve the request
    * @returns {boolean}
    */
@@ -233,7 +235,7 @@ class App {
   }
 
   /**
-   * @param {string} url pattern of requested URL
+   * @param {string} url start of the route to resolve
    * @param {resFunction} fn function to resolve the request
    * @returns {boolean}
    */
@@ -254,8 +256,8 @@ class App {
   //#region generic functions
   /**
    * @param {string} method http-method
-   * @param {string} functionName name of the new group
-   * @param {resFunction} fn function to resolve the requests
+   * @param {string} functionName name of the generic function
+   * @param {resFunction} fn function to resolve the request
    * @returns {boolean}
    */
   addGenericRestFunction(method, functionName, fn) {
@@ -266,25 +268,25 @@ class App {
   }
 
   /**
-   * @param {string} method URL of the endpoint
-   * @param {string} functionName name of the functioin
-   * @param {string} url URL of the endpoint
-   * @param {boolean} isRoute
+   * @param {string} method http-method
+   * @param {string} functionName name of the generic function
+   * @param {string} route route to resolve
+   * @param {boolean} isRoute wether to register a route or endpoint
    * @returns {boolean}
    */
-  useGenericRestFunction(method, functionName, url, isRoute = false) {
+  useGenericRestFunction(method, functionName, route, isRoute = false) {
     const m = method.toUpperCase();
     if (!this.m_methods.includes(m)) return !!WARN('invalid method', m);
 
     const fn = this.m_genericRestFunctions[m][functionName];
     if (!fn) return !!WARN('invalid function name');
 
-    return !!(isRoute ? (this.m_restRouts[m][url] = fn) : (this.m_restEndpoints[m][url] = fn));
+    return !!(isRoute ? (this.m_restRouts[m][route] = fn) : (this.m_restEndpoints[m][route] = fn));
   }
 
   /**
-   * @param {string} functionName name of the functioin
-   * @param {resFunction} fn function to resolve the requests
+   * @param {string} functionName name of the generic function
+   * @param {resFunction} fn function to resolve the request
    * @returns {boolean}
    */
   addGenericFunction(functionName, fn) {
@@ -293,20 +295,23 @@ class App {
   }
 
   /**
-   * @param {string} url URL of the endpoint
-   * @param {string} functionName name of the functioin
-   * @param {boolean} isRoute
+   * @param {string} functionName name of the generic function
+   * @param {string} route route to resolve
+   * @param {boolean} isRoute wether to register a route or endpoint
    * @returns {boolean}
    */
-  useGenericFunction(functionName, url, isRoute = false) {
+  useGenericFunction(functionName, route, isRoute = false) {
     const fn = this.m_genericFunctions[functionName];
     if (!fn) return !!WARN('invalid function name');
 
-    return !!(isRoute ? (this.m_routs[url] = fn) : (this.m_endpoints[url] = fn));
+    return !!(isRoute ? (this.m_routs[route] = fn) : (this.m_endpoints[route] = fn));
   }
   //#endregion
+
+  m_404 = throw404;
 }
 
+//#region util-functions
 /**
  * @param {IncomingMessage} req
  * @param {resolverLUT} resolvers
@@ -347,8 +352,6 @@ function throw404(req, res) {
     mime: 'text/html',
   });
 }
-
-const mimeTypes = require('./data/mimeTypes.json');
 
 /**
  * @param {string} filePath path of file
@@ -401,8 +404,9 @@ function getBodyJSON(req) {
     });
   });
 }
+//#endregion
 
-module.exports = { App, buildRes, getType, serveFromFS, getBodyJSON };
+module.exports = { App, buildRes, getType, serveFromFS, getBodyJSON, throw404 };
 
 /**
  * @callback resFunction
