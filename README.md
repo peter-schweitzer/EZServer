@@ -8,6 +8,22 @@ simple, ultra light weight node.js module with 0 dependencies for simple backend
 > but should run on all active LTS versions
 
 ## Resolving reqests
+To resolve a request simply use the 'add' function of the app.
+Eg. to resolve the request '/myrequest', respond with 'Hello World!' and the status code '200' do the following:
+```js
+const { App, buildRes } = require('ezserver');
 
-> for documentation & examples refer to [`example/index.js`](https://github.com/peter-schweitzer/EZServer/blob/master/example/index.js)
+const app = new App();
+
+app.add('/myrequest', (req, res) => {
+    buildRes(res, 'Hello World!', {
+        code: 200
+    });
+});
+
+app.listen(8080);
+```
+
+
+> for further documentation & examples refer to [`example/index.js`](https://github.com/peter-schweitzer/EZServer/blob/master/example/index.js)
 
