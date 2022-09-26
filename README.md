@@ -7,7 +7,7 @@ simple, ultra light weight node.js module with 0 dependencies for simple backend
 > EZServer is developed on the current node version (v18)
 > but should run on all active LTS versions
 
-## Resolving reqests
+## Resolving requests
 The most basic way of resolving a request is usíng the 'add' function of the app.
 Eg. to resolve a request to `/myrequest` and respond with `Hello World!` do the following:
 
