@@ -331,7 +331,7 @@ function getResFunction(req, resolvers) {
  * @param {any} data data of the response
  * @param {Object} options options
  * @param {number} options.code status code of the response
- * @param {string} options.mime mime type of the response
+ * @param {string} options.mime mime-type of the response
  * @returns {void}
  */
 function buildRes(res, data, { code, mime }) {
@@ -355,14 +355,14 @@ function throw404(req, res) {
 
 /**
  * @param {string} filePath path of file
- * @returns {string} mimeType fo the file
+ * @returns {string} mime-type fo the file
  */
 function getType(filePath) {
   return mimeTypes[filePath.split('.').pop()] || WARN('mime-type not found') || 'text/plain';
 }
 
 /**
- * @param {ServerResponse} res response the from Server
+ * @param {ServerResponse} res response from the Server
  * @param {string} filePath path of file
  * @param {number} statusCode status code of the response (default 200)
  * @returns {void}
@@ -416,4 +416,3 @@ module.exports = { App, buildRes, getType, serveFromFS, getBodyJSON, throw404 };
  */
 
 /** @typedef {Object.<string, resFunction>} resolverLUT */
-
