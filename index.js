@@ -1,5 +1,5 @@
-const { createServer, IncomingMessage, ServerResponse } = require('http');
-const { readFile } = require('fs');
+const { createServer, Server, IncomingMessage, ServerResponse } = require('node:http');
+const { readFile } = require('node:fs');
 
 const mimeTypes = require('./data/mimeTypes.json');
 
@@ -89,6 +89,8 @@ class App {
   m_genericFunctions = {};
   //#endregion
 
+  /** @type {Server}*/
+  m_httpServer;
   constructor() {
     this.m_httpServer = createServer((req, res) => {
       req.url = decodeURIComponent(req.url);
@@ -99,6 +101,11 @@ class App {
   /** @param {number|string} port port the server listens on */
   listen(port) {
     this.m_httpServer.listen(port);
+  }
+
+  /** @param {number|string} port port the server listens on */
+  kill() {
+    this.m_httpServer.close(() => WARN('server was killed'));
   }
 
   //#region endpoints
