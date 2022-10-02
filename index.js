@@ -112,7 +112,7 @@ class App {
   /**
    * @param {string} route route to resolve
    * @param {resFunction} fn function to resolve the request
-   * @returns {boolean}
+   * @returns {boolean} wether the function was successfully registered
    */
   get(route, fn) {
     LOG('added get:', route);
@@ -122,7 +122,7 @@ class App {
   /**
    * @param {string} route route to resolve
    * @param {resFunction} fn function to resolve the request
-   * @returns {boolean}
+   * @returns {boolean} wether the function was successfully registered
    */
   head(route, fn) {
     LOG('added head:', route);
@@ -132,7 +132,7 @@ class App {
   /**
    * @param {string} route route to resolve
    * @param {resFunction} fn function to resolve the request
-   * @returns {boolean}
+   * @returns {boolean} wether the function was successfully registered
    */
   post(route, fn) {
     LOG('added post:', route);
@@ -142,7 +142,7 @@ class App {
   /**
    * @param {string} route route to resolve
    * @param {resFunction} fn function to resolve the request
-   * @returns {boolean}
+   * @returns {boolean} wether the function was successfully registered
    */
   put(route, fn) {
     LOG('added put:', route);
@@ -152,7 +152,7 @@ class App {
   /**
    * @param {string} route route to resolve
    * @param {resFunction} fn function to resolve the request
-   * @returns {boolean}
+   * @returns {boolean} wether the function was successfully registered
    */
   delete(route, fn) {
     LOG('added delete:', route);
@@ -162,7 +162,7 @@ class App {
   /**
    * @param {string} route route to resolve
    * @param {resFunction} fn function to resolve the request
-   * @returns {boolean}
+   * @returns {boolean} wether the function was successfully registered
    */
   connect(route, fn) {
     LOG('added connect:', route);
@@ -172,7 +172,7 @@ class App {
   /**
    * @param {string} route route to resolve
    * @param {resFunction} fn function to resolve the request
-   * @returns {boolean}
+   * @returns {boolean} wether the function was successfully registered
    */
   options(route, fn) {
     LOG('added options:', route);
@@ -182,7 +182,7 @@ class App {
   /**
    * @param {string} route route to resolve
    * @param {resFunction} fn function to resolve the request
-   * @returns {boolean}
+   * @returns {boolean} wether the function was successfully registered
    */
   trace(route, fn) {
     LOG('added trace:', route);
@@ -192,7 +192,7 @@ class App {
   /**
    * @param {string} route route to resolve
    * @param {resFunction} fn function to resolve the request
-   * @returns {boolean}
+   * @returns {boolean} wether the function was successfully registered
    */
   patch(route, fn) {
     LOG('added patch:', route);
@@ -210,7 +210,7 @@ class App {
   /**
    * @param {string} route route to resolve
    * @param {resFunction} fn function to resolve the request
-   * @returns {boolean}
+   * @returns {boolean} wether the function was successfully registered
    */
   add(route, fn) {
     LOG('added:', route);
@@ -223,14 +223,14 @@ class App {
    * @param {string} method http-method of the request
    * @param {string} route start of the route to resolve
    * @param {resFunction} fn function to resolve the request
-   * @returns {boolean}
+   * @returns {boolean} wether the function was successfully registered
    */
   addRestRoute(method, route, fn) {
     const m = method.toUpperCase();
     if (!this.m_methods.includes(m)) return !!WARN('invalid method', m);
 
     LOG('adding rest-route for method ' + m, route);
-    return !!(this.m_restRouts[m][route] = fn);
+    return !!(route.includes(':') ? false : (this.m_restRouts[m][route] = fn));
   }
 
   /**
@@ -244,7 +244,7 @@ class App {
   /**
    * @param {string} url start of the route to resolve
    * @param {resFunction} fn function to resolve the request
-   * @returns {boolean}
+   * @returns {boolean} wether the function was successfully registered
    */
   addRoute(route, fn) {
     LOG('adding route', route);
@@ -265,7 +265,7 @@ class App {
    * @param {string} method http-method
    * @param {string} functionName name of the generic function
    * @param {resFunction} fn function to resolve the request
-   * @returns {boolean}
+   * @returns {boolean} wether the function was successfully registered
    */
   addGenericRestFunction(method, functionName, fn) {
     const m = method.toUpperCase();
@@ -279,7 +279,7 @@ class App {
    * @param {string} functionName name of the generic function
    * @param {string} route route to resolve
    * @param {boolean} isRoute wether to register a route or endpoint
-   * @returns {boolean}
+   * @returns {boolean} wether the function was successfully registered
    */
   useGenericRestFunction(method, functionName, route, isRoute = false) {
     const m = method.toUpperCase();
@@ -294,7 +294,7 @@ class App {
   /**
    * @param {string} functionName name of the generic function
    * @param {resFunction} fn function to resolve the request
-   * @returns {boolean}
+   * @returns {boolean} wether the function was successfully registered
    */
   addGenericFunction(functionName, fn) {
     if (!functionName) return !!WARN('invalid functionName', functionName);
@@ -305,7 +305,7 @@ class App {
    * @param {string} functionName name of the generic function
    * @param {string} route route to resolve
    * @param {boolean} isRoute wether to register a route or endpoint
-   * @returns {boolean}
+   * @returns {boolean} wether the function was successfully registered
    */
   useGenericFunction(functionName, route, isRoute = false) {
     const fn = this.m_genericFunctions[functionName];
