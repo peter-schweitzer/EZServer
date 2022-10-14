@@ -104,8 +104,8 @@ class App {
   }
 
   /** @param {number|string} port port the server listens on */
-  kill() {
-    this.m_httpServer.close(() => WARN('server was killed'));
+  close() {
+    this.m_httpServer.close(() => WARN('server was closed'));
   }
 
   //#region endpoints
