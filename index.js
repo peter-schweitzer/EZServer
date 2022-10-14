@@ -1,4 +1,5 @@
-const { createServer, Server, IncomingMessage, ServerResponse } = require('node:http');
+'use strict';
+const { createServer } = require('node:http');
 const { readFile } = require('node:fs');
 
 const mimeTypes = require('./data/mimeTypes.json');
@@ -414,6 +415,12 @@ function getBodyJSON(req) {
 //#endregion
 
 module.exports = { App, buildRes, getType, serveFromFS, getBodyJSON, throw404 };
+
+/**
+ * @typedef {import('http').Server} Server
+ * @typedef {import('http').IncomingMessage} IncomingMessage
+ * @typedef {import('http').ServerResponse} ServerResponse
+ */
 
 /**
  * @callback resFunction
