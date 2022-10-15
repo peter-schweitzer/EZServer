@@ -48,6 +48,7 @@ class App {
   /** @type {string[]} */
   m_methods = ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH'];
 
+  //#region resolverLUT's
   //#region endpoints
   m_restEndpoints = {
     /** @type {resolverLUT} */
@@ -124,6 +125,7 @@ class App {
 
   /** @type {resolverLUT}*/
   m_genericFunctions = {};
+  //#endregion
   //#endregion
 
   /** @type {Server}*/
@@ -389,7 +391,7 @@ function getResFunction(req, resolvers) {
  * @param {string} options.mime mime-type of the response (default is 'text/plain')
  * @returns {void}
  */
-function buildRes(res, data, { code, mime }) {
+function buildRes(res, data, { code, mime } = { code: null, mime: null }) {
   res.writeHead(code || 200, { 'Content-Type': mime || 'text/plain' });
   res.write(data);
   res.end();
