@@ -479,7 +479,7 @@ module.exports = { App, buildRes, getType, serveFromFS, getBodyJSON, throw404 };
  * @callback resFunction
  * @param {IncomingMessage} req
  * @param {ServerResponse} res
- * @param {params} parameters
+ * @param {Parameters} parameters
  * @returns {void}
  */
 
