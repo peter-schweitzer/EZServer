@@ -5,7 +5,7 @@ const { readFile } = require('node:fs');
 const mimeTypes = require('./data/mimeTypes.json');
 
 const LOG = console.log;
-const WARN = console.warn;
+const WRN = console.warn;
 const ERR = console.error;
 
 class App {
@@ -91,9 +91,9 @@ class App {
   //#endregion
 
   /** @type {Server}*/
-  m_httpServer;
+  m_http_server;
   constructor() {
-    this.m_httpServer = createServer((req, res) => {
+    this.m_http_server = createServer((req, res) => {
       req.url = decodeURIComponent(req.url);
       (this.m_restEndpoint(req) || this.m_endpoints[req.url] || this.m_restRoute(req) || this.m_route(req) || this.m_404)(req, res);
     });
@@ -101,12 +101,12 @@ class App {
 
   /** @param {number|string} port port the server listens on */
   listen(port) {
-    this.m_httpServer.listen(port);
+    this.m_http_server.listen(port);
   }
 
   /** @param {number|string} port port the server listens on */
   close() {
-    this.m_httpServer.close(() => WARN('server was closed'));
+    this.m_http_server.close(() => WRN('server was closed'));
   }
 
   //#region endpoints
@@ -205,7 +205,7 @@ class App {
    * @returns {(resFunction|false)}
    */
   m_restEndpoint({ url, method }) {
-    return this.m_methods.includes(method) ? this.m_restEndpoints[method][url] : !!WARN('invalid request method');
+    return this.m_methods.includes(method) ? this.m_restEndpoints[method][url] : !!WRN('invalid request method');
   }
 
   /**
@@ -228,7 +228,7 @@ class App {
    */
   addRestRoute(method, route, fn) {
     const m = method.toUpperCase();
-    if (!this.m_methods.includes(m)) return !!WARN('invalid method', m);
+    if (!this.m_methods.includes(m)) return !!WRN('invalid method', m);
 
     LOG('adding rest-route for method ' + m, route);
     return !!(route.includes(':') ? false : (this.m_restRouts[m][route] = fn));
@@ -239,7 +239,7 @@ class App {
    * @returns {(resFunction|false)}
    */
   m_restRoute(req) {
-    return this.m_methods.includes(req.method) ? getResFunction(req, this.m_restRouts[req.method]) : !!WARN('invalid request method');
+    return this.m_methods.includes(req.method) ? getResFunction(req, this.m_restRouts[req.method]) : !!WRN('invalid request method');
   }
 
   /**
@@ -270,8 +270,8 @@ class App {
    */
   addGenericRestFunction(method, functionName, fn) {
     const m = method.toUpperCase();
-    if (!this.m_methods.includes(m)) return !!WARN('invalid method', m);
-    if (!functionName) return !!WARN('invalid functionName', functionName);
+    if (!this.m_methods.includes(m)) return !!WRN('invalid method', m);
+    if (!functionName) return !!WRN('invalid functionName', functionName);
     return LOG('adding generic rest function for method ' + method, functionName) || !(this.m_genericRestFunctions[m][functionName] = fn);
   }
 
@@ -284,10 +284,10 @@ class App {
    */
   useGenericRestFunction(method, functionName, route, isRoute = false) {
     const m = method.toUpperCase();
-    if (!this.m_methods.includes(m)) return !!WARN('invalid method', m);
+    if (!this.m_methods.includes(m)) return !!WRN('invalid method', m);
 
     const fn = this.m_genericRestFunctions[m][functionName];
-    if (!fn) return !!WARN('invalid function name');
+    if (!fn) return !!WRN('invalid function name');
 
     return !!(isRoute ? (this.m_restRouts[m][route] = fn) : (this.m_restEndpoints[m][route] = fn));
   }
@@ -298,7 +298,7 @@ class App {
    * @returns {boolean} wether the function was successfully registered
    */
   addGenericFunction(functionName, fn) {
-    if (!functionName) return !!WARN('invalid functionName', functionName);
+    if (!functionName) return !!WRN('invalid functionName', functionName);
     return !!(this.m_genericFunctions[functionName] = fn);
   }
 
@@ -310,7 +310,7 @@ class App {
    */
   useGenericFunction(functionName, route, isRoute = false) {
     const fn = this.m_genericFunctions[functionName];
-    if (!fn) return !!WARN('invalid function name');
+    if (!fn) return !!WRN('invalid function name');
 
     return !!(isRoute ? (this.m_routs[route] = fn) : (this.m_endpoints[route] = fn));
   }
@@ -354,7 +354,7 @@ function buildRes(res, data, { code, mime }) {
  * @returns {void}
  */
 function throw404(req, res) {
-  WARN('404 on', req.url);
+  WRN('404 on', req.url);
   buildRes(res, '<!DOCTYPE html><head><meta charset="UTF-8"><title>404</title></head><body><h1>ERROR</h1><p>404 not found.</p></body></html>', {
     code: 404,
     mime: 'text/html',
@@ -362,23 +362,23 @@ function throw404(req, res) {
 }
 
 /**
- * @param {string} filePath path of file
- * @returns {string} mime-type fo the file
+ * @param {string} filePathOrName path, or name of  the file
+ * @returns {string} mime-type of the file (default 'text/plain')
  */
-function getType(filePath) {
-  return mimeTypes[filePath.split('.').pop()] || WARN('mime-type not found') || 'text/plain';
+function getType(filePathOrName) {
+  return mimeTypes[filePathOrName.split('.').pop()] || WRN('mime-type not found') || 'text/plain';
 }
 
 /**
  * @param {ServerResponse} res response from the Server
- * @param {string} filePath path of file
- * @param {number} statusCode status code of the response (default 200)
+ * @param {string} filePath path of the file
+ * @param {number} statusCode status code f thoe response (default 200)
  * @returns {void}
  */
 function serveFromFS(res, filePath, statusCode = 200) {
   LOG('reading file from FS:', filePath);
   readFile(filePath, (err, data) => {
-    const header = !err ? { code: statusCode, mime: getType(filePath) } : { code: 500, mime: 'text/plain' };
+    const header = err ? { code: 500, mime: 'text/plain' } : { code: statusCode, mime: getType(filePath) };
     buildRes(res, data || `error while loading file from fs:\n${err}`, header);
   });
 }
@@ -403,7 +403,7 @@ function getBodyJSON(req) {
         json = JSON.parse(buff);
         resCode = req.method === 'PUT' ? 201 : 200;
       } catch (e) {
-        WARN('error while parsing request body; sending code 400');
+        WRN('error while parsing request body; sending code 400');
         ERR(e);
         resCode = 400;
       }
@@ -416,6 +416,7 @@ function getBodyJSON(req) {
 
 module.exports = { App, buildRes, getType, serveFromFS, getBodyJSON, throw404 };
 
+//#region typedef's
 /**
  * @typedef {import('http').Server} Server
  * @typedef {import('http').IncomingMessage} IncomingMessage
@@ -430,3 +431,4 @@ module.exports = { App, buildRes, getType, serveFromFS, getBodyJSON, throw404 };
  */
 
 /** @typedef {Object.<string, resFunction>} resolverLUT */
+//#endregion
