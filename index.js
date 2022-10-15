@@ -8,6 +8,42 @@ const LOG = console.log;
 const WRN = console.warn;
 const ERR = console.error;
 
+class Parameters {
+  /** @type {params} */
+  m_parameters = { query: {} };
+
+  /** @param {string} query_string */
+  m_add_query(query_string) {
+    if (query_string)
+      for (const kv of query_string.split('&'))
+        (([k, v]) => {
+          if (k && v) this.m_parameters.query[decodeURIComponent(k)] = decodeURIComponent(v);
+        })(kv.split('='));
+  }
+
+  constructor() {}
+
+  /**
+   * @param {string} name
+   * @param {string?} fallback
+   */
+  query(name, fallback = null) {
+    return this.m_parameters.query[name] || fallback;
+  }
+
+  /**
+   * @param {string} name
+   * @param {number?} fallback
+   */
+  queryInt(name, fallback = null) {
+    try {
+      return parseInt(this.m_parameters.query[name]) || fallback;
+    } catch (e) {
+      return ERR(e) || fallback;
+    }
+  }
+}
+
 class App {
   /** @type {string[]} */
   m_methods = ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH'];
@@ -94,8 +130,19 @@ class App {
   m_http_server;
   constructor() {
     this.m_http_server = createServer((req, res) => {
-      req.url = decodeURIComponent(req.url);
-      (this.m_restEndpoint(req) || this.m_endpoints[req.url] || this.m_restRoute(req) || this.m_route(req) || this.m_404)(req, res);
+      const parameters = new Parameters();
+
+      const split_url = req.url.split('?');
+      switch (split_url.length) {
+        default:
+          return buildRes(res, 'malformed URL', { code: 400, mime: 'text/plain' });
+        case 2:
+          parameters.m_add_query(split_url[1]);
+        case 1:
+          req.url = decodeURIComponent(split_url[0]);
+      }
+
+      (this.m_restEndpoint(req) || this.m_endpoints[req.url] || this.m_restRoute(req) || this.m_route(req) || this.m_404)(req, res, parameters);
     });
   }
 
@@ -424,9 +471,15 @@ module.exports = { App, buildRes, getType, serveFromFS, getBodyJSON, throw404 };
  */
 
 /**
+ * @typedef {Object} params
+ * @property {Object.<string, string>} query
+ */
+
+/**
  * @callback resFunction
  * @param {IncomingMessage} req
  * @param {ServerResponse} res
+ * @param {params} parameters
  * @returns {void}
  */
 
