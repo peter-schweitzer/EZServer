@@ -2,7 +2,9 @@
 const { createServer } = require('node:http');
 const { readFile } = require('node:fs');
 
+/** @type {Object.<string, string>} */
 const mimeTypes = require('./data/mimeTypes.json');
+const http_methods = { GET: 'GET', HEAD: 'HEAD', POST: 'POST', PUT: 'PUT', DELETE: 'DELETE', CONNECT: 'CONNECT', OPTIONS: 'OPTIONS', TRACE: 'TRACE', PATCH: 'PATCH' };
 
 const LOG = console.log;
 const WRN = console.warn;
@@ -25,31 +27,37 @@ class Parameters {
 
   /**
    * @param {string} name
-   * @param {string?} fallback
+   * @param {string?} defaultValue
+   * @returns {string?}
    */
-  query(name, fallback = null) {
-    return this.m_parameters.query[name] || fallback;
+  query(name, defaultValue = null) {
+    return this.m_parameters.query[name] || defaultValue;
   }
 
   /**
    * @param {string} name
    * @param {number?} fallback
+   * @returns {number?}
    */
-  queryInt(name, fallback = null) {
+  queryInt(name, defaultValue = null) {
     try {
-      return parseInt(this.m_parameters.query[name]) || fallback;
+      return parseInt(this.query(name, defaultValue));
     } catch (e) {
-      return ERR(e) || fallback;
+      return ERR(e) || null;
     }
   }
 }
 
 class App {
-  /** @type {string[]} */
-  m_methods = ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH'];
+  /** @type {Server}*/
+  m_http_server;
 
-  //#region resolverLUT's
+  /** @type {resFunction} */
+  m_404 = throw404;
+
+  //#region resolverLUT data objects
   //#region endpoints
+  /**@type {Object.<string, Object.<string, resFunction>>} */
   m_restEndpoints = {
     /** @type {resolverLUT} */
     GET: {},
@@ -76,6 +84,7 @@ class App {
   //#endregion
 
   //#region routs
+  /**@type {Object.<string, Object.<string, resFunction>>} */
   m_restRouts = {
     /** @type {resolverLUT} */
     GET: {},
@@ -102,6 +111,7 @@ class App {
   //#endregion
 
   //#region general functions
+  /**@type {Object.<string, Object.<string, resFunction>>} */
   m_genericRestFunctions = {
     /** @type {resolverLUT} */
     GET: {},
@@ -128,8 +138,6 @@ class App {
   //#endregion
   //#endregion
 
-  /** @type {Server}*/
-  m_http_server;
   constructor() {
     this.m_http_server = createServer((req, res) => {
       const parameters = new Parameters();
@@ -148,12 +156,15 @@ class App {
     });
   }
 
-  /** @param {number|string} port port the server listens on */
+  /**
+   * @param {number|string} port port the server should listens on
+   * @returns {void}
+   */
   listen(port) {
     this.m_http_server.listen(port);
   }
 
-  /** @param {number|string} port port the server listens on */
+  /** @returns {void} */
   close() {
     this.m_http_server.close(() => WRN('server was closed'));
   }
@@ -251,10 +262,10 @@ class App {
 
   /**
    * @param {IncomingMessage}
-   * @returns {(resFunction|false)}
+   * @returns {resFunction | false}
    */
   m_restEndpoint({ url, method }) {
-    return this.m_methods.includes(method) ? this.m_restEndpoints[method][url] : !!WRN('invalid request method');
+    return method in http_methods ? this.m_restEndpoints[method][url] : !!WRN('invalid request method');
   }
 
   /**
@@ -277,7 +288,7 @@ class App {
    */
   addRestRoute(method, route, fn) {
     const m = method.toUpperCase();
-    if (!this.m_methods.includes(m)) return !!WRN('invalid method', m);
+    if (!(m in http_methods)) return !!WRN('invalid method', m);
 
     LOG('adding rest-route for method ' + m, route);
     return !!(route.includes(':') ? false : (this.m_restRouts[m][route] = fn));
@@ -288,7 +299,7 @@ class App {
    * @returns {(resFunction|false)}
    */
   m_restRoute(req) {
-    return this.m_methods.includes(req.method) ? getResFunction(req, this.m_restRouts[req.method]) : !!WRN('invalid request method');
+    return req.method in http_methods ? getResFunction(req, this.m_restRouts[req.method]) : !!WRN('invalid request method');
   }
 
   /**
@@ -319,7 +330,7 @@ class App {
    */
   addGenericRestFunction(method, functionName, fn) {
     const m = method.toUpperCase();
-    if (!this.m_methods.includes(m)) return !!WRN('invalid method', m);
+    if (!(m in http_methods)) return !!WRN('invalid method', m);
     if (!functionName) return !!WRN('invalid functionName', functionName);
     return LOG('adding generic rest function for method ' + method, functionName) || !(this.m_genericRestFunctions[m][functionName] = fn);
   }
@@ -333,7 +344,7 @@ class App {
    */
   useGenericRestFunction(method, functionName, route, isRoute = false) {
     const m = method.toUpperCase();
-    if (!this.m_methods.includes(m)) return !!WRN('invalid method', m);
+    if (!(m in http_methods)) return !!WRN('invalid method', m);
 
     const fn = this.m_genericRestFunctions[m][functionName];
     if (!fn) return !!WRN('invalid function name');
@@ -364,8 +375,6 @@ class App {
     return !!(isRoute ? (this.m_routs[route] = fn) : (this.m_endpoints[route] = fn));
   }
   //#endregion
-
-  m_404 = throw404;
 }
 
 //#region util-functions
@@ -463,7 +472,7 @@ function getBodyJSON(req) {
 }
 //#endregion
 
-module.exports = { App, buildRes, getType, serveFromFS, getBodyJSON, throw404 };
+module.exports = { App, buildRes, getType, serveFromFS, getBodyJSON, throw404, METHODS: http_methods };
 
 //#region typedef's
 /**
