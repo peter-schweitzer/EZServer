@@ -1,4 +1,5 @@
 'use strict';
+//#region imports and const's
 const { createServer } = require('node:http');
 const { readFile } = require('node:fs');
 
@@ -9,6 +10,7 @@ const http_methods = { GET: 'GET', HEAD: 'HEAD', POST: 'POST', PUT: 'PUT', DELET
 const LOG = console.log;
 const WRN = console.warn;
 const ERR = console.error;
+//#endregion
 
 class Parameters {
   /** @type {params} */
@@ -160,7 +162,7 @@ class App {
 
   /** @returns {void} */
   close() {
-    this.m_http_server.close(() => WRN('server was closed'));
+    this.m_http_server.close((err) => (err ? ERR("server couldn't be closed") : WRN('server was closed')));
   }
 
   //#region endpoints
