@@ -2,6 +2,7 @@ const { App, buildRes, serveFromFS } = require('../');
 
 const app = new App();
 app.listen('65535');
+
 /**
  ** ================ EZServer Supports Endopoints ===================
  */
@@ -30,6 +31,8 @@ app.patch('/patch', (req, res) => {
 app.add('/', (req, res) => {
   serveFromFS(res, './html/home.html');
 });
+
+app.add('/favicon.ico', () => buildRes(res, '', { code: 404, mime: 'text/plain' }));
 
 /**
  ** ================ EZServer Supports Routs ===================
@@ -78,4 +81,3 @@ app.useGenericRestFunction('get', 'name', '/generic/route', true);
 app.useGenericFunction('name', '/generic/rest-route', true);
 
 /** @typedef {import('../index').resFunction} resFunction */
-
