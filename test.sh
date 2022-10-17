@@ -1,2 +1,2 @@
 #!/bin/bash
-cd test/ && node .
+cd test/ && node --trace-warnings .
