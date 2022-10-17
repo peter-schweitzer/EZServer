@@ -24,4 +24,7 @@ app.add('/myrequest', (req, res) => {
 app.listen(8080);
 ```
 
+The `req`-Object is passed from the node:http server, but is slightly modified.<br>
+EZServer adds`req.uri`, which is very similar to req.url, but URI-decoded and <i style="color: #ff2020">without</i> a query string.<br>
+
 > for further documentation & examples refer to [`example/index.js`](https://github.com/peter-schweitzer/EZServer/blob/master/example/index.js)

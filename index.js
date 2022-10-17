@@ -161,7 +161,7 @@ class App {
    * @returns {void}
    */
   listen(port) {
-    this.m_http_server.listen(port);
+    this.m_http_server.listen(port, () => LOG(`server listening on port ${port}`));
   }
 
   /** @returns {void} */
@@ -303,7 +303,7 @@ class App {
   }
 
   /**
-   * @param {string} url start of the route to resolve
+   * @param {string} route start of the route to resolve
    * @param {resFunction} fn function to resolve the request
    * @returns {boolean} wether the function was successfully registered
    */
