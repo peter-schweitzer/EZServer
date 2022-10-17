@@ -468,7 +468,7 @@ function getBodyJSON(req) {
 }
 //#endregion
 
-module.exports = { App, buildRes, getType, serveFromFS, getBodyJSON, throw404, METHODS: http_methods };
+module.exports = { App, buildRes, getType, serveFromFS, getBodyJSON, throw404, HTTP_METHODS: http_methods };
 
 //#region typedef's
 /**
