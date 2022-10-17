@@ -19,7 +19,7 @@ class Parameters {
     if (query_string)
       for (const kv of query_string.split('&'))
         (([k, v]) => {
-          if (k && v) this.m_parameters.query[decodeURIComponent(k)] = decodeURIComponent(v);
+          if (k.length && v?.length) Object.defineProperty(this.m_parameters.query, k, { value: v });
         })(kv.split('='));
   }
 
@@ -142,17 +142,11 @@ class App {
     this.m_http_server = createServer((req, res) => {
       const parameters = new Parameters();
 
-      const split_url = req.url.split('?');
-      switch (split_url.length) {
-        default:
-          return buildRes(res, 'malformed URL', { code: 400, mime: 'text/plain' });
-        case 2:
-          parameters.m_add_query(split_url[1]);
-        case 1:
-          req.url = decodeURIComponent(split_url[0]);
-      }
+      const [uri, query_str] = decodeURIComponent(req.url).split('?');
+      Object.defineProperty(req, 'uri', { value: uri });
+      if (!!query_str) parameters.m_add_query(query_str);
 
-      (this.m_restEndpoint(req) || this.m_endpoints[req.url] || this.m_restRoute(req) || this.m_route(req) || this.m_404)(req, res, parameters);
+      (this.m_restEndpoint(req) || this.m_endpoints[req.uri] || this.m_restRoute(req) || this.m_route(req) || this.m_404)(req, res, parameters);
     });
   }
 
@@ -264,8 +258,8 @@ class App {
    * @param {IncomingMessage}
    * @returns {resFunction | false}
    */
-  m_restEndpoint({ url, method }) {
-    return method in http_methods ? this.m_restEndpoints[method][url] : !!WRN('invalid request method');
+  m_restEndpoint({ uri, method }) {
+    return method in http_methods ? this.m_restEndpoints[method][uri] : !!WRN('invalid request method');
   }
 
   /**
@@ -384,7 +378,7 @@ class App {
  * @returns {resFunction}
  */
 function getResFunction(req, resolvers) {
-  let ss = req.url.split('/');
+  let ss = req.uri.split('/');
   for (; ss.length > 1; ss.pop()) {
     let path = ss.join('/');
     if (resolvers.hasOwnProperty(path)) return resolvers[path];
