@@ -4,7 +4,7 @@
 
 simple, ultra light weight node.js module with 0 dependencies for simple backend/REST-API development
 
-> EZServer is developed on the current node version (v18)
+> EZServer is developed on the current node version (v19)
 > but should run on all active LTS versions
 
 ## Resolving requests
