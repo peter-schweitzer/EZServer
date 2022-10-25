@@ -1,5 +1,6 @@
 const assert = require('assert');
 const { App, buildRes } = require('../index');
+const { Parameters } = require('../src/parameters');
 
 const app = new App();
 app.listen('1234');
@@ -8,9 +9,14 @@ app.listen('1234');
   /**
    * @param {import('http').IncomingMessage} req
    * @param {import('http').ServerResponse} res
+   * @param {Parameters} p
    */
-  const testFunction = (req, res) => {
-    buildRes(res, `method: ${req.method} | route: ${req.url}`, { code: 200, mime: 'text/plain' });
+  const testFunction = (req, res, p) => {
+    const { query, route } = p.m_parameters;
+    buildRes(res, `method: ${req.method} | route: ${req.url} | param (querry): ${Object.keys(query).length} | param (route): ${Object.keys(route).length}`, {
+      code: 200,
+      mime: 'text/plain',
+    });
   };
 
   app.get('/get', testFunction);
@@ -136,39 +142,48 @@ app.listen('1234');
   assert(app.m_routs['/generic'], "generic route wasn't register");
   assert(app.m_route({ uri: '/generic/route-test' }) === testFunction, 'generic route');
 
+  //*================*//
+  //*================*//
+
+  app.get('/param/:prm', testFunction);
+  assert(app.m_rest_endpoint_with_param({ uri: '/param/pram-val', method: 'GET' }, new Parameters()) === testFunction, 'rest endpoint with param');
+
   ///////////
   ///////////
 
   async function test() {
-    for (const [u, m] of [
-      ['/get', 'GET'],
-      ['/post', 'POST'],
-      ['/put', 'PUT'],
-      ['/delete', 'DELETE'],
-      ['/patch', 'PATCH'],
-      ['/add', 'GET'],
-      ['/get/route-test', 'GET'],
-      ['/post/route-test', 'POST'],
-      ['/put/route-test', 'PUT'],
-      ['/delete/route-test', 'DELETE'],
-      ['/patch/route-test', 'PATCH'],
-      ['/addRoute/route-test', 'GET'],
-      ['/get/generic/endpoint', 'GET'],
-      ['/get/generic/route-test', 'GET'],
-      ['/post/generic/endpoint', 'POST'],
-      ['/post/generic/route-test', 'POST'],
-      ['/put/generic/endpoint', 'PUT'],
-      ['/put/generic/route-test', 'PUT'],
-      ['/delete/generic/endpoint', 'DELETE'],
-      ['/delete/generic/route-test', 'DELETE'],
-      ['/patch/generic/endpoint', 'PATCH'],
-      ['/patch/generic/route-test', 'PATCH'],
-      ['/generic/endpoint', 'GET'],
-      ['/generic/route-test', 'GET'],
+    for (const [u, m, q, r] of [
+      ['/get', 'GET', 0, 0],
+      ['/post', 'POST', 0, 0],
+      ['/put', 'PUT', 0, 0],
+      ['/delete', 'DELETE', 0, 0],
+      ['/patch', 'PATCH', 0, 0],
+      ['/add', 'GET', 0, 0],
+      ['/get/route-test', 'GET', 0, 0],
+      ['/post/route-test', 'POST', 0, 0],
+      ['/put/route-test', 'PUT', 0, 0],
+      ['/delete/route-test', 'DELETE', 0, 0],
+      ['/patch/route-test', 'PATCH', 0, 0],
+      ['/addRoute/route-test', 'GET', 0, 0],
+      ['/get/generic/endpoint', 'GET', 0, 0],
+      ['/get/generic/route-test', 'GET', 0, 0],
+      ['/post/generic/endpoint', 'POST', 0, 0],
+      ['/post/generic/route-test', 'POST', 0, 0],
+      ['/put/generic/endpoint', 'PUT', 0, 0],
+      ['/put/generic/route-test', 'PUT', 0, 0],
+      ['/delete/generic/endpoint', 'DELETE', 0, 0],
+      ['/delete/generic/route-test', 'DELETE', 0, 0],
+      ['/patch/generic/endpoint', 'PATCH', 0, 0],
+      ['/patch/generic/route-test', 'PATCH', 0, 0],
+      ['/generic/endpoint', 'GET', 0, 0],
+      ['/generic/route-test', 'GET', 0, 0],
+      ['/get?a=a&b=b&c=c', 'GET', 3, 0],
+      ['/param/prm?a=a&b=b&c=c', 'GET', 3, 1],
+      ['/param/prm', 'GET', 0, 1],
     ]) {
       const txt = await (await fetch('http://127.0.0.1:1234' + u, { method: m })).text();
       console.log(m, u, txt);
-      assert(txt === `method: ${m} | route: ${u}`, u);
+      assert(txt === `method: ${m} | route: ${u} | param (querry): ${q} | param (route): ${r}`, u);
     }
   }
 

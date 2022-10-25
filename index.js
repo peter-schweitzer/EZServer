@@ -23,6 +23,7 @@ class App {
 
   //#region resolverLUT data objects
   //#region endpoints
+  //#region without param
   /**@type {Object.<string, Object.<string, resFunction>>} */
   m_rest_endpoints = {
     /** @type {resolverLUT} */
@@ -47,6 +48,32 @@ class App {
 
   /** @type {resolverLUT} */
   m_endpoints = {};
+  //#endregion
+
+  //#region with param
+  m_rest_endpoints_with_params = {
+    /** @type {resolverLUT} */
+    GET: {},
+    /** @type {resolverLUT} */
+    HEAD: {},
+    /** @type {resolverLUT} */
+    POST: {},
+    /** @type {resolverLUT} */
+    PUT: {},
+    /** @type {resolverLUT} */
+    DELETE: {},
+    /** @type {resolverLUT} */
+    CONNECT: {},
+    /** @type {resolverLUT} */
+    OPTIONS: {},
+    /** @type {resolverLUT} */
+    TRACE: {},
+    /** @type {resolverLUT} */
+    PATCH: {},
+  };
+
+  m_endpoints_with_params = {};
+  //#endregion
   //#endregion
 
   //#region routs
@@ -112,7 +139,15 @@ class App {
       Object.defineProperty(req, 'uri', { value: uri });
       if (query_str) parameters.m_add_query(query_str);
 
-      (this.m_rest_endpoint(req) || this.m_endpoints[req.uri] || this.m_rest_route(req) || this.m_route(req) || this.m_404)(req, res, parameters);
+      (
+        this.m_rest_endpoint(req) ||
+        this.m_endpoints[req.uri] ||
+        this.m_rest_endpoint_with_param(req, parameters) ||
+        this.m_endpoint_with_param(req, parameters) ||
+        this.m_rest_route(req) ||
+        this.m_route(req) ||
+        this.m_404
+      )(req, res, parameters);
     });
   }
 
@@ -137,7 +172,7 @@ class App {
    */
   get(route, fn) {
     LOG('added get:', route);
-    return !!(this.m_rest_endpoints.GET[route] = fn);
+    this.m_edpoint_addition_helper(this.m_rest_endpoints.GET, this.m_rest_endpoints_with_params.GET, route, fn);
   }
 
   /**
@@ -147,7 +182,7 @@ class App {
    */
   head(route, fn) {
     LOG('added head:', route);
-    return !!(this.m_rest_endpoints.HEAD[route] = fn);
+    this.m_edpoint_addition_helper(this.m_rest_endpoints.HEAD, this.m_rest_endpoints_with_params.HEAD, route, fn);
   }
 
   /**
@@ -157,7 +192,7 @@ class App {
    */
   post(route, fn) {
     LOG('added post:', route);
-    return !!(this.m_rest_endpoints.POST[route] = fn);
+    this.m_edpoint_addition_helper(this.m_rest_endpoints.POST, this.m_rest_endpoints_with_params.POST, route, fn);
   }
 
   /**
@@ -167,7 +202,7 @@ class App {
    */
   put(route, fn) {
     LOG('added put:', route);
-    return !!(this.m_rest_endpoints.PUT[route] = fn);
+    this.m_edpoint_addition_helper(this.m_rest_endpoints.PUT, this.m_rest_endpoints_with_params.PUT, route, fn);
   }
 
   /**
@@ -177,7 +212,7 @@ class App {
    */
   delete(route, fn) {
     LOG('added delete:', route);
-    return !!(this.m_rest_endpoints.DELETE[route] = fn);
+    this.m_edpoint_addition_helper(this.m_rest_endpoints.DELETE, this.m_rest_endpoints_with_params.DELETE, route, fn);
   }
 
   /**
@@ -187,7 +222,7 @@ class App {
    */
   connect(route, fn) {
     LOG('added connect:', route);
-    return !!(this.m_rest_endpoints.CONNECT[route] = fn);
+    this.m_edpoint_addition_helper(this.m_rest_endpoints.CONNECT, this.m_rest_endpoints_with_params.CONNECT, route, fn);
   }
 
   /**
@@ -197,7 +232,7 @@ class App {
    */
   options(route, fn) {
     LOG('added options:', route);
-    return !!(this.m_rest_endpoints.OPTIONS[route] = fn);
+    this.m_edpoint_addition_helper(this.m_rest_endpoints.OPTIONS, this.m_rest_endpoints_with_params.OPTIONS, route, fn);
   }
 
   /**
@@ -207,7 +242,7 @@ class App {
    */
   trace(route, fn) {
     LOG('added trace:', route);
-    return !!(this.m_rest_endpoints.TRACE[route] = fn);
+    this.m_edpoint_addition_helper(this.m_rest_endpoints.TRACE, this.m_rest_endpoints_with_params.TRACE, route, fn);
   }
 
   /**
@@ -217,7 +252,7 @@ class App {
    */
   patch(route, fn) {
     LOG('added patch:', route);
-    return !!(this.m_rest_eendpoints.PATCH[route] = fn);
+    this.m_edpoint_addition_helper(this.m_rest_endpoints.PATCH, this.m_rest_endpoints_with_params.PATCH, route, fn);
   }
 
   /**
@@ -229,13 +264,30 @@ class App {
   }
 
   /**
+   * @param {IncomingMessage}
+   * @param {Parameters} parameters
+   * @returns {resFunction | false}
+   */
+  m_rest_endpoint_with_param({ uri, method }, parameters) {
+    return method in http_methods ? getResFunctionWithParams(uri, this.m_rest_endpoints_with_params[method], parameters) : !!WRN('invalid request method');
+  }
+
+  /**
    * @param {string} route route to resolve
    * @param {resFunction} fn function to resolve the request
    * @returns {boolean} wether the function was successfully registered
    */
   add(route, fn) {
     LOG('added:', route);
-    return !!(this.m_endpoints[route] = fn);
+    this.m_edpoint_addition_helper(this.m_endpoints, this.m_endpoints_with_params, route, fn);
+  }
+
+  /**
+   * @param {IncomingMessage}
+   * @returns {resFunction | false}
+   */
+  m_endpoint_with_param(req, parameters) {
+    return getResFunctionWithParams(req.uri, this.m_endpoints_with_params, parameters);
   }
   //#endregion
 
@@ -335,6 +387,21 @@ class App {
     return !!(isRoute ? (this.m_routs[route] = fn) : (this.m_endpoints[route] = fn));
   }
   //#endregion
+
+  //#region helper
+  /**
+   *
+   * @param {resolverLUT} lut_without_params
+   * @param {resolverLUT} lut_with_params
+   * @param {string} route
+   * @param {resFunction} fn
+   * @returns {boolean} wether the function was successfully registered
+   */
+  m_edpoint_addition_helper(lut_without_params, lut_with_params, route, fn) {
+    if (route.includes('/:')) return !!addResFunctionWithParams(lut_with_params, route, fn);
+    else return !!(lut_without_params[route] = fn);
+  }
+  //#endregion
 }
 
 //#region util-functions
@@ -350,6 +417,75 @@ function getResFunction(req, resolvers) {
     if (resolvers.hasOwnProperty(path)) return resolvers[path];
   }
   return resolvers['/'] || false;
+}
+
+/**
+ * @param {Object.<string, any>} resolverTree
+ * @param {string} uri
+ * @param {resFunction} fn
+ */
+function addResFunctionWithParams(resolverTree, uri, fn) {
+  let tmp = resolverTree;
+  let current_segment = [''];
+  const params = [];
+
+  for (const part of uri.split('/').splice(1)) {
+    if (part[0] !== ':' && current_segment.push(part)) continue;
+    params.push(part.slice(1));
+
+    if (current_segment.length > 1) {
+      const segment = current_segment.join('/');
+      tmp = tmp.hasOwnProperty('routes') ? tmp.routes : (tmp.routes = {});
+      tmp = tmp.hasOwnProperty(segment) ? tmp[segment] : (tmp[segment] = { param: {} });
+    }
+    current_segment = [''];
+    tmp = tmp.hasOwnProperty('param') ? tmp.param : (tmp.param = {});
+  }
+
+  if (current_segment.length > 1) {
+    const segment = current_segment.join('/');
+    tmp = tmp.hasOwnProperty('routes') ? tmp.routes : (tmp.routes = {});
+    tmp = tmp.hasOwnProperty(segment) ? tmp[segment] : (tmp[segment] = {});
+  }
+
+  tmp.params = params;
+  tmp.fn = fn;
+}
+
+/**
+ * @param {IncomingMessage} req
+ * @param {Object.<string, any>} resolverTree
+ * @param {Parameters} parameters
+ */
+function getResFunctionWithParams(uri, resolverTree, parameters) {
+  if (uri === '/') return resolverTree?.routes.hasOwnProperty('/') ? resolverTree.routes['/'].fn : false;
+
+  const params = [];
+  let tmp = resolverTree;
+  let rest = uri.split('/').slice(1);
+
+  while (true) {
+    if (tmp.hasOwnProperty('routes')) {
+      const ss = ['', ...rest];
+      for (rest = []; ss.length > 1; rest.unshift(ss.pop())) {
+        const route = ss.join('/');
+        if (tmp.routes.hasOwnProperty(route)) {
+          tmp = tmp.routes[route];
+          break;
+        }
+      }
+    }
+
+    if (!tmp.hasOwnProperty('param')) break;
+
+    tmp = tmp['param'];
+    params.push(rest.shift());
+  }
+
+  if (!tmp.hasOwnProperty('fn') || !tmp.hasOwnProperty('params')) return false;
+
+  parameters.m_add_route(tmp.params, params);
+  return tmp.fn;
 }
 
 /**
@@ -444,6 +580,7 @@ module.exports = { App, buildRes, getType, serveFromFS, getBodyJSON, throw404, H
 /**
  * @typedef {Object} params
  * @property {Object.<string, string>} query
+ * @property {Object.<string, string>} route
  */
 
 /**

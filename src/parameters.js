@@ -1,5 +1,5 @@
 class Parameters {
-  /** @type {params} */
+  /** @type {import("..").params} */
   m_parameters = { query: {}, route: {} };
 
   //#region adding params
@@ -13,8 +13,20 @@ class Parameters {
       }
   }
 
+  /**
+   * @param {string[]} key_arr
+   * @param {string[]} val_arr
+   * @returns {boolean} was_successfull
+   */
+  m_add_route(key_arr, val_arr) {
+    if (key_arr.length !== val_arr.length) return false;
+    for (let i = 0; i < key_arr.length; i++) this.m_parameters.route[key_arr[i]] = val_arr[i];
+  }
+  //#endregion
+
   constructor() {}
 
+  //#region getting params
   //#region querry
   /**
    * @param {string} name
@@ -37,6 +49,32 @@ class Parameters {
       return ERR(e) || null;
     }
   }
+  //#endregion
+
+  //#region route
+  /**
+   * @param {string} name
+   * @param {string?} defaultValue
+   * @returns {string?}
+   */
+  route(name, defaultValue = null) {
+    return this.m_parameters.route[name] || defaultValue;
+  }
+
+  /**
+   * @param {string} name
+   * @param {number?} fallback
+   * @returns {number?}
+   */
+  routeInt(name, defaultValue = null) {
+    try {
+      return parseInt(this.route(name, defaultValue));
+    } catch (e) {
+      ERR(e);
+      return null;
+    }
+  }
+  //#endregion
   //#endregion
 }
 
