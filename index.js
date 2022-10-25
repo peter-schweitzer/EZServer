@@ -1,7 +1,9 @@
 'use strict';
-//#region imports and const's
+//#region imports and global const's
 const { createServer } = require('node:http');
 const { readFile } = require('node:fs');
+
+const { Parameters } = require('./src/parameters.js');
 
 /** @type {Object.<string, string>} */
 const mimeTypes = require('./data/mimeTypes.json');
@@ -11,44 +13,6 @@ const LOG = console.log;
 const WRN = console.warn;
 const ERR = console.error;
 //#endregion
-
-class Parameters {
-  /** @type {params} */
-  m_parameters = { query: {} };
-
-  /** @param {string} query_string */
-  m_add_query(query_string) {
-    if (query_string)
-      for (const kv of query_string.split('&'))
-        (([k, v]) => {
-          if (k.length && v?.length) Object.defineProperty(this.m_parameters.query, k, { value: v });
-        })(kv.split('='));
-  }
-
-  constructor() {}
-
-  /**
-   * @param {string} name
-   * @param {string?} defaultValue
-   * @returns {string?}
-   */
-  query(name, defaultValue = null) {
-    return this.m_parameters.query[name] || defaultValue;
-  }
-
-  /**
-   * @param {string} name
-   * @param {number?} fallback
-   * @returns {number?}
-   */
-  queryInt(name, defaultValue = null) {
-    try {
-      return parseInt(this.query(name, defaultValue));
-    } catch (e) {
-      return ERR(e) || null;
-    }
-  }
-}
 
 class App {
   /** @type {Server}*/
@@ -60,7 +24,7 @@ class App {
   //#region resolverLUT data objects
   //#region endpoints
   /**@type {Object.<string, Object.<string, resFunction>>} */
-  m_restEndpoints = {
+  m_rest_endpoints = {
     /** @type {resolverLUT} */
     GET: {},
     /** @type {resolverLUT} */
@@ -87,7 +51,7 @@ class App {
 
   //#region routs
   /**@type {Object.<string, Object.<string, resFunction>>} */
-  m_restRouts = {
+  m_rest_routes = {
     /** @type {resolverLUT} */
     GET: {},
     /** @type {resolverLUT} */
@@ -114,7 +78,7 @@ class App {
 
   //#region general functions
   /**@type {Object.<string, Object.<string, resFunction>>} */
-  m_genericRestFunctions = {
+  m_generic_rest_functions = {
     /** @type {resolverLUT} */
     GET: {},
     /** @type {resolverLUT} */
@@ -136,7 +100,7 @@ class App {
   };
 
   /** @type {resolverLUT}*/
-  m_genericFunctions = {};
+  m_generic_functions = {};
   //#endregion
   //#endregion
 
@@ -146,9 +110,9 @@ class App {
 
       const [uri, query_str] = decodeURIComponent(req.url).split('?');
       Object.defineProperty(req, 'uri', { value: uri });
-      if (!!query_str) parameters.m_add_query(query_str);
+      if (query_str) parameters.m_add_query(query_str);
 
-      (this.m_restEndpoint(req) || this.m_endpoints[req.uri] || this.m_restRoute(req) || this.m_route(req) || this.m_404)(req, res, parameters);
+      (this.m_rest_endpoint(req) || this.m_endpoints[req.uri] || this.m_rest_route(req) || this.m_route(req) || this.m_404)(req, res, parameters);
     });
   }
 
@@ -173,7 +137,7 @@ class App {
    */
   get(route, fn) {
     LOG('added get:', route);
-    return !!(this.m_restEndpoints.GET[route] = fn);
+    return !!(this.m_rest_endpoints.GET[route] = fn);
   }
 
   /**
@@ -183,7 +147,7 @@ class App {
    */
   head(route, fn) {
     LOG('added head:', route);
-    return !!(this.m_restEndpoints.HEAD[route] = fn);
+    return !!(this.m_rest_endpoints.HEAD[route] = fn);
   }
 
   /**
@@ -193,7 +157,7 @@ class App {
    */
   post(route, fn) {
     LOG('added post:', route);
-    return !!(this.m_restEndpoints.POST[route] = fn);
+    return !!(this.m_rest_endpoints.POST[route] = fn);
   }
 
   /**
@@ -203,7 +167,7 @@ class App {
    */
   put(route, fn) {
     LOG('added put:', route);
-    return !!(this.m_restEndpoints.PUT[route] = fn);
+    return !!(this.m_rest_endpoints.PUT[route] = fn);
   }
 
   /**
@@ -213,7 +177,7 @@ class App {
    */
   delete(route, fn) {
     LOG('added delete:', route);
-    return !!(this.m_restEndpoints.DELETE[route] = fn);
+    return !!(this.m_rest_endpoints.DELETE[route] = fn);
   }
 
   /**
@@ -223,7 +187,7 @@ class App {
    */
   connect(route, fn) {
     LOG('added connect:', route);
-    return !!(this.m_restEndpoints.CONNECT[route] = fn);
+    return !!(this.m_rest_endpoints.CONNECT[route] = fn);
   }
 
   /**
@@ -233,7 +197,7 @@ class App {
    */
   options(route, fn) {
     LOG('added options:', route);
-    return !!(this.m_restEndpoints.OPTIONS[route] = fn);
+    return !!(this.m_rest_endpoints.OPTIONS[route] = fn);
   }
 
   /**
@@ -243,7 +207,7 @@ class App {
    */
   trace(route, fn) {
     LOG('added trace:', route);
-    return !!(this.m_restEndpoints.TRACE[route] = fn);
+    return !!(this.m_rest_endpoints.TRACE[route] = fn);
   }
 
   /**
@@ -253,15 +217,15 @@ class App {
    */
   patch(route, fn) {
     LOG('added patch:', route);
-    return !!(this.m_restEndpoints.PATCH[route] = fn);
+    return !!(this.m_rest_eendpoints.PATCH[route] = fn);
   }
 
   /**
    * @param {IncomingMessage}
    * @returns {resFunction | false}
    */
-  m_restEndpoint({ uri, method }) {
-    return method in http_methods ? this.m_restEndpoints[method][uri] : !!WRN('invalid request method');
+  m_rest_endpoint({ uri, method }) {
+    return method in http_methods ? this.m_rest_endpoints[method][uri] : !!WRN('invalid request method');
   }
 
   /**
@@ -284,18 +248,18 @@ class App {
    */
   addRestRoute(method, route, fn) {
     const m = method.toUpperCase();
-    if (!(m in http_methods)) return !!WRN('invalid method', m);
+    if (!http_methods.hasOwnProperty(m)) return !!WRN('invalid method', m);
 
     LOG('adding rest-route for method ' + m, route);
-    return !!(route.includes(':') ? false : (this.m_restRouts[m][route] = fn));
+    return !!(this.m_rest_routes[m][route] = fn);
   }
 
   /**
    * @param {IncomingMessage} req
    * @returns {(resFunction|false)}
    */
-  m_restRoute(req) {
-    return req.method in http_methods ? getResFunction(req, this.m_restRouts[req.method]) : !!WRN('invalid request method');
+  m_rest_route(req) {
+    return http_methods.hasOwnProperty(req.method) ? getResFunction(req, this.m_rest_routes[req.method]) : !!WRN('invalid request method');
   }
 
   /**
@@ -328,7 +292,7 @@ class App {
     const m = method.toUpperCase();
     if (!(m in http_methods)) return !!WRN('invalid method', m);
     if (!functionName) return !!WRN('invalid functionName', functionName);
-    return LOG('adding generic rest function for method ' + method, functionName) || !(this.m_genericRestFunctions[m][functionName] = fn);
+    return LOG('adding generic rest function for method ' + method, functionName) || !(this.m_generic_rest_functions[m][functionName] = fn);
   }
 
   /**
@@ -342,10 +306,10 @@ class App {
     const m = method.toUpperCase();
     if (!(m in http_methods)) return !!WRN('invalid method', m);
 
-    const fn = this.m_genericRestFunctions[m][functionName];
+    const fn = this.m_generic_rest_functions[m][functionName];
     if (!fn) return !!WRN('invalid function name');
 
-    return !!(isRoute ? (this.m_restRouts[m][route] = fn) : (this.m_restEndpoints[m][route] = fn));
+    return !!(isRoute ? (this.m_rest_routes[m][route] = fn) : (this.m_rest_endpoints[m][route] = fn));
   }
 
   /**
@@ -355,7 +319,7 @@ class App {
    */
   addGenericFunction(functionName, fn) {
     if (!functionName) return !!WRN('invalid functionName', functionName);
-    return !!(this.m_genericFunctions[functionName] = fn);
+    return !!(this.m_generic_functions[functionName] = fn);
   }
 
   /**
@@ -365,7 +329,7 @@ class App {
    * @returns {boolean} wether the function was successfully registered
    */
   useGenericFunction(functionName, route, isRoute = false) {
-    const fn = this.m_genericFunctions[functionName];
+    const fn = this.m_generic_functions[functionName];
     if (!fn) return !!WRN('invalid function name');
 
     return !!(isRoute ? (this.m_routs[route] = fn) : (this.m_endpoints[route] = fn));
