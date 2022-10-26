@@ -148,6 +148,9 @@ app.listen('1234');
   app.get('/param/:prm', testFunction);
   assert(app.m_rest_endpoint_with_param({ uri: '/param/pram-val', method: 'GET' }, new Parameters()) === testFunction, 'rest endpoint with param');
 
+  app.add('/param2/:prm1/:prm2', testFunction);
+  assert(app.m_endpoint_with_param({ uri: '/param2/pram1-val/pram2-val' }, new Parameters()) === testFunction, 'endpoint with param');
+
   ///////////
   ///////////
 
@@ -180,6 +183,8 @@ app.listen('1234');
       ['/get?a=a&b=b&c=c', 'GET', 3, 0],
       ['/param/prm?a=a&b=b&c=c', 'GET', 3, 1],
       ['/param/prm', 'GET', 0, 1],
+      ['/param2/pram1-val/pram2-val?a=a&b=b&c=c', 'GET', 3, 2],
+      ['/param2/pram1-val/pram2-val', 'GET', 0, 2],
     ]) {
       const txt = await (await fetch('http://127.0.0.1:1234' + u, { method: m })).text();
       console.log(m, u, txt);
