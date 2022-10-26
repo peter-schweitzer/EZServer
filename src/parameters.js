@@ -1,5 +1,5 @@
 class Parameters {
-  /** @type {import("..").params} */
+  /** @type {params} */
   m_parameters = { query: {}, route: {} };
 
   //#region adding params
@@ -79,3 +79,9 @@ class Parameters {
 }
 
 module.exports = { Parameters };
+
+/**
+ * @typedef {Object} params
+ * @property {Object.<string, string>} query
+ * @property {Object.<string, string>} route
+ */
