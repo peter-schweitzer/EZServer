@@ -150,7 +150,7 @@ class App {
   }
 
   /**
-   * @param {number|string} port port the server should listens on
+   * @param {number|string} port port the server will listen on
    * @returns {void}
    */
   listen(port) {
@@ -163,6 +163,7 @@ class App {
   }
 
   //#region endpoints
+  //#region rest endpoints
   /**
    * @param {string} route route to resolve
    * @param {resFunction} fn function to resolve the request
@@ -269,7 +270,9 @@ class App {
   m_rest_endpoint_with_param({ uri, method }, parameters) {
     return method in http_methods ? getResFunctionWithParams(uri, this.m_rest_endpoints_with_params[method], parameters) : !!WRN('invalid request method');
   }
+  //#endregion
 
+  //#region non rest endpoints
   /**
    * @param {string} route route to resolve
    * @param {resFunction} fn function to resolve the request
@@ -288,8 +291,10 @@ class App {
     return getResFunctionWithParams(req.uri, this.m_endpoints_with_params, parameters);
   }
   //#endregion
+  //#endregion
 
   //#region routs
+  //#region rest routs
   /**
    * @param {string} method http-method of the request
    * @param {string} route start of the route to resolve
@@ -311,7 +316,9 @@ class App {
   m_rest_route(req) {
     return http_methods.hasOwnProperty(req.method) ? getResFunction(req, this.m_rest_routes[req.method]) : !!WRN('invalid request method');
   }
+  //#endregion
 
+  //#region non rest endpoints
   /**
    * @param {string} route start of the route to resolve
    * @param {resFunction} fn function to resolve the request
@@ -330,8 +337,10 @@ class App {
     return getResFunction(req, this.m_routs);
   }
   //#endregion
+  //#endregion
 
   //#region generic functions
+  //#region generic rest functions
   /**
    * @param {string} method http-method
    * @param {string} functionName name of the generic function
@@ -361,7 +370,9 @@ class App {
 
     return !!(isRoute ? (this.m_rest_routes[m][route] = fn) : (this.m_rest_endpoints[m][route] = fn));
   }
+  //#endregion
 
+  //#region generic non rest functions
   /**
    * @param {string} functionName name of the generic function
    * @param {resFunction} fn function to resolve the request
@@ -384,6 +395,7 @@ class App {
 
     return !!(isRoute ? (this.m_routs[route] = fn) : (this.m_endpoints[route] = fn));
   }
+  //#endregion
   //#endregion
 
   //#region helper
