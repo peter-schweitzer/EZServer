@@ -149,18 +149,16 @@ function getBodyJSON(req) {
 
     req.on('end', () => {
       let json = { value: null };
-      let resCode = 500; // internal server error as fallback; should always be overwritten
 
       try {
         json = JSON.parse(buff);
-        resCode = req.method === 'PUT' ? 201 : 200;
       } catch (e) {
         WRN('error while parsing request body; sending code 400');
         ERR(e);
-        resCode = 400;
+        json = false;
       }
 
-      resolve({ json: json, http_code: resCode });
+      resolve(json);
     });
   });
 }
