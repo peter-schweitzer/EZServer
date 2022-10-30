@@ -3,6 +3,10 @@ const { readFile } = require('node:fs');
 /** @type {Object.<string, string>} */
 const mimeTypes = require('../data/mimeTypes.json');
 
+const LOG = console.log;
+const WRN = console.warn;
+const ERR = console.error;
+
 /**
  * @param {IncomingMessage} req
  * @param {resolverLUT} resolvers
@@ -163,7 +167,7 @@ function getBodyJSON(req) {
   });
 }
 
-module.exports = { getResFunction, addResFunctionWithParams, getResFunctionWithParams, buildRes, throw404, getType, serveFromFS, getBodyJSON };
+module.exports = { LOG, WRN, ERR, getResFunction, addResFunctionWithParams, getResFunctionWithParams, buildRes, throw404, getType, serveFromFS, getBodyJSON };
 
 /**
  * @typedef {import('http').IncomingMessage} IncomingMessage

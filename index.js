@@ -3,13 +3,22 @@
 const { createServer } = require('node:http');
 
 const { Parameters } = require('./src/parameters.js');
-const { getResFunction, addResFunctionWithParams, getResFunctionWithParams, buildRes, throw404, getType, serveFromFS, getBodyJSON } = require('./src/utils.js');
+const {
+  LOG,
+  WRN,
+  ERR,
+  getResFunction,
+  addResFunctionWithParams,
+  getResFunctionWithParams,
+  buildRes,
+  throw404,
+  getType,
+  serveFromFS,
+  getBodyJSON,
+} = require('./src/utils.js');
 
 const http_methods = { GET: 'GET', HEAD: 'HEAD', POST: 'POST', PUT: 'PUT', DELETE: 'DELETE', CONNECT: 'CONNECT', OPTIONS: 'OPTIONS', TRACE: 'TRACE', PATCH: 'PATCH' };
 
-const LOG = console.log;
-const WRN = console.warn;
-const ERR = console.error;
 //#endregion
 
 class App {
