@@ -16,9 +16,6 @@ class App {
   /** @type {Server}*/
   m_http_server;
 
-  /** @type {resFunction} */
-  m_404 = throw404;
-
   //#region resolverLUT data objects
   //#region endpoints
   //#region without param
@@ -149,6 +146,8 @@ class App {
     });
   }
 
+  //#region functions
+  //#region node:http server functions
   /**
    * @param {number|string} port port the server will listen on
    * @returns {void}
@@ -161,6 +160,7 @@ class App {
   close() {
     this.m_http_server.close((err) => (err ? ERR("server couldn't be closed") : WRN('server was closed')));
   }
+  //#endregion
 
   //#region endpoints
   //#region rest endpoints
@@ -285,10 +285,11 @@ class App {
 
   /**
    * @param {IncomingMessage}
+   * @param {Parameters}
    * @returns {resFunction | false}
    */
-  m_endpoint_with_param(req, parameters) {
-    return getResFunctionWithParams(req.uri, this.m_endpoints_with_params, parameters);
+  m_endpoint_with_param({ uri }, parameters) {
+    return getResFunctionWithParams(uri, this.m_endpoints_with_params, parameters);
   }
   //#endregion
   //#endregion
@@ -411,6 +412,11 @@ class App {
     if (route.includes('/:')) return !!addResFunctionWithParams(lut_with_params, route, fn);
     else return !!(lut_without_params[route] = fn);
   }
+  //#endregion
+
+  /** @type {resFunction} */
+  m_404 = throw404;
+
   //#endregion
 }
 
