@@ -288,7 +288,7 @@ class App {
    * @returns {resFunction | false}
    */
   m_endpoint({ uri }) {
-    return this.m_endpoints.hasOwnProperty(req.uri) ? this.m_endpoints[uri] : false;
+    return this.m_endpoints.hasOwnProperty(uri) ? this.m_endpoints[uri] : false;
   }
 
   /**
