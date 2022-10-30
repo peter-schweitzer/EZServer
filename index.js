@@ -136,7 +136,7 @@ class App {
 
       (
         this.m_rest_endpoint(req) ||
-        this.m_endpoints[req.uri] ||
+        this.m_endpoint(req) ||
         this.m_rest_endpoint_with_param(req, parameters) ||
         this.m_endpoint_with_param(req, parameters) ||
         this.m_rest_route(req) ||
@@ -281,6 +281,14 @@ class App {
   add(route, fn) {
     LOG('added:', route);
     this.m_edpoint_addition_helper(this.m_endpoints, this.m_endpoints_with_params, route, fn);
+  }
+
+  /**
+   * @param {IncomingMessage}
+   * @returns {resFunction | false}
+   */
+  m_endpoint({ uri }) {
+    return this.m_endpoints.hasOwnProperty(req.uri) ? this.m_endpoints[uri] : false;
   }
 
   /**
