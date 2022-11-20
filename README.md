@@ -9,15 +9,15 @@ simple, ultra light weight node.js module with 0 dependencies for simple backend
 
 ## Resolving requests
 
-The most basic way of resolving a request is usíng the 'add' function of the app.
-Eg. to resolve a request to `/myrequest` and respond with `Hello World!` do the following:
+The most basic way of resolving a request is using the 'add' function of the app.
+Eg. to resolve a request to `/myRequest` and respond with `Hello World!` do the following:
 
 ```js
 const { App, buildRes } = require('@peter-schweitzer/ezserver');
 
 const app = new App();
 
-app.add('/myrequest', (req, res) => {
+app.add('/myRequest', (req, res) => {
   buildRes(res, 'Hello World!');
 });
 
