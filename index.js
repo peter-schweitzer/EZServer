@@ -164,9 +164,17 @@ class App {
     this.m_http_server.listen(port, () => LOG(`server listening on port ${port}`));
   }
 
-  /** @returns {void} */
+  /** @returns {boolean} false if the server isn't open when close is called */
   close() {
-    this.m_http_server.close((err) => (err ? ERR("server couldn't be closed") : WRN('server was closed')));
+    new Promise((resolve, reject) => this.m_http_server.close((err) => (err ? reject('error on close', err) : resolve('server is closed'))))
+      .catch((err) => {
+        ERR(err);
+        return false;
+      })
+      .then((wrn) => {
+        WRN(wrn);
+        return true;
+      });
   }
   //#endregion
 
