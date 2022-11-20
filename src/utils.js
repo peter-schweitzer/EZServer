@@ -143,27 +143,23 @@ function serveFromFS(res, filePath, statusCode = 200) {
 
 /**
  * @param {IncomingMessage} req
- * @return {Promise<{json: Object<string, any>, http_code: number}>}
+ * @return {Promise<{json: Object|null, err: Object|null }>}
  */
 function getBodyJSON(req) {
   return new Promise((resolve) => {
     let buff = '';
 
-    req.on('data', (chunk) => {
-      buff += chunk;
-    });
+    req.on('data', (chunk) => (buff += chunk));
 
     req.on('end', () => {
-      let json = { value: null };
+      let json = { json: null, err: null };
 
       try {
-        json = JSON.parse(buff);
+        json.json = JSON.parse(buff);
       } catch (e) {
-        WRN('error while parsing request body; sending code 400');
-        ERR(e);
-        json = false;
+        ERR('error in getBodyJSON', e);
+        json.err = e;
       }
-
       resolve(json);
     });
   });
