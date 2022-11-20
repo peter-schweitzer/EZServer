@@ -34,6 +34,7 @@ class Parameters {
    * @returns {string?}
    */
   query(name, defaultValue = null) {
+    if (!name || typeof name !== 'string') return null;
     return this.m_parameters.query[name] || defaultValue;
   }
 
@@ -43,6 +44,7 @@ class Parameters {
    * @returns {number?}
    */
   queryInt(name, defaultValue = null) {
+    if (!name || typeof name !== 'string') return null;
     try {
       return parseInt(this.query(name, defaultValue));
     } catch (e) {
@@ -58,6 +60,7 @@ class Parameters {
    * @returns {string?}
    */
   route(name, defaultValue = null) {
+    if (!name || typeof name !== 'string') return null;
     return this.m_parameters.route[name] || defaultValue;
   }
 
@@ -67,6 +70,7 @@ class Parameters {
    * @returns {number?}
    */
   routeInt(name, defaultValue = null) {
+    if (!name || typeof name !== 'string') return null;
     try {
       return parseInt(this.route(name, defaultValue));
     } catch (e) {
