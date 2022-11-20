@@ -91,7 +91,7 @@ function getResFunctionWithParams(uri, resolverTree, parameters) {
 }
 
 /**
- * @param {ServerResponse} res respnose from the server
+ * @param {ServerResponse} res response from the server
  * @param {any} data data of the response
  * @param {Object} options optional options
  * @param {number} options.code status code of the response (default is 200)
@@ -128,7 +128,7 @@ function getType(filePathOrName) {
 /**
  * @param {ServerResponse} res response from the Server
  * @param {string} filePath path of the file
- * @param {number} statusCode status code f thoe response (default 200)
+ * @param {number} statusCode status code df the response (default 200)
  * @returns {void}
  */
 function serveFromFS(res, filePath, statusCode = 200) {

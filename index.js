@@ -156,7 +156,7 @@ class App {
   }
 
   //#region functions
-  //#region node:http server functions
+  //#region node:http Server functions
   /**
    * @param {number|string} port port the server will listen on
    * @returns {void}
@@ -174,93 +174,93 @@ class App {
   //#region endpoints
   //#region rest endpoints
   /**
-   * @param {string} route route to resolve
-   * @param {resFunction} fn function to resolve the request
+   * @param {string} uri uri to resolve
+   * @param {resFunction} fn function for resolve the request
    * @returns {boolean} wether the function was successfully registered
    */
-  get(route, fn) {
-    LOG('added get:', route);
-    this.m_edpoint_addition_helper(this.m_rest_endpoints.GET, this.m_rest_endpoints_with_params.GET, route, fn);
+  get(uri, fn) {
+    LOG('added get:', uri);
+    this.m_endpoint_addition_helper(this.m_rest_endpoints.GET, this.m_rest_endpoints_with_params.GET, uri, fn);
   }
 
   /**
-   * @param {string} route route to resolve
-   * @param {resFunction} fn function to resolve the request
+   * @param {string} uri uri to resolve
+   * @param {resFunction} fn function for resolve the request
    * @returns {boolean} wether the function was successfully registered
    */
-  head(route, fn) {
-    LOG('added head:', route);
-    this.m_edpoint_addition_helper(this.m_rest_endpoints.HEAD, this.m_rest_endpoints_with_params.HEAD, route, fn);
+  head(uri, fn) {
+    LOG('added head:', uri);
+    this.m_endpoint_addition_helper(this.m_rest_endpoints.HEAD, this.m_rest_endpoints_with_params.HEAD, uri, fn);
   }
 
   /**
-   * @param {string} route route to resolve
-   * @param {resFunction} fn function to resolve the request
+   * @param {string} uri uri to resolve
+   * @param {resFunction} fn function for resolve the request
    * @returns {boolean} wether the function was successfully registered
    */
-  post(route, fn) {
-    LOG('added post:', route);
-    this.m_edpoint_addition_helper(this.m_rest_endpoints.POST, this.m_rest_endpoints_with_params.POST, route, fn);
+  post(uri, fn) {
+    LOG('added post:', uri);
+    this.m_endpoint_addition_helper(this.m_rest_endpoints.POST, this.m_rest_endpoints_with_params.POST, uri, fn);
   }
 
   /**
-   * @param {string} route route to resolve
-   * @param {resFunction} fn function to resolve the request
+   * @param {string} uri uri to resolve
+   * @param {resFunction} fn function for resolve the request
    * @returns {boolean} wether the function was successfully registered
    */
-  put(route, fn) {
-    LOG('added put:', route);
-    this.m_edpoint_addition_helper(this.m_rest_endpoints.PUT, this.m_rest_endpoints_with_params.PUT, route, fn);
+  put(uri, fn) {
+    LOG('added put:', uri);
+    this.m_endpoint_addition_helper(this.m_rest_endpoints.PUT, this.m_rest_endpoints_with_params.PUT, uri, fn);
   }
 
   /**
-   * @param {string} route route to resolve
-   * @param {resFunction} fn function to resolve the request
+   * @param {string} uri uri to resolve
+   * @param {resFunction} fn function for resolve the request
    * @returns {boolean} wether the function was successfully registered
    */
-  delete(route, fn) {
-    LOG('added delete:', route);
-    this.m_edpoint_addition_helper(this.m_rest_endpoints.DELETE, this.m_rest_endpoints_with_params.DELETE, route, fn);
+  delete(uri, fn) {
+    LOG('added delete:', uri);
+    this.m_endpoint_addition_helper(this.m_rest_endpoints.DELETE, this.m_rest_endpoints_with_params.DELETE, uri, fn);
   }
 
   /**
-   * @param {string} route route to resolve
-   * @param {resFunction} fn function to resolve the request
+   * @param {string} uri uri to resolve
+   * @param {resFunction} fn function for resolve the request
    * @returns {boolean} wether the function was successfully registered
    */
-  connect(route, fn) {
-    LOG('added connect:', route);
-    this.m_edpoint_addition_helper(this.m_rest_endpoints.CONNECT, this.m_rest_endpoints_with_params.CONNECT, route, fn);
+  connect(uri, fn) {
+    LOG('added connect:', uri);
+    this.m_endpoint_addition_helper(this.m_rest_endpoints.CONNECT, this.m_rest_endpoints_with_params.CONNECT, uri, fn);
   }
 
   /**
-   * @param {string} route route to resolve
-   * @param {resFunction} fn function to resolve the request
+   * @param {string} uri uri to resolve
+   * @param {resFunction} fn function for resolve the request
    * @returns {boolean} wether the function was successfully registered
    */
-  options(route, fn) {
-    LOG('added options:', route);
-    this.m_edpoint_addition_helper(this.m_rest_endpoints.OPTIONS, this.m_rest_endpoints_with_params.OPTIONS, route, fn);
+  options(uri, fn) {
+    LOG('added options:', uri);
+    this.m_endpoint_addition_helper(this.m_rest_endpoints.OPTIONS, this.m_rest_endpoints_with_params.OPTIONS, uri, fn);
   }
 
   /**
-   * @param {string} route route to resolve
-   * @param {resFunction} fn function to resolve the request
+   * @param {string} uri uri to resolve
+   * @param {resFunction} fn function for resolve the request
    * @returns {boolean} wether the function was successfully registered
    */
-  trace(route, fn) {
-    LOG('added trace:', route);
-    this.m_edpoint_addition_helper(this.m_rest_endpoints.TRACE, this.m_rest_endpoints_with_params.TRACE, route, fn);
+  trace(uri, fn) {
+    LOG('added trace:', uri);
+    this.m_endpoint_addition_helper(this.m_rest_endpoints.TRACE, this.m_rest_endpoints_with_params.TRACE, uri, fn);
   }
 
   /**
-   * @param {string} route route to resolve
-   * @param {resFunction} fn function to resolve the request
+   * @param {string} uri uri to resolve
+   * @param {resFunction} fn function for resolve the request
    * @returns {boolean} wether the function was successfully registered
    */
-  patch(route, fn) {
-    LOG('added patch:', route);
-    this.m_edpoint_addition_helper(this.m_rest_endpoints.PATCH, this.m_rest_endpoints_with_params.PATCH, route, fn);
+  patch(uri, fn) {
+    LOG('added patch:', uri);
+    this.m_endpoint_addition_helper(this.m_rest_endpoints.PATCH, this.m_rest_endpoints_with_params.PATCH, uri, fn);
   }
 
   /**
@@ -283,13 +283,13 @@ class App {
 
   //#region non rest endpoints
   /**
-   * @param {string} route route to resolve
-   * @param {resFunction} fn function to resolve the request
+   * @param {string} uri uri to resolve
+   * @param {resFunction} fn function for resolve the request
    * @returns {boolean} wether the function was successfully registered
    */
-  add(route, fn) {
-    LOG('added:', route);
-    this.m_edpoint_addition_helper(this.m_endpoints, this.m_endpoints_with_params, route, fn);
+  add(uri, fn) {
+    LOG('added:', uri);
+    this.m_endpoint_addition_helper(this.m_endpoints, this.m_endpoints_with_params, uri, fn);
   }
 
   /**
@@ -315,16 +315,16 @@ class App {
   //#region rest routs
   /**
    * @param {string} method http-method of the request
-   * @param {string} route start of the route to resolve
-   * @param {resFunction} fn function to resolve the request
+   * @param {string} uri start of the uri to resolve
+   * @param {resFunction} fn function for resolve the request
    * @returns {boolean} wether the function was successfully registered
    */
-  addRestRoute(method, route, fn) {
+  addRestRoute(method, uri, fn) {
     const m = method.toUpperCase();
     if (!http_methods.hasOwnProperty(m)) return !!WRN('invalid method', m);
 
-    LOG('adding rest-route for method ' + m, route);
-    return !!(this.m_rest_routes[m][route] = fn);
+    LOG('adding rest-route for method ' + m, uri);
+    return !!(this.m_rest_routes[m][uri] = fn);
   }
 
   /**
@@ -338,13 +338,13 @@ class App {
 
   //#region non rest endpoints
   /**
-   * @param {string} route start of the route to resolve
-   * @param {resFunction} fn function to resolve the request
+   * @param {string} uri start of the uri to resolve
+   * @param {resFunction} fn function for resolve the request
    * @returns {boolean} wether the function was successfully registered
    */
-  addRoute(route, fn) {
-    LOG('adding route', route);
-    return !!(this.m_routs[route] = fn);
+  addRoute(uri, fn) {
+    LOG('adding route', uri);
+    return !!(this.m_routs[uri] = fn);
   }
 
   /**
@@ -362,7 +362,7 @@ class App {
   /**
    * @param {string} method http-method
    * @param {string} functionName name of the generic function
-   * @param {resFunction} fn function to resolve the request
+   * @param {resFunction} fn function for resolve the request
    * @returns {boolean} wether the function was successfully registered
    */
   addGenericRestFunction(method, functionName, fn) {
@@ -375,25 +375,25 @@ class App {
   /**
    * @param {string} method http-method
    * @param {string} functionName name of the generic function
-   * @param {string} route route to resolve
+   * @param {string} uri uri to resolve
    * @param {boolean} isRoute wether to register a route or endpoint
    * @returns {boolean} wether the function was successfully registered
    */
-  useGenericRestFunction(method, functionName, route, isRoute = false) {
+  useGenericRestFunction(method, functionName, uri, isRoute = false) {
     const m = method.toUpperCase();
     if (!(m in http_methods)) return !!WRN('invalid method', m);
 
     const fn = this.m_generic_rest_functions[m][functionName];
     if (!fn) return !!WRN('invalid function name');
 
-    return !!(isRoute ? (this.m_rest_routes[m][route] = fn) : (this.m_rest_endpoints[m][route] = fn));
+    return !!(isRoute ? (this.m_rest_routes[m][uri] = fn) : (this.m_rest_endpoints[m][uri] = fn));
   }
   //#endregion
 
   //#region generic non rest functions
   /**
    * @param {string} functionName name of the generic function
-   * @param {resFunction} fn function to resolve the request
+   * @param {resFunction} fn function for resolve the request
    * @returns {boolean} wether the function was successfully registered
    */
   addGenericFunction(functionName, fn) {
@@ -403,15 +403,15 @@ class App {
 
   /**
    * @param {string} functionName name of the generic function
-   * @param {string} route route to resolve
+   * @param {string} uri uri to resolve
    * @param {boolean} isRoute wether to register a route or endpoint
    * @returns {boolean} wether the function was successfully registered
    */
-  useGenericFunction(functionName, route, isRoute = false) {
+  useGenericFunction(functionName, uri, isRoute = false) {
     const fn = this.m_generic_functions[functionName];
     if (!fn) return !!WRN('invalid function name');
 
-    return !!(isRoute ? (this.m_routs[route] = fn) : (this.m_endpoints[route] = fn));
+    return !!(isRoute ? (this.m_routs[uri] = fn) : (this.m_endpoints[uri] = fn));
   }
   //#endregion
   //#endregion
@@ -421,13 +421,13 @@ class App {
    *
    * @param {resolverLUT} lut_without_params
    * @param {resolverLUT} lut_with_params
-   * @param {string} route
+   * @param {string} uri
    * @param {resFunction} fn
    * @returns {boolean} wether the function was successfully registered
    */
-  m_edpoint_addition_helper(lut_without_params, lut_with_params, route, fn) {
-    if (route.includes('/:')) return !!addResFunctionWithParams(lut_with_params, route, fn);
-    else return !!(lut_without_params[route] = fn);
+  m_endpoint_addition_helper(lut_without_params, lut_with_params, uri, fn) {
+    if (uri.includes('/:')) return !!addResFunctionWithParams(lut_with_params, uri, fn);
+    else return !!(lut_without_params[uri] = fn);
   }
   //#endregion
 

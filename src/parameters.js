@@ -16,7 +16,7 @@ class Parameters {
   /**
    * @param {string[]} key_arr
    * @param {string[]} val_arr
-   * @returns {boolean} was_successfull
+   * @returns {boolean} was_successful
    */
   m_add_route(key_arr, val_arr) {
     if (key_arr.length !== val_arr.length) return false;
@@ -27,7 +27,7 @@ class Parameters {
   constructor() {}
 
   //#region getting params
-  //#region querry
+  //#region query
   /**
    * @param {string} name
    * @param {string?} defaultValue
@@ -39,7 +39,7 @@ class Parameters {
 
   /**
    * @param {string} name
-   * @param {number?} fallback
+   * @param {number?} defaultValue
    * @returns {number?}
    */
   queryInt(name, defaultValue = null) {
@@ -63,7 +63,7 @@ class Parameters {
 
   /**
    * @param {string} name
-   * @param {number?} fallback
+   * @param {number?} defaultValue
    * @returns {number?}
    */
   routeInt(name, defaultValue = null) {

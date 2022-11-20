@@ -4,13 +4,13 @@ const app = new App();
 app.listen('65535');
 
 /**
- ** ================ EZServer Supports Endopoints ===================
+ ** ================ EZServer Supports Endpoints ===================
  */
 
-// An Endopoint only resolves the specified URI.
-// Endopoints have the highest specificity, so 'over-write' Routs
+// An Endpoint only resolves the specified URI.
+// Endpoints have the highest specificity, so 'over-write' Routs
 
-// these are the most specific, as they only resolve a specific URI with a specific HTTP-mehtods
+// these are the most specific, as they only resolve a specific URI with a specific HTTP-methods
 app.get('/get', (req, res) => {
   buildRes(res, 'get');
 });
@@ -38,7 +38,7 @@ app.add('/favicon.ico', () => buildRes(res, '', { code: 404, mime: 'text/plain' 
  ** ================ EZServer Supports Routs ===================
  */
 
-//These resolve all requests, with the specified HTTP-method, to routes beginning with the specified route ('/' - seperated)
+//These resolve all requests, with the specified HTTP-method, to routes beginning with the specified route ('/' - separated)
 app.addRestRoute('get', '/rest/get', (req, res) => {
   buildRes(res, 'get-route');
 });
@@ -55,7 +55,7 @@ app.addRestRoute('patch', '/rest/patch', (req, res) => {
   buildRes(res, 'patch-route');
 });
 
-//addRoute again ignores the HTTP-mehtod (similar to add()), hence being less specific than addRestRoute()
+//addRoute again ignores the HTTP-method (similar to add()), hence being less specific than addRestRoute()
 app.addRoute('/route', (req, res) => {
   buildRes(res, `route`);
 });
