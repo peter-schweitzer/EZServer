@@ -7,6 +7,8 @@ const LOG = console.log;
 const WRN = console.warn;
 const ERR = console.error;
 
+const HTTP_METHODS = { GET: 'GET', HEAD: 'HEAD', POST: 'POST', PUT: 'PUT', DELETE: 'DELETE', CONNECT: 'CONNECT', OPTIONS: 'OPTIONS', TRACE: 'TRACE', PATCH: 'PATCH' };
+
 /**
  * @param {IncomingMessage} req
  * @param {resolverLUT} resolvers
@@ -167,7 +169,20 @@ function getBodyJSON(req) {
   });
 }
 
-module.exports = { LOG, WRN, ERR, getResFunction, addResFunctionWithParams, getResFunctionWithParams, buildRes, throw404, getType, serveFromFS, getBodyJSON };
+module.exports = {
+  LOG,
+  WRN,
+  ERR,
+  HTTP_METHODS,
+  getResFunction,
+  addResFunctionWithParams,
+  getResFunctionWithParams,
+  buildRes,
+  throw404,
+  getType,
+  serveFromFS,
+  getBodyJSON,
+};
 
 /**
  * @typedef {import('http').IncomingMessage} IncomingMessage

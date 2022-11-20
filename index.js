@@ -7,6 +7,7 @@ const {
   LOG,
   WRN,
   ERR,
+  HTTP_METHODS,
   getResFunction,
   addResFunctionWithParams,
   getResFunctionWithParams,
@@ -16,8 +17,6 @@ const {
   serveFromFS,
   getBodyJSON,
 } = require('./src/utils.js');
-
-const http_methods = { GET: 'GET', HEAD: 'HEAD', POST: 'POST', PUT: 'PUT', DELETE: 'DELETE', CONNECT: 'CONNECT', OPTIONS: 'OPTIONS', TRACE: 'TRACE', PATCH: 'PATCH' };
 
 //#endregion
 
@@ -268,7 +267,7 @@ class App {
    * @returns {resFunction | false}
    */
   m_rest_endpoint({ uri, method }) {
-    return method in http_methods ? this.m_rest_endpoints[method][uri] : !!WRN('invalid request method');
+    return method in HTTP_METHODS ? this.m_rest_endpoints[method][uri] : !!WRN('invalid request method');
   }
 
   /**
@@ -277,7 +276,7 @@ class App {
    * @returns {resFunction | false}
    */
   m_rest_endpoint_with_param({ uri, method }, parameters) {
-    return method in http_methods ? getResFunctionWithParams(uri, this.m_rest_endpoints_with_params[method], parameters) : !!WRN('invalid request method');
+    return method in HTTP_METHODS ? getResFunctionWithParams(uri, this.m_rest_endpoints_with_params[method], parameters) : !!WRN('invalid request method');
   }
   //#endregion
 
@@ -321,7 +320,7 @@ class App {
    */
   addRestRoute(method, uri, fn) {
     const m = method.toUpperCase();
-    if (!http_methods.hasOwnProperty(m)) return !!WRN('invalid method', m);
+    if (!HTTP_METHODS.hasOwnProperty(m)) return !!WRN('invalid method', m);
 
     LOG('adding rest-route for method ' + m, uri);
     return !!(this.m_rest_routes[m][uri] = fn);
@@ -332,7 +331,7 @@ class App {
    * @returns {(resFunction|false)}
    */
   m_rest_route(req) {
-    return http_methods.hasOwnProperty(req.method) ? getResFunction(req, this.m_rest_routes[req.method]) : !!WRN('invalid request method');
+    return HTTP_METHODS.hasOwnProperty(req.method) ? getResFunction(req, this.m_rest_routes[req.method]) : !!WRN('invalid request method');
   }
   //#endregion
 
@@ -367,7 +366,7 @@ class App {
    */
   addGenericRestFunction(method, functionName, fn) {
     const m = method.toUpperCase();
-    if (!(m in http_methods)) return !!WRN('invalid method', m);
+    if (!(m in HTTP_METHODS)) return !!WRN('invalid method', m);
     if (!functionName) return !!WRN('invalid functionName', functionName);
     return LOG('adding generic rest function for method ' + method, functionName) || !(this.m_generic_rest_functions[m][functionName] = fn);
   }
@@ -381,7 +380,7 @@ class App {
    */
   useGenericRestFunction(method, functionName, uri, isRoute = false) {
     const m = method.toUpperCase();
-    if (!(m in http_methods)) return !!WRN('invalid method', m);
+    if (!(m in HTTP_METHODS)) return !!WRN('invalid method', m);
 
     const fn = this.m_generic_rest_functions[m][functionName];
     if (!fn) return !!WRN('invalid function name');
@@ -437,7 +436,7 @@ class App {
   //#endregion
 }
 
-module.exports = { App, buildRes, getType, serveFromFS, getBodyJSON, throw404, HTTP_METHODS: http_methods };
+module.exports = { App, buildRes, getType, serveFromFS, getBodyJSON, throw404, HTTP_METHODS };
 
 //#region typedef's
 /**
