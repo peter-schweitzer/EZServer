@@ -7,15 +7,16 @@ const {
   LOG,
   WRN,
   ERR,
-  HTTP_METHODS,
+  addEndpointWithOrWithoutParams,
   getResFunction,
-  addResFunctionWithParams,
   getResFunctionWithParams,
-  buildRes,
-  throw404,
-  getType,
-  serveFromFS,
+
   getBodyJSON,
+  getType,
+  buildRes,
+  serveFromFS,
+  throw404,
+  HTTP_METHODS,
 } = require('./src/utils.js');
 
 //#endregion
@@ -187,7 +188,7 @@ class App {
    */
   get(uri, fn) {
     LOG('added get:', uri);
-    this.m_endpoint_addition_helper(this.m_rest_endpoints.GET, this.m_rest_endpoints_with_params.GET, uri, fn);
+    addEndpointWithOrWithoutParams(this.m_rest_endpoints.GET, this.m_rest_endpoints_with_params.GET, uri, fn);
   }
 
   /**
@@ -197,7 +198,7 @@ class App {
    */
   head(uri, fn) {
     LOG('added head:', uri);
-    this.m_endpoint_addition_helper(this.m_rest_endpoints.HEAD, this.m_rest_endpoints_with_params.HEAD, uri, fn);
+    addEndpointWithOrWithoutParams(this.m_rest_endpoints.HEAD, this.m_rest_endpoints_with_params.HEAD, uri, fn);
   }
 
   /**
@@ -207,7 +208,7 @@ class App {
    */
   post(uri, fn) {
     LOG('added post:', uri);
-    this.m_endpoint_addition_helper(this.m_rest_endpoints.POST, this.m_rest_endpoints_with_params.POST, uri, fn);
+    addEndpointWithOrWithoutParams(this.m_rest_endpoints.POST, this.m_rest_endpoints_with_params.POST, uri, fn);
   }
 
   /**
@@ -217,7 +218,7 @@ class App {
    */
   put(uri, fn) {
     LOG('added put:', uri);
-    this.m_endpoint_addition_helper(this.m_rest_endpoints.PUT, this.m_rest_endpoints_with_params.PUT, uri, fn);
+    addEndpointWithOrWithoutParams(this.m_rest_endpoints.PUT, this.m_rest_endpoints_with_params.PUT, uri, fn);
   }
 
   /**
@@ -227,7 +228,7 @@ class App {
    */
   delete(uri, fn) {
     LOG('added delete:', uri);
-    this.m_endpoint_addition_helper(this.m_rest_endpoints.DELETE, this.m_rest_endpoints_with_params.DELETE, uri, fn);
+    addEndpointWithOrWithoutParams(this.m_rest_endpoints.DELETE, this.m_rest_endpoints_with_params.DELETE, uri, fn);
   }
 
   /**
@@ -237,7 +238,7 @@ class App {
    */
   connect(uri, fn) {
     LOG('added connect:', uri);
-    this.m_endpoint_addition_helper(this.m_rest_endpoints.CONNECT, this.m_rest_endpoints_with_params.CONNECT, uri, fn);
+    addEndpointWithOrWithoutParams(this.m_rest_endpoints.CONNECT, this.m_rest_endpoints_with_params.CONNECT, uri, fn);
   }
 
   /**
@@ -247,7 +248,7 @@ class App {
    */
   options(uri, fn) {
     LOG('added options:', uri);
-    this.m_endpoint_addition_helper(this.m_rest_endpoints.OPTIONS, this.m_rest_endpoints_with_params.OPTIONS, uri, fn);
+    addEndpointWithOrWithoutParams(this.m_rest_endpoints.OPTIONS, this.m_rest_endpoints_with_params.OPTIONS, uri, fn);
   }
 
   /**
@@ -257,7 +258,7 @@ class App {
    */
   trace(uri, fn) {
     LOG('added trace:', uri);
-    this.m_endpoint_addition_helper(this.m_rest_endpoints.TRACE, this.m_rest_endpoints_with_params.TRACE, uri, fn);
+    addEndpointWithOrWithoutParams(this.m_rest_endpoints.TRACE, this.m_rest_endpoints_with_params.TRACE, uri, fn);
   }
 
   /**
@@ -267,7 +268,7 @@ class App {
    */
   patch(uri, fn) {
     LOG('added patch:', uri);
-    this.m_endpoint_addition_helper(this.m_rest_endpoints.PATCH, this.m_rest_endpoints_with_params.PATCH, uri, fn);
+    addEndpointWithOrWithoutParams(this.m_rest_endpoints.PATCH, this.m_rest_endpoints_with_params.PATCH, uri, fn);
   }
 
   /**
@@ -296,7 +297,7 @@ class App {
    */
   add(uri, fn) {
     LOG('added:', uri);
-    this.m_endpoint_addition_helper(this.m_endpoints, this.m_endpoints_with_params, uri, fn);
+    addEndpointWithOrWithoutParams(this.m_endpoints, this.m_endpoints_with_params, uri, fn);
   }
 
   /**
@@ -421,21 +422,6 @@ class App {
     return !!(isRoute ? (this.m_routs[uri] = fn) : (this.m_endpoints[uri] = fn));
   }
   //#endregion
-  //#endregion
-
-  //#region helper
-  /**
-   *
-   * @param {resolverLUT} lut_without_params
-   * @param {resolverLUT} lut_with_params
-   * @param {string} uri
-   * @param {resFunction} fn
-   * @returns {boolean} wether the function was successfully registered
-   */
-  m_endpoint_addition_helper(lut_without_params, lut_with_params, uri, fn) {
-    if (uri.includes('/:')) return !!addResFunctionWithParams(lut_with_params, uri, fn);
-    else return !!(lut_without_params[uri] = fn);
-  }
   //#endregion
 
   /** @type {resFunction} */

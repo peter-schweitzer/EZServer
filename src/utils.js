@@ -93,6 +93,19 @@ function getResFunctionWithParams(uri, resolverTree, parameters) {
 }
 
 /**
+ *
+ * @param {resolverLUT} lut_without_params
+ * @param {resolverLUT} lut_with_params
+ * @param {string} uri
+ * @param {resFunction} fn
+ * @returns {boolean} wether the function was successfully registered
+ */
+function addEndpointWithOrWithoutParams(lut_without_params, lut_with_params, uri, fn) {
+  if (uri.includes('/:')) return !!addResFunctionWithParams(lut_with_params, uri, fn);
+  else return !!(lut_without_params[uri] = fn);
+}
+
+/**
  * @param {ServerResponse} res response from the server
  * @param {any} data data of the response
  * @param {Object} options optional options
@@ -170,14 +183,15 @@ module.exports = {
   WRN,
   ERR,
   HTTP_METHODS,
+  addEndpointWithOrWithoutParams,
   getResFunction,
   addResFunctionWithParams,
   getResFunctionWithParams,
   buildRes,
-  throw404,
   getType,
-  serveFromFS,
   getBodyJSON,
+  serveFromFS,
+  throw404,
 };
 
 /**
