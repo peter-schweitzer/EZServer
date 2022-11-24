@@ -377,11 +377,84 @@ _**[generic functions:](#generic-functions)**_
 
 #### addGenericRestFunction
 
+> ```js
+> addGenericRestFunction(method: string, functionName: string, fn: resFunction): boolean
+> ```
+
+> ```js
+> app.addGenericRestFunction(HTTP_METHODS.GET, 'GenericGET', (_, res, _) => {
+>   buildRes(res, "triggered generic rest function for method 'GET', named 'GenericGET'");
+> });
+> ```
+
+Here `app` is the [EZServer instance](#app).
+Here `HTTP_METHODS` is the [HTTP_METHODS object](#http_methods).
+
+The function is stored in the [EZServer instance](#app) under the name `GenericGET`.
+It can be used unlimited times.
+[To do so](#usegenericrestfunction) reference it by it's name ('GenericGET').
+The function only succeeds (returns true) if the specified method is valid (see [HTTP_METHODS object](#http_methods) for more information).
+
 #### useGenericRestFunction
+
+> ```js
+> useGenericRestFunction(method: string, functionName: string, uri: string, isRoute: boolean false): boolean
+> ```
+
+> ```js
+> app.useGenericRestFunction(HTTP_METHODS.GET, 'GenericGet', '/generic ', false): boolean
+> app.useGenericRestFunction(HTTP_METHODS.GET, 'GenericGet', '/generic/route ', true): boolean
+> ```
+
+Here `app` is the [EZServer instance](#app).
+Here `HTTP_METHODS` is the [HTTP_METHODS object](#http_methods).
+
+The `functionName` is the name given to the function you want to use use (see [addGenericRestFunction](#addgenericrestfunction))
+If `isRoute` is set to `false` the function uses the same mechanism, as the functions described in the [rest endpoints](#restendpoints) section, under the hood.
+If `isRoute` is set to `true` the function uses the same mechanism as [addRestRoute](#addrestroute) under the hood.
+The function only succeeds (returns true) if the specified method is valid (see [HTTP_METHODS object](#http_methods) for more information).
 
 #### addGenericFunction
 
+> ```js
+> addGenericFunction(functionName: string, fn: resFunction): boolean
+> ```
+
+> ```js
+> app.addGenericFunction('Generic', (_, res, _) => {
+>   buildRes(res, "triggered generic function named 'Generic'");
+> });
+> ```
+
+Here `app` is the [EZServer instance](#app).
+
+The function is stored in the [EZServer instance](#app) under the name `Generic`.
+It can be used unlimited times.
+[To do so](#usegenericrestfunction) reference it by it's name ('Generic').
+
 #### useGenericFunction
+
+> ```js
+> useGenericFunction(functionName: string, uri: string, isRoute: boolean false): boolean
+> ```
+
+> ```js
+> app.useGenericFunction('GenericGet', '/generic ', false): boolean
+> app.useGenericFunction('GenericGet', '/generic/route ', true): boolean
+> ```
+
+Here `app` is the [EZServer instance](#app).
+
+The `functionName` is the name given to the function you want to use use (see [addGenericFunction](#addgenericfunction))
+If `isRoute` is set to `false` the function uses the same mechanism as [add](#add) under the hood.
+If `isRoute` is set to `true` the function uses the same mechanism as [addRoute](#addroute) under the hood.
+
+### Internals
+
+Internal variables and functions are prefixed with `m_` and in snake-case.
+You can access and modify all of the internal data-structures, but is strongly discouraged unless you know what you are doing.
+
+You can read more about the implementation in [`dev.md > App > internals`](https://github.com/peter-schweitzer/EZServer/tree/master/documentation/dev.md#internals).
 
 <!---->
 
