@@ -53,7 +53,7 @@ routes are URIs that can be triggered by any URI that starts with the route (can
 
 App - main class of EZServer
 |
-|_**[application life time:](#application-life-time)**_
+|-_**[application life time:](#application-life-time)**_
 | |-[constructor](#constructor)
 | |-[listen](#listen)
 | '-[close](#close)
@@ -68,6 +68,7 @@ App - main class of EZServer
 | |-[options](#options)
 | |-[trace](#trace)
 | |-[patch](#patch)
+| |
 | '-[add](#add)
 |
 |-_**[routs:](#routs)**_
@@ -78,6 +79,7 @@ App - main class of EZServer
 |-_**[generic functions:](#generic-functions)**_
 | |-[addGenericRestFunction](#addGenericRestFunction)
 | |-[useGenericRestFunction](#useGenericRestFunction)
+| |
 | |-[addGenericFunction](#addGenericFunction)
 | '-[useGenericFunction](#useGenericFunction)
 |
@@ -88,6 +90,12 @@ const { App } = require('@peter-schweitzer/ezserver'); // require App from EZSer
 ```
 
 ### application life time
+
+_**[application life time:](#application-life-time)**_
+|
+|-[constructor](#constructor)
+|-[listen](#listen)
+'-[close](#close)
 
 #### constructor
 
@@ -137,7 +145,24 @@ If an error occurs (this happens when the server is not open and close() is call
 
 ### endpoints
 
-#### get
+_**[endpoints:](#endpoints)**_
+|
+|-[rest endpoints](#restendpoints)
+| |-[get](#get)
+| |-[head](#head)
+| |-[post](#post)
+| |-[put](#put)
+| |-[delete](#delete)
+| |-[connect](#connect)
+| |-[options](#options)
+| |-[trace](#trace)
+| '-[patch](#patch)
+|
+'-[add](#add)
+
+#### rest endpoints
+
+##### get
 
 ```js
 get(route: string, fn: function(req: node:http.IncomingMessage, res: node:http.ServerResponse, parameters: Parameters) => void): boolean;
@@ -153,7 +178,7 @@ app.get('/', (req, res, params) => {
 Here `app` is the [EZServer instance](#app).
 The function is called if the http-method is 'GET' and it is the most [specific](#specificity) [resolver](#resolver).
 
-#### head
+##### head
 
 ```js
 head(route: string, fn: function(req: node:http.IncomingMessage, res: node:http.ServerResponse, parameters: Parameters) => void): boolean;
@@ -169,7 +194,7 @@ app.head('/', (req, res, params) => {
 Here `app` is the [EZServer instance](#app).
 The function is called if the http-method is 'HEAD' and it is the most [specific](#specificity) [resolver](#resolver).
 
-#### post
+##### post
 
 ```js
 post(route: string, fn: function(req: node:http.IncomingMessage, res: node:http.ServerResponse, parameters: Parameters) => void): boolean;
@@ -185,7 +210,7 @@ app.post('/', (req, res, params) => {
 Here `app` is the [EZServer instance](#app).
 The function is called if the http-method is 'POST' and it is the most [specific](#specificity) [resolver](#resolver).
 
-#### put
+##### put
 
 ```js
 put(route: string, fn: function(req: node:http.IncomingMessage, res: node:http.ServerResponse, parameters: Parameters) => void): boolean;
@@ -201,7 +226,7 @@ app.put('/', (req, res, params) => {
 Here `app` is the [EZServer instance](#app).
 The function is called if the http-method is 'PUT' and it is the most [specific](#specificity) [resolver](#resolver).
 
-#### delete
+##### delete
 
 ```js
 delete(route: string, fn: function(req: node:http.IncomingMessage, res: node:http.ServerResponse, parameters: Parameters) => void): boolean;
@@ -217,7 +242,7 @@ app.delete('/', (req, res, params) => {
 Here `app` is the [EZServer instance](#app).
 The function is called if the http-method is 'DELETE' and it is the most [specific](#specificity) [resolver](#resolver).
 
-#### connect
+##### connect
 
 ```js
 connect(route: string, fn: function(req: node:http.IncomingMessage, res: node:http.ServerResponse, parameters: Parameters) => void): boolean;
@@ -233,7 +258,7 @@ app.connect('/', (req, res, params) => {
 Here `app` is the [EZServer instance](#app).
 The function is called if the http-method is 'CONNECT' and it is the most [specific](#specificity) [resolver](#resolver).
 
-#### options
+##### options
 
 ```js
 options(route: string, fn: function(req: node:http.IncomingMessage, res: node:http.ServerResponse, parameters: Parameters) => void): boolean;
@@ -249,7 +274,7 @@ app.options('/', (req, res, params) => {
 Here `app` is the [EZServer instance](#app).
 The function is called if the http-method is 'OPTIONS' and it is the most [specific](#specificity) [resolver](#resolver).
 
-#### trace
+##### trace
 
 ```js
 trace(route: string, fn: function(req: node:http.IncomingMessage, res: node:http.ServerResponse, parameters: Parameters) => void): boolean;
@@ -265,7 +290,7 @@ app.trace('/', (req, res, params) => {
 Here `app` is the [EZServer instance](#app).
 The function is called if the http-method is 'TRACE' and it is the most [specific](#specificity) [resolver](#resolver).
 
-#### patch
+##### patch
 
 ```js
 patch(route: string, fn: function(req: node:http.IncomingMessage, res: node:http.ServerResponse, parameters: Parameters) => void): boolean;
@@ -299,6 +324,11 @@ The function is called regardless of HTTP method and if it is the most [specific
 
 ### routs
 
+_**[routs:](#routs)**_
+|
+|-[addRestRoute](#addRestRoute)
+'-[addRoute](#addRoute)
+
 #### addRestRoute
 
 > ```js
@@ -315,7 +345,7 @@ Here `app` is the [EZServer instance](#app).
 Here `HTTP_METHODS` is the [HTTP_METHODS object](#http_methods).
 
 The function is called if the http-method matches the specified method and it is the most [specific](#specificity) [resolver](#resolver).
-The function only succeeds if the specified method is valid (see [HTTP_METHODS object](#http_methods) for more information).
+The function only succeeds (returns true) if the specified method is valid (see [HTTP_METHODS object](#http_methods) for more information).
 
 #### addRoute
 
@@ -336,6 +366,14 @@ Here `HTTP_METHODS` is the [HTTP_METHODS object](#http_methods).
 The function is called regardless of HTTP method and if it is the most [specific](#specificity) [resolver](#resolver).
 
 ### generic functions
+
+_**[generic functions:](#generic-functions)**_
+|
+|-[addGenericRestFunction](#addGenericRestFunction)
+|-[useGenericRestFunction](#useGenericRestFunction)
+|
+|-[addGenericFunction](#addGenericFunction)
+'-[useGenericFunction](#useGenericFunction)
 
 #### addGenericRestFunction
 
@@ -400,31 +438,17 @@ Otherwise null is returned.
 utils
 |
 |-[buildRes](#buildRes)
-|-[throw404](#throw404)
 |-[getType](#getType)
 |-[serveFromFS](#serveFromFS)
 |-[getBodyJSON](#getBodyJSON)
+|-[throw404](#throw404)
 '-[HTTP_METHODS](#http_methods)
 
 ### buildRes
 
 ```js
-buildRes(res: node:http.ServerResponse, data: any, { code: ?number, mime: ?string }): void
+buildRes(res: node:http.ServerResponse, data: any, { code: ?number = 200, mime: ?string = 'text/plain' }): void
 ```
-
-### throw404
-
-> ```js
-> throw404(req: node:http.IncomingMessage, res: node:http.ServerResponse): void
-> ```
-
-> ```js
-> app.get('/404', (req, res, param) => throw404(req, res));
-> ```
-
-Here `app` is the [EZServer instance](#app).
-
-Resolves the request by sending a 404 html-string.
 
 ### getType
 
@@ -432,7 +456,7 @@ Resolves the request by sending a 404 html-string.
 > getType(filePathOrName: string): string
 > ```
 
-Here `filePathOrName` should be the name of a file with a file ending (delimited by a '.')
+Here `filePathOrName` is the name of a file with a file ending (delimited by a '.')
 
 Returns the correct ContentType string based on the ending (string after the last '.') of filePathOrName.
 
@@ -461,6 +485,20 @@ Here `json` is the Object returned by JSON.parse() if successful, otherwise null
 Here `err` is the Error that was thrown by JSON.parse if unsuccessful, otherwise null.
 
 If a request's body has json data `getBodyJson` parses and returns it asynchronously.
+
+### throw404
+
+> ```js
+> throw404(req: node:http.IncomingMessage, res: node:http.ServerResponse): void
+> ```
+
+> ```js
+> app.get('/404', (req, res, param) => throw404(req, res));
+> ```
+
+Here `app` is the [EZServer instance](#app).
+
+Resolves the request by sending a 404 html-string.
 
 ### HTTP_METHODS
 
