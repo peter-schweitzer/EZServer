@@ -1,20 +1,21 @@
 # consumer documentation
 
-ezserver-package
-|
-|-[definitions](#definitions)
-|-[App (main EZServer class)](#app)
-|-[Parameters](#parameters)
-'-[utils](#utils)
+ezserver-package <br>
+| <br>
+|-[definitions](#definitions) <br>
+|-[App (main EZServer class)](#app) <br>
+|-[Parameters](#parameters) <br>
+'-[utils](#utils) <br>
 
 ## definitions
 
-definitions
-|-[specificity](#specificity)
-|-[resolver](#resolver)
-|-[resFunction](#resFunction)
-|-[endpoint](#resolver)
-'-[route](#resFunction)
+definitions<br>
+|<br>
+|-[specificity](#specificity)<br>
+|-[resolver](#resolver)<br>
+|-[resFunction](#resFunction)<br>
+|-[endpoint](#resolver)<br>
+'-[route](#resFunction)<br>
 
 ### specificity
 
@@ -51,39 +52,39 @@ routes are URIs that can be triggered by any URI that starts with the route (can
 
 ## App
 
-App - main class of EZServer
-|
-|-_**[application life time:](#application-life-time)**_
-| |-[constructor](#constructor)
-| |-[listen](#listen)
-| '-[close](#close)
-|
-|-_**[endpoints:](#endpoints)**_
-| |-[get](#get)
-| |-[head](#head)
-| |-[post](#post)
-| |-[put](#put)
-| |-[delete](#delete)
-| |-[connect](#connect)
-| |-[options](#options)
-| |-[trace](#trace)
-| |-[patch](#patch)
-| |
-| '-[add](#add)
-|
-|-_**[routs:](#routs)**_
-| |-[addRestRoute](#addRestRoute)
-| '-[addRoute](#addRoute)
-|
-|
-|-_**[generic functions:](#generic-functions)**_
-| |-[addGenericRestFunction](#addGenericRestFunction)
-| |-[useGenericRestFunction](#useGenericRestFunction)
-| |
-| |-[addGenericFunction](#addGenericFunction)
-| '-[useGenericFunction](#useGenericFunction)
-|
-'-_**[internals](#internals)**_
+App - main class of EZServer<br>
+|<br>
+|-_**[application life time:](#application-life-time)**_<br>
+| |-[constructor](#constructor)<br>
+| |-[listen](#listen)<br>
+| '-[close](#close)<br>
+|<br>
+|-_**[endpoints:](#endpoints)**_<br>
+| |-[get](#get)<br>
+| |-[head](#head)<br>
+| |-[post](#post)<br>
+| |-[put](#put)<br>
+| |-[delete](#delete)<br>
+| |-[connect](#connect)<br>
+| |-[options](#options)<br>
+| |-[trace](#trace)<br>
+| |-[patch](#patch)<br>
+| |<br>
+| '-[add](#add)<br>
+|<br>
+|-_**[routs:](#routs)**_<br>
+| |-[addRestRoute](#addRestRoute)<br>
+| '-[addRoute](#addRoute)<br>
+|<br>
+|<br>
+|-_**[generic functions:](#generic-functions)**_<br>
+| |-[addGenericRestFunction](#addGenericRestFunction)<br>
+| |-[useGenericRestFunction](#useGenericRestFunction)<br>
+| |<br>
+| |-[addGenericFunction](#addGenericFunction)<br>
+| '-[useGenericFunction](#useGenericFunction)<br>
+|<br>
+'-_**[internals](#internals)**_<br>
 
 ```js
 const { App } = require('@peter-schweitzer/ezserver'); // require App from EZServer
@@ -91,11 +92,11 @@ const { App } = require('@peter-schweitzer/ezserver'); // require App from EZSer
 
 ### application life time
 
-_**[application life time:](#application-life-time)**_
-|
-|-[constructor](#constructor)
-|-[listen](#listen)
-'-[close](#close)
+_**application life time**_<br>
+|<br>
+|-[constructor](#constructor)<br>
+|-[listen](#listen)<br>
+'-[close](#close)<br>
 
 #### constructor
 
@@ -145,20 +146,20 @@ If an error occurs (this happens when the server is not open and close() is call
 
 ### endpoints
 
-_**[endpoints:](#endpoints)**_
-|
-|-[rest endpoints](#restendpoints)
-| |-[get](#get)
-| |-[head](#head)
-| |-[post](#post)
-| |-[put](#put)
-| |-[delete](#delete)
-| |-[connect](#connect)
-| |-[options](#options)
-| |-[trace](#trace)
-| '-[patch](#patch)
-|
-'-[add](#add)
+_**endpoints:**_<br>
+|<br>
+|-[rest endpoints](#restendpoints)<br>
+| |-[get](#get)<br>
+| |-[head](#head)<br>
+| |-[post](#post)<br>
+| |-[put](#put)<br>
+| |-[delete](#delete)<br>
+| |-[connect](#connect)<br>
+| |-[options](#options)<br>
+| |-[trace](#trace)<br>
+| '-[patch](#patch)<br>
+|<br>
+'-[add](#add)<br>
 
 #### rest endpoints
 
@@ -169,7 +170,7 @@ get(route: string, fn: function(req: node:http.IncomingMessage, res: node:http.S
 ```
 
 ```js
-app.get('/', (req, res, params) => {
+app.get('/', (req, res, _) => {
   console.log(req.uri);
   buildRes(res, 'triggered get-catchall');
 });
@@ -185,7 +186,7 @@ head(route: string, fn: function(req: node:http.IncomingMessage, res: node:http.
 ```
 
 ```js
-app.head('/', (req, res, params) => {
+app.head('/', (req, res, _) => {
   console.log(req.uri);
   buildRes(res, 'triggered head-catchall');
 });
@@ -201,7 +202,7 @@ post(route: string, fn: function(req: node:http.IncomingMessage, res: node:http.
 ```
 
 ```js
-app.post('/', (req, res, params) => {
+app.post('/', (req, res, _) => {
   console.log(req.uri);
   buildRes(res, 'triggered post-catchall');
 });
@@ -217,7 +218,7 @@ put(route: string, fn: function(req: node:http.IncomingMessage, res: node:http.S
 ```
 
 ```js
-app.put('/', (req, res, params) => {
+app.put('/', (req, res, _) => {
   console.log(req.uri);
   buildRes(res, 'triggered put-catchall');
 });
@@ -233,7 +234,7 @@ delete(route: string, fn: function(req: node:http.IncomingMessage, res: node:htt
 ```
 
 ```js
-app.delete('/', (req, res, params) => {
+app.delete('/', (req, res, _) => {
   console.log(req.uri);
   buildRes(res, 'triggered delete-catchall');
 });
@@ -249,7 +250,7 @@ connect(route: string, fn: function(req: node:http.IncomingMessage, res: node:ht
 ```
 
 ```js
-app.connect('/', (req, res, params) => {
+app.connect('/', (req, res, _) => {
   console.log(req.uri);
   buildRes(res, 'triggered connect-catchall');
 });
@@ -265,7 +266,7 @@ options(route: string, fn: function(req: node:http.IncomingMessage, res: node:ht
 ```
 
 ```js
-app.options('/', (req, res, params) => {
+app.options('/', (req, res, _) => {
   console.log(req.uri);
   buildRes(res, 'triggered options-catchall');
 });
@@ -281,7 +282,7 @@ trace(route: string, fn: function(req: node:http.IncomingMessage, res: node:http
 ```
 
 ```js
-app.trace('/', (req, res, params) => {
+app.trace('/', (req, res, _) => {
   console.log(req.uri);
   buildRes(res, 'triggered trace-catchall');
 });
@@ -297,7 +298,7 @@ patch(route: string, fn: function(req: node:http.IncomingMessage, res: node:http
 ```
 
 ```js
-app.patch('/', (req, res, params) => {
+app.patch('/', (req, res, _) => {
   console.log(req.uri);
   buildRes(res, 'triggered patch-catchall');
 });
@@ -313,7 +314,7 @@ add(route: string, fn: function(req: node:http.IncomingMessage, res: node:http.S
 ```
 
 ```js
-app.add('/', (req, res, params) => {
+app.add('/', (req, res, _) => {
   console.log(req.uri);
   buildRes(res, 'triggered catchall for all http methods');
 });
@@ -324,10 +325,10 @@ The function is called regardless of HTTP method and if it is the most [specific
 
 ### routs
 
-_**[routs:](#routs)**_
-|
-|-[addRestRoute](#addRestRoute)
-'-[addRoute](#addRoute)
+_**routs:**_<br>
+|<br>
+|-[addRestRoute](#addRestRoute)<br>
+'-[addRoute](#addRoute)<br>
 
 #### addRestRoute
 
@@ -354,7 +355,7 @@ addRoute(uri: string, fn: function(req: node:http.IncomingMessage, res: node:htt
 ```
 
 ```js
-app.addRoute(HTTP_METHODS.GET, '/', (req, res, params) => {
+app.addRoute(HTTP_METHODS.GET, '/', (req, res, _) => {
   console.log(req.uri);
   buildRes(res, 'triggered catchall for all http methods');
 });
@@ -367,13 +368,13 @@ The function is called regardless of HTTP method and if it is the most [specific
 
 ### generic functions
 
-_**[generic functions:](#generic-functions)**_
-|
-|-[addGenericRestFunction](#addGenericRestFunction)
-|-[useGenericRestFunction](#useGenericRestFunction)
-|
-|-[addGenericFunction](#addGenericFunction)
-'-[useGenericFunction](#useGenericFunction)
+_**generic functions:**_<br>
+|<br>
+|-[addGenericRestFunction](#addGenericRestFunction)<br>
+|-[useGenericRestFunction](#useGenericRestFunction)<br>
+|<br>
+|-[addGenericFunction](#addGenericFunction)<br>
+'-[useGenericFunction](#useGenericFunction)<br>
 
 #### addGenericRestFunction
 
@@ -460,13 +461,13 @@ You can read more about the implementation in [`dev.md > App > internals`](https
 
 ## Parameters
 
-Parameters
-|
-|-[query](#query)
-|-[queryInt](#queryInt)
-|
-|-[route](#route)
-'-[routeInt](#routeInt)
+Parameters<br>
+|<br>
+|-[query](#query)<br>
+|-[queryInt](#queryInt)<br>
+|<br>
+|-[route](#route)<br>
+'-[routeInt](#routeInt)<br>
 
 [Parameters](#Parameters) is the helper class that provides a simple API for getting query- and route-parameters
 
@@ -508,14 +509,14 @@ Otherwise null is returned.
 
 ## utils
 
-utils
-|
-|-[buildRes](#buildRes)
-|-[getType](#getType)
-|-[serveFromFS](#serveFromFS)
-|-[getBodyJSON](#getBodyJSON)
-|-[throw404](#throw404)
-'-[HTTP_METHODS](#http_methods)
+utils<br>
+|<br>
+|-[buildRes](#buildRes)<br>
+|-[getType](#getType)<br>
+|-[serveFromFS](#serveFromFS)<br>
+|-[getBodyJSON](#getBodyJSON)<br>
+|-[throw404](#throw404)<br>
+'-[HTTP_METHODS](#http_methods)<br>
 
 ### buildRes
 
@@ -546,7 +547,7 @@ Returns the correct ContentType string based on the ending (string after the las
 > ```
 
 > ```js
-> app.put('/json/echo', (req, res, params) => {
+> app.put('/json/echo', (req, res, _) => {
 >   let { json, err } = getBodyJSON(req);
 >   if (err) return buildRes(res, `invalid JSON: ${err}`, { code: 400, mime: 'text/plain' });
 >   buildRes(res, json, { mime: 'application/json' });
@@ -566,7 +567,7 @@ If a request's body has json data `getBodyJson` parses and returns it asynchrono
 > ```
 
 > ```js
-> app.get('/404', (req, res, param) => throw404(req, res));
+> app.get('/404', (req, res, _) => throw404(req, res));
 > ```
 
 Here `app` is the [EZServer instance](#app).
@@ -580,7 +581,7 @@ Resolves the request by sending a 404 html-string.
 > ```
 
 > ```js
-> app.addRestRoute(HTTP_METHODS.GET, '/get', (req, res, param) => {
+> app.addRestRoute(HTTP_METHODS.GET, '/get', (_, res, _) => {
 >   buildRes(res, "triggered '/get' fot HTTP method 'GET'");
 > });
 > ```
