@@ -3,9 +3,11 @@ const { readFile } = require('node:fs');
 /** @type {Object.<string, string>} */
 const mimeTypes = require('../data/mimeTypes.json');
 
+//#region console functions
 const LOG = console.log;
 const WRN = console.warn;
 const ERR = console.error;
+//#endregion
 
 const HTTP_METHODS = { GET: 'GET', HEAD: 'HEAD', POST: 'POST', PUT: 'PUT', DELETE: 'DELETE', CONNECT: 'CONNECT', OPTIONS: 'OPTIONS', TRACE: 'TRACE', PATCH: 'PATCH' };
 
@@ -93,7 +95,6 @@ function getResFunctionWithParams(uri, resolverTree, parameters) {
 }
 
 /**
- *
  * @param {resolverLUT} lut_without_params
  * @param {resolverLUT} lut_with_params
  * @param {string} uri

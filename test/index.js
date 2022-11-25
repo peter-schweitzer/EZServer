@@ -1,6 +1,6 @@
 const assert = require('assert');
 const { App, buildRes } = require('../index');
-const { Parameters } = require('../src/parameters');
+const { Parameters } = require('../src/Parameters');
 
 const app = new App();
 app.listen('1234');

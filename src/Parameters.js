@@ -5,7 +5,7 @@ class Parameters {
   //#region adding params
   /** @param {string} query_string */
   m_add_query(query_string) {
-    if (query_string)
+    if (!!query_string)
       for (const kv of query_string.split('&')) {
         const [k, v] = kv.split('=');
         if (k.length && v?.length) this.m_parameters.query[k] = v;
@@ -27,6 +27,17 @@ class Parameters {
   constructor() {}
 
   //#region getting params
+
+  /**
+   * @param {string} name
+   * @param {string?} defaultValue
+   * @param {Object.<string, string>} LUT
+   * @returns
+   */
+  m_getter_macro = (name, defaultValue = null, LUT) => {
+    return typeof name !== 'string' || !name || !LUT.hasOwnProperty(name) ? defaultValue : this.m_parameters.query[name];
+  };
+
   //#region query
   /**
    * @param {string} name
@@ -34,8 +45,7 @@ class Parameters {
    * @returns {string?}
    */
   query(name, defaultValue = null) {
-    if (!name || typeof name !== 'string') return null;
-    return this.m_parameters.query[name] || defaultValue;
+    return this.m_getter_macro(name, defaultValue, this.m_parameters.query);
   }
 
   /**
@@ -44,12 +54,13 @@ class Parameters {
    * @returns {number?}
    */
   queryInt(name, defaultValue = null) {
-    if (!name || typeof name !== 'string') return null;
-    try {
-      return parseInt(this.query(name, defaultValue));
-    } catch (e) {
-      return ERR(e) || null;
-    }
+    const str = this.m_getter_macro(name, defaultValue, this.m_parameters.query);
+    if (!!str)
+      try {
+        return parseInt(str);
+      } catch (e) {
+        return ERR(e) || defaultValue;
+      }
   }
   //#endregion
 
@@ -60,8 +71,7 @@ class Parameters {
    * @returns {string?}
    */
   route(name, defaultValue = null) {
-    if (!name || typeof name !== 'string') return null;
-    return this.m_parameters.route[name] || defaultValue;
+    return this.m_getter_macro(name, defaultValue, this.m_parameters.route);
   }
 
   /**
@@ -70,13 +80,13 @@ class Parameters {
    * @returns {number?}
    */
   routeInt(name, defaultValue = null) {
-    if (!name || typeof name !== 'string') return null;
-    try {
-      return parseInt(this.route(name, defaultValue));
-    } catch (e) {
-      ERR(e);
-      return null;
-    }
+    const str = this.m_getter_macro(name, defaultValue, this.m_parameters.route);
+    if (!!str)
+      try {
+        return parseInt(str);
+      } catch (e) {
+        return ERR(e) || defaultValue;
+      }
   }
   //#endregion
   //#endregion

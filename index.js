@@ -2,7 +2,7 @@
 //#region imports and global const's
 const { createServer } = require('node:http');
 
-const { Parameters } = require('./src/parameters.js');
+const { Parameters } = require('./src/Parameters.js');
 const {
   LOG,
   WRN,
@@ -430,7 +430,7 @@ class App {
   //#endregion
 }
 
-module.exports = { App, buildRes, getType, serveFromFS, getBodyJSON, throw404, HTTP_METHODS };
+module.exports = { App, buildRes, getType, serveFromFS, getBodyJSON, throw404, HTTP_METHODS, Parameters };
 
 //#region typedef's
 /**
