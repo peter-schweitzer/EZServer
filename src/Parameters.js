@@ -27,17 +27,6 @@ class Parameters {
   constructor() {}
 
   //#region getting params
-
-  /**
-   * @param {string} name
-   * @param {string?} defaultValue
-   * @param {Object.<string, string>} LUT
-   * @returns
-   */
-  m_getter_macro = (name, defaultValue = null, LUT) => {
-    return typeof name !== 'string' || !name || !LUT.hasOwnProperty(name) ? defaultValue : this.m_parameters.query[name];
-  };
-
   //#region query
   /**
    * @param {string} name
@@ -45,7 +34,7 @@ class Parameters {
    * @returns {string?}
    */
   query(name, defaultValue = null) {
-    return this.m_getter_macro(name, defaultValue, this.m_parameters.query);
+    return typeof name !== 'string' || !name || !this.m_parameters.query.hasOwnProperty(name) ? defaultValue : this.m_parameters.query[name];
   }
 
   /**
@@ -54,13 +43,14 @@ class Parameters {
    * @returns {number?}
    */
   queryInt(name, defaultValue = null) {
-    const str = this.m_getter_macro(name, defaultValue, this.m_parameters.query);
+    const str = this.query(name, defaultValue);
     if (!!str)
       try {
         return parseInt(str);
       } catch (e) {
-        return ERR(e) || defaultValue;
+        ERR(e);
       }
+    return defaultValue;
   }
   //#endregion
 
@@ -71,7 +61,7 @@ class Parameters {
    * @returns {string?}
    */
   route(name, defaultValue = null) {
-    return this.m_getter_macro(name, defaultValue, this.m_parameters.route);
+    return typeof name !== 'string' || !name || !this.m_parameters.route.hasOwnProperty(name) ? defaultValue : this.m_parameters.route[name];
   }
 
   /**
@@ -80,13 +70,14 @@ class Parameters {
    * @returns {number?}
    */
   routeInt(name, defaultValue = null) {
-    const str = this.m_getter_macro(name, defaultValue, this.m_parameters.route);
+    const str = this.route(name, defaultValue);
     if (!!str)
       try {
         return parseInt(str);
       } catch (e) {
-        return ERR(e) || defaultValue;
+        ERR(e);
       }
+    return defaultValue;
   }
   //#endregion
   //#endregion
