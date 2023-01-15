@@ -31,24 +31,25 @@ function getResFunction(req, resolvers) {
  * @param {resFunction} fn
  */
 function addResFunctionWithParams(resolverTree, uri, fn) {
-  let tmp = resolverTree;
-  let current_segment = [''];
   const params = [];
+  let tmp = resolverTree;
+  let current_segment = [];
 
-  for (const part of uri.split('/').splice(1)) {
+  const parts = uri.split('/').splice(1);
+  for (const part of parts) {
     if (part[0] !== ':' && current_segment.push(part)) continue;
     params.push(part.slice(1));
 
-    if (current_segment.length > 1) {
+    if (!!current_segment.length) {
       const segment = current_segment.join('/');
       tmp = tmp.hasOwnProperty('routes') ? tmp.routes : (tmp.routes = {});
       tmp = tmp.hasOwnProperty(segment) ? tmp[segment] : (tmp[segment] = { param: {} });
     }
-    current_segment = [''];
+    current_segment = [];
     tmp = tmp.hasOwnProperty('param') ? tmp.param : (tmp.param = {});
   }
 
-  if (current_segment.length > 1) {
+  if (!!current_segment.length) {
     const segment = current_segment.join('/');
     tmp = tmp.hasOwnProperty('routes') ? tmp.routes : (tmp.routes = {});
     tmp = tmp.hasOwnProperty(segment) ? tmp[segment] : (tmp[segment] = {});
@@ -59,21 +60,21 @@ function addResFunctionWithParams(resolverTree, uri, fn) {
 }
 
 /**
- * @param {IncomingMessage} req
+ * @param {string} uri
  * @param {Object.<string, any>} resolverTree
  * @param {Parameters} parameters
  */
 function getResFunctionWithParams(uri, resolverTree, parameters) {
-  if (uri === '/') return resolverTree?.routes.hasOwnProperty('/') ? resolverTree.routes['/'].fn : false;
+  if (uri === '/') return false;
 
   const params = [];
   let tmp = resolverTree;
-  let rest = uri.split('/').slice(1);
+  let rest = uri.split('/').slice(1); //.slice to remove empty string at the start of the array
 
   while (true) {
     if (tmp.hasOwnProperty('routes')) {
-      const ss = ['', ...rest];
-      for (rest = []; ss.length > 1; rest.unshift(ss.pop())) {
+      const ss = rest;
+      for (rest = []; !!ss; rest.unshift(ss.pop())) {
         const route = ss.join('/');
         if (tmp.routes.hasOwnProperty(route)) {
           tmp = tmp.routes[route];
