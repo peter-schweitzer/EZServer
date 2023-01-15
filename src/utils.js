@@ -198,7 +198,6 @@ module.exports = {
 /**
  * @typedef {import('http').IncomingMessage} IncomingMessage
  * @typedef {import('http').ServerResponse} ServerResponse
- *
  * @typedef {import('..').resFunction} resFunction
  * @typedef {import('..').resolverLUT} resolverLUT
  */

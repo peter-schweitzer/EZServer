@@ -1,3 +1,5 @@
+'use strict';
+
 class Parameters {
   /**@type {Object.<string, string>} */
   #query = {};
@@ -5,24 +7,29 @@ class Parameters {
   #route = {};
 
   //#region adding params
-  /** @param {string} query_string */
+  /**
+   * @param {string} query_string
+   * @returns {boolean} was successful
+   */
   m_add_query(query_string) {
     if (!!query_string)
       for (const kv of query_string.split('&')) {
         const [k, v] = kv.split('=');
-        if (k.length && v?.length) this.m_parameters.query[k] = v;
+        if (!k || !v) return false;
         this.#query[k] = v;
       }
+    return true;
   }
 
   /**
    * @param {string[]} key_arr
    * @param {string[]} val_arr
-   * @returns {boolean} was_successful
+   * @returns {boolean} was successful
    */
   m_add_route(key_arr, val_arr) {
     if (key_arr.length !== val_arr.length) return false;
     for (let i = 0; i < key_arr.length; i++) this.#route[key_arr[i]] = val_arr[i];
+    return true;
   }
   //#endregion
 
@@ -48,7 +55,7 @@ class Parameters {
    * @param {number?} defaultValue
    * @returns {number?}
    */
-  queryInt(name, defaultValue = null) {
+  queryInt(name = null, defaultValue = null) {
     const str = this.query(name, defaultValue);
     if (!!str)
       try {
@@ -66,7 +73,7 @@ class Parameters {
    * @param {string?} defaultValue
    * @returns {string?}
    */
-  route(name, defaultValue = null) {
+  route(name = null, defaultValue = null) {
     return this.#route[name] || defaultValue;
   }
 
@@ -75,7 +82,7 @@ class Parameters {
    * @param {number?} defaultValue
    * @returns {number?}
    */
-  routeInt(name, defaultValue = null) {
+  routeInt(name = null, defaultValue = null) {
     const str = this.route(name, defaultValue);
     if (!!str)
       try {
@@ -90,9 +97,3 @@ class Parameters {
 }
 
 module.exports = { Parameters };
-
-/**
- * @typedef {Object} params
- * @property {Object.<string, string>} query
- * @property {Object.<string, string>} route
- */

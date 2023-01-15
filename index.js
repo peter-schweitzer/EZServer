@@ -137,11 +137,12 @@ class App {
 
   constructor() {
     this.m_http_server = createServer((req, res) => {
-      const parameters = new Parameters();
-
       const [uri, query_str] = decodeURIComponent(req.url).split('?');
+
       Object.defineProperty(req, 'uri', { value: uri });
-      if (query_str) parameters.m_add_query(query_str);
+
+      const parameters = new Parameters();
+      if (!!query_str) parameters.m_add_query(query_str);
 
       (
         this.#rest_endpoint(req) ||
