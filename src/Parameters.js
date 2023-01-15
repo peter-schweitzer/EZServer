@@ -1,6 +1,8 @@
 class Parameters {
-  /** @type {params} */
-  m_parameters = { query: {}, route: {} };
+  /**@type {Object.<string, string>} */
+  #query = {};
+  /**@type {Object.<string, string>} */
+  #route = {};
 
   //#region adding params
   /** @param {string} query_string */
@@ -9,7 +11,7 @@ class Parameters {
       for (const kv of query_string.split('&')) {
         const [k, v] = kv.split('=');
         if (k.length && v?.length) this.m_parameters.query[k] = v;
-        else return false;
+        this.#query[k] = v;
       }
   }
 
@@ -20,7 +22,7 @@ class Parameters {
    */
   m_add_route(key_arr, val_arr) {
     if (key_arr.length !== val_arr.length) return false;
-    for (let i = 0; i < key_arr.length; i++) this.m_parameters.route[key_arr[i]] = val_arr[i];
+    for (let i = 0; i < key_arr.length; i++) this.#route[key_arr[i]] = val_arr[i];
   }
   //#endregion
 
@@ -33,8 +35,12 @@ class Parameters {
    * @param {string?} defaultValue
    * @returns {string?}
    */
-  query(name, defaultValue = null) {
-    return typeof name !== 'string' || !name || !this.m_parameters.query.hasOwnProperty(name) ? defaultValue : this.m_parameters.query[name];
+  query(name = null, defaultValue = null) {
+    try {
+      return this.#query[name] || defaultValue;
+    } catch {
+      return defaultValue;
+    }
   }
 
   /**
@@ -61,7 +67,7 @@ class Parameters {
    * @returns {string?}
    */
   route(name, defaultValue = null) {
-    return typeof name !== 'string' || !name || !this.m_parameters.route.hasOwnProperty(name) ? defaultValue : this.m_parameters.route[name];
+    return this.#route[name] || defaultValue;
   }
 
   /**
