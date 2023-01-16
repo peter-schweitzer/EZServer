@@ -16,7 +16,7 @@ class Parameters {
       for (const kv of query_string.split('&')) {
         const [k, v] = kv.split('=');
         if (!k || !v) return false;
-        this.#query[k] = v;
+        Object.defineProperty(this.#query, k, v);
       }
     return true;
   }
