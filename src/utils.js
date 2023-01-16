@@ -74,7 +74,7 @@ function getResFunctionWithParams(uri, resolverTree, parameters) {
   while (true) {
     if (tmp.hasOwnProperty('routes')) {
       const ss = rest;
-      for (rest = []; !!ss; rest.unshift(ss.pop())) {
+      for (rest = []; !!ss.length; rest.unshift(ss.pop())) {
         const route = ss.join('/');
         if (tmp.routes.hasOwnProperty(route)) {
           tmp = tmp.routes[route];
