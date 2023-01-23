@@ -115,7 +115,7 @@ function addEndpointWithOrWithoutParams(lut_without_params, lut_with_params, uri
  * @param {string} options.mime mime-type of the response (default is 'text/plain')
  * @returns {void}
  */
-function buildRes(res, data, { code, mime } = { code: null, mime: null }) {
+function buildRes(res, data = '', { code, mime } = { code: null, mime: null }) {
   res.writeHead(code ?? 200, { 'Content-Type': mime ?? 'text/plain' });
   res.write(data);
   res.end();
