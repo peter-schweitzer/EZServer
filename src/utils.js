@@ -3,18 +3,14 @@ const { readFile } = require('node:fs');
 /** @type {Object.<string, string>} */
 const mimeTypes = require('../data/mimeTypes.json');
 
-//#region console functions
-const LOG = console.log;
-const WRN = console.warn;
-const ERR = console.error;
-//#endregion
+const { log: LOG, table: TAB, warn: WRN, error: ERR } = console;
 
 const HTTP_METHODS = { GET: 'GET', HEAD: 'HEAD', POST: 'POST', PUT: 'PUT', DELETE: 'DELETE', CONNECT: 'CONNECT', OPTIONS: 'OPTIONS', TRACE: 'TRACE', PATCH: 'PATCH' };
 
 /**
  * @param {IncomingMessage} req
  * @param {resolverLUT} resolvers
- * @returns {resFunction}
+ * @returns {(resFunction|false)}
  */
 function getResFunction(req, resolvers) {
   let ss = req.uri.split('/');
@@ -29,6 +25,7 @@ function getResFunction(req, resolvers) {
  * @param {Object.<string, any>} resolverTree
  * @param {string} uri
  * @param {resFunction} fn
+ * @returns {void}
  */
 function addResFunctionWithParams(resolverTree, uri, fn) {
   const params = [];
@@ -63,6 +60,7 @@ function addResFunctionWithParams(resolverTree, uri, fn) {
  * @param {string} uri
  * @param {Object.<string, any>} resolverTree
  * @param {Parameters} parameters
+ * @returns {(resFunction | false)}
  */
 function getResFunctionWithParams(uri, resolverTree, parameters) {
   if (uri === '/') return false;
@@ -92,7 +90,7 @@ function getResFunctionWithParams(uri, resolverTree, parameters) {
   if (!tmp.hasOwnProperty('fn') || !tmp.hasOwnProperty('params')) return false;
 
   parameters.m_add_route(tmp.params, params);
-  return tmp.fn;
+  return tmp.fn || false;
 }
 
 /**
@@ -100,11 +98,11 @@ function getResFunctionWithParams(uri, resolverTree, parameters) {
  * @param {resolverLUT} lut_with_params
  * @param {string} uri
  * @param {resFunction} fn
- * @returns {boolean} wether the function was successfully registered
+ * @returns {void}
  */
 function addEndpointWithOrWithoutParams(lut_without_params, lut_with_params, uri, fn) {
-  if (uri.includes('/:')) return !!addResFunctionWithParams(lut_with_params, uri, fn);
-  else return !!(lut_without_params[uri] = fn);
+  if (uri.includes('/:')) addResFunctionWithParams(lut_with_params, uri, fn);
+  else lut_without_params[uri] = fn;
 }
 
 /**
@@ -139,7 +137,10 @@ function throw404(req, res) {
  * @returns {string} mime-type of the file (default 'text/plain')
  */
 function getType(filePathOrName) {
-  return mimeTypes[filePathOrName.split('.').pop()] || WRN('mime-type not found') || 'text/plain';
+  const file_ending = filePathOrName.split('.').pop();
+  if (mimeTypes.hasOwnProperty(file_ending)) return mimeTypes[file_ending];
+  WRN('mime-type not found');
+  return 'text/plain';
 }
 
 /**
@@ -158,7 +159,7 @@ function serveFromFS(res, filePath, statusCode = 200) {
 
 /**
  * @param {IncomingMessage} req
- * @return {Promise<{json: Object|null, err: Object|null }>}
+ * @return {Promise<ErrorOr<any>>}
  */
 function getBodyJSON(req) {
   return new Promise((resolve) => {
@@ -167,21 +168,19 @@ function getBodyJSON(req) {
     req.on('data', (chunk) => (buff += chunk));
 
     req.on('end', () => {
-      let json = { json: null, err: null };
-
       try {
-        json.json = JSON.parse(buff);
+        return { data: JSON.parse(buff), err: null };
       } catch (e) {
-        ERR('error in getBodyJSON', e);
-        json.err = e;
+        ERR('error in getBodyJSON:', e);
+        return { data: null, err: `${e.name}:\n${e.message}` };
       }
-      resolve(json);
     });
   });
 }
 
 module.exports = {
   LOG,
+  TAB,
   WRN,
   ERR,
   HTTP_METHODS,
@@ -201,4 +200,9 @@ module.exports = {
  * @typedef {import('http').ServerResponse} ServerResponse
  * @typedef {import('..').resFunction} resFunction
  * @typedef {import('..').resolverLUT} resolverLUT
+ */
+
+/**
+ * @typedef {{err: string?, data: T?}} ErrorOr<T>
+ * @template T
  */
