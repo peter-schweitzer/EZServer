@@ -169,10 +169,10 @@ function getBodyJSON(req) {
 
     req.on('end', () => {
       try {
-        return { data: JSON.parse(buff), err: null };
+        resolve({ data: JSON.parse(buff), err: null });
       } catch (e) {
         ERR('error in getBodyJSON:', e);
-        return { data: null, err: `${e.name}:\n${e.message}` };
+        resolve({ data: null, err: `${e.name}:\n${e.message}` });
       }
     });
   });
