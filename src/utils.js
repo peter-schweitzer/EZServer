@@ -1,6 +1,8 @@
 const { readFile } = require('node:fs');
 
-/** @type {Object.<string, string>} */
+import '../types';
+
+/** @type {LUT<string>} */
 const mimeTypes = require('../data/mimeTypes.json');
 
 const { log: LOG, table: TAB, warn: WRN, error: ERR } = console;
@@ -10,7 +12,7 @@ const HTTP_METHODS = { GET: 'GET', HEAD: 'HEAD', POST: 'POST', PUT: 'PUT', DELET
 /**
  * @param {IncomingMessage} req
  * @param {resolverLUT} resolvers
- * @returns {(resFunction|false)}
+ * @returns {FalseOr<resFunction>}
  */
 function getResFunction(req, resolvers) {
   let ss = req.uri.split('/');
@@ -60,7 +62,7 @@ function addResFunctionWithParams(resolverTree, uri, fn) {
  * @param {string} uri
  * @param {Object.<string, any>} resolverTree
  * @param {Parameters} parameters
- * @returns {(resFunction | false)}
+ * @returns {FalseOr<resFunction>}
  */
 function getResFunctionWithParams(uri, resolverTree, parameters) {
   if (uri === '/') return false;
@@ -175,6 +177,11 @@ function getBodyJSON(req) {
         resolve({ data: null, err: `${e.name}:\n${e.message}` });
       }
     });
+
+    req.on('error', (err) => {
+      ERR('error in getBodyJSON:', e);
+      resolve({ data: null, err: `${e.name}:\n${e.message}` });
+    });
   });
 }
 
@@ -194,15 +201,3 @@ module.exports = {
   serveFromFS,
   throw404,
 };
-
-/**
- * @typedef {import('http').IncomingMessage} IncomingMessage
- * @typedef {import('http').ServerResponse} ServerResponse
- * @typedef {import('..').resFunction} resFunction
- * @typedef {import('..').resolverLUT} resolverLUT
- */
-
-/**
- * @typedef {{err: string?, data: T?}} ErrorOr<T>
- * @template T
- */

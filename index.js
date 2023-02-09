@@ -18,6 +18,8 @@ const {
   HTTP_METHODS,
 } = require('./src/utils.js');
 
+import './types';
+
 //#endregion
 
 class App {
@@ -27,7 +29,7 @@ class App {
   //#region resolverLUT data objects
   //#region endpoints
   //#region without param
-  /**@type {Object.<string, Object.<string, resFunction>>} */
+  /**@type {LUT<resolverLUT>} */
   #rest_endpoints = {
     /** @type {resolverLUT} */
     GET: {},
@@ -54,7 +56,7 @@ class App {
   //#endregion
 
   //#region with param
-  /**@type {Object.<string, Object.<string, resFunction>>} */
+  /**@type {LUT<resolverLUT>} */
   #rest_endpoints_with_params = {
     /** @type {resolverLUT} */
     GET: {},
@@ -81,7 +83,7 @@ class App {
   //#endregion
 
   //#region routs
-  /**@type {Object.<string, Object.<string, resFunction>>} */
+  /**@type {LUT<resolverLUT>} */
   #rest_routes = {
     /** @type {resolverLUT} */
     GET: {},
@@ -108,7 +110,7 @@ class App {
   //#endregion
 
   //#region general functions
-  /**@type {Object.<string, Object.<string, resFunction>>} */
+  /**@type {LUT<resolverLUT>} */
   #generic_rest_functions = {
     /** @type {resolverLUT} */
     GET: {},
@@ -274,7 +276,7 @@ class App {
 
   /**
    * @param {IncomingMessage}
-   * @returns {resFunction | false}
+   * @returns {FalseOr<resFunction>}
    */
   #rest_endpoint({ uri, method }) {
     return method in HTTP_METHODS ? this.#rest_endpoints[method][uri] : !!WRN('invalid request method');
@@ -283,7 +285,7 @@ class App {
   /**
    * @param {IncomingMessage}
    * @param {Parameters} parameters
-   * @returns {resFunction | false}
+   * @returns {FalseOr<resFunction>}
    */
   #rest_endpoint_with_param({ uri, method }, parameters) {
     return method in HTTP_METHODS ? getResFunctionWithParams(uri, this.#rest_endpoints_with_params[method], parameters) : !!WRN('invalid request method');
@@ -303,7 +305,7 @@ class App {
 
   /**
    * @param {IncomingMessage}
-   * @returns {resFunction | false}
+   * @returns {FalseOr<resFunction>}
    */
   #endpoint({ uri }) {
     return this.#endpoints.hasOwnProperty(uri) ? this.#endpoints[uri] : false;
@@ -312,7 +314,7 @@ class App {
   /**
    * @param {IncomingMessage}
    * @param {Parameters}
-   * @returns {resFunction | false}
+   * @returns {FalseOr<resFunction>}
    */
   #endpoint_with_param({ uri }, parameters) {
     return getResFunctionWithParams(uri, this.#endpoints_with_params, parameters);
@@ -338,7 +340,7 @@ class App {
 
   /**
    * @param {IncomingMessage} req
-   * @returns {(resFunction|false)}
+   * @returns {FalseOr<resFunction>}
    */
   #rest_route(req) {
     return HTTP_METHODS.hasOwnProperty(req.method) ? getResFunction(req, this.#rest_routes[req.method]) : !!WRN('invalid request method');
@@ -358,7 +360,7 @@ class App {
 
   /**
    * @param {IncomingMessage} req
-   * @returns {(resFunction|false)}
+   * @returns {FalseOr<resFunction>}
    */
   #route(req) {
     return getResFunction(req, this.#routs);
@@ -428,21 +430,3 @@ class App {
 }
 
 module.exports = { App, buildRes, getType, serveFromFS, getBodyJSON, throw404, HTTP_METHODS, Parameters };
-
-//#region typedef's
-/**
- * @typedef {import('http').Server} Server
- * @typedef {import('http').IncomingMessage} IncomingMessage
- * @typedef {import('http').ServerResponse} ServerResponse
- */
-
-/**
- * @callback resFunction
- * @param {IncomingMessage} req
- * @param {ServerResponse} res
- * @param {Parameters} parameters
- * @returns {void}
- */
-
-/** @typedef {Object.<string, resFunction>} resolverLUT */
-//#endregion
