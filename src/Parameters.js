@@ -1,9 +1,11 @@
 'use strict';
 
+/** @type {import('../types')}*/
+
 class Parameters {
-  /**@type {Object.<string, string>} */
+  /**@type {LUT<string>} */
   #query = {};
-  /**@type {Object.<string, string>} */
+  /**@type {LUT<string>} */
   #route = {};
 
   //#region adding params

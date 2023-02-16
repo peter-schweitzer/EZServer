@@ -1,6 +1,6 @@
 const { readFile } = require('node:fs');
 
-import '../types';
+/** @type {import('../types')}*/
 
 /** @type {LUT<string>} */
 const mimeTypes = require('../data/mimeTypes.json');

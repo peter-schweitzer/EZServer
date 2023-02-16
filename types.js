@@ -2,7 +2,7 @@
  * @callback resFunction
  * @param {IncomingMessage} req
  * @param {ServerResponse} res
- * @param {Parameters} parameters
+ * @param {import('./src/Parameters').Parameters} parameters
  * @returns {void}
  */
 

@@ -18,7 +18,7 @@ const {
   HTTP_METHODS,
 } = require('./src/utils.js');
 
-import './types';
+/** @type {import('./types')} */
 
 //#endregion
 
