@@ -117,7 +117,7 @@ function addEndpointWithOrWithoutParams(lut_without_params, lut_with_params, uri
  * @returns {void}
  */
 function buildRes(res, data = undefined, { code = 200, mime = 'text/plain', headers = {} }) {
-  Object.defineProperty(headers, 'Content-Type', mime);
+  Object.defineProperty(headers, 'Content-Type', { value: mime });
   res.writeHead(code, headers);
   if (data !== undefined) res.write(data);
   res.end();
