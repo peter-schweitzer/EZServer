@@ -116,7 +116,7 @@ function addEndpointWithOrWithoutParams(lut_without_params, lut_with_params, uri
  * @param {LUT<string|number>} options.headers additional headers ('Content-Type' is overwritten by mime, default is an empty Object)
  * @returns {void}
  */
-function buildRes(res, data = undefined, { code = 200, mime = 'text/plain', headers = {} }) {
+function buildRes(res, data = undefined, { code = 200, mime = 'text/plain', headers = {} } = {}) {
   Object.defineProperty(headers, 'Content-Type', { value: mime });
   res.writeHead(code, headers);
   if (data !== undefined) res.write(data);
