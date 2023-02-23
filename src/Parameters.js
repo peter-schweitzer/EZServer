@@ -16,9 +16,9 @@ class Parameters {
   m_add_query(query_string) {
     if (!!query_string)
       for (const kv of query_string.split('&')) {
-        const [k, v] = kv.split('=');
-        if (!k || !v) return false;
-        Object.defineProperty(this.#query, k, v);
+        const [key, value] = kv.split('=');
+        if (!key || !value) return false;
+        Object.defineProperty(this.#query, key, { value });
       }
     return true;
   }
