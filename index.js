@@ -19,7 +19,6 @@ const {
 } = require('./src/utils.js');
 
 /** @type {import('./types')} */
-
 //#endregion
 
 class App {
@@ -29,7 +28,6 @@ class App {
   //#region resolverLUT data objects
   //#region endpoints
   //#region without param
-  /**@type {LUT<resolverLUT>} */
   #rest_endpoints = {
     /** @type {resolverLUT} */
     GET: {},
@@ -56,7 +54,6 @@ class App {
   //#endregion
 
   //#region with param
-  /**@type {LUT<resolverLUT>} */
   #rest_endpoints_with_params = {
     /** @type {resolverLUT} */
     GET: {},
@@ -83,7 +80,6 @@ class App {
   //#endregion
 
   //#region routs
-  /**@type {LUT<resolverLUT>} */
   #rest_routes = {
     /** @type {resolverLUT} */
     GET: {},
@@ -110,7 +106,6 @@ class App {
   //#endregion
 
   //#region general functions
-  /**@type {LUT<resolverLUT>} */
   #generic_rest_functions = {
     /** @type {resolverLUT} */
     GET: {},
