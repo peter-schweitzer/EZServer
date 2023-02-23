@@ -139,7 +139,7 @@ class App {
       Object.defineProperty(req, 'uri', { value: uri });
 
       const parameters = new Parameters();
-      if (!!query_str) parameters.m_add_query(query_str);
+      if (!!query_str) parameters.add_query(query_str);
 
       (
         this.#rest_endpoint(req) ||

@@ -91,7 +91,7 @@ function getResFunctionWithParams(uri, resolverTree, parameters) {
 
   if (!tmp.hasOwnProperty('fn') || !tmp.hasOwnProperty('params')) return false;
 
-  parameters.m_add_route(tmp.params, params);
+  parameters.add_route(tmp.params, params);
   return tmp.fn || false;
 }
 

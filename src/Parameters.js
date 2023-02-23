@@ -13,7 +13,7 @@ class Parameters {
    * @param {string} query_string
    * @returns {boolean} was successful
    */
-  m_add_query(query_string) {
+  add_query(query_string) {
     if (!!query_string)
       for (const kv of query_string.split('&')) {
         const [key, value] = kv.split('=');
@@ -28,7 +28,7 @@ class Parameters {
    * @param {string[]} val_arr
    * @returns {boolean} was successful
    */
-  m_add_route(key_arr, val_arr) {
+  add_route(key_arr, val_arr) {
     if (key_arr.length !== val_arr.length) return false;
     for (let i = 0; i < key_arr.length; i++) this.#route[key_arr[i]] = val_arr[i];
     return true;
