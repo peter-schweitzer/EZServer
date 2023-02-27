@@ -57,15 +57,11 @@ class Parameters {
    * @param {number?} defaultValue
    * @returns {number?}
    */
-  queryInt(name = null, defaultValue = null) {
+  queryNumber(name = null, defaultValue = null) {
     const str = this.query(name, defaultValue);
-    if (!!str)
-      try {
-        return parseInt(str);
-      } catch (e) {
-        ERR(e);
-      }
-    return defaultValue;
+    if (!str) return defaultValue;
+    const num = parseFloat(str);
+    return isNaN(num) ? defaultValue : num;
   }
   //#endregion
 
@@ -84,15 +80,11 @@ class Parameters {
    * @param {number?} defaultValue
    * @returns {number?}
    */
-  routeInt(name = null, defaultValue = null) {
+  routeNumber(name = null, defaultValue = null) {
     const str = this.route(name, defaultValue);
-    if (!!str)
-      try {
-        return parseInt(str);
-      } catch (e) {
-        ERR(e);
-      }
-    return defaultValue;
+    if (!str) return defaultValue;
+    const num = parseFloat(str);
+    return isNaN(num) ? defaultValue : num;
   }
   //#endregion
   //#endregion
