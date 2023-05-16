@@ -1,19 +1,57 @@
-const { readFile } = require('node:fs');
-
-/** @type {import('../types')}*/
+import { readFile } from 'node:fs';
 
 /** @type {LUT<string>} */
-const mimeTypes = require('../data/mimeTypes.json');
+import mimeTypes from '../data/mimeTypes.json' assert { type: 'json' };
 
-const { log: LOG, table: TAB, warn: WRN, error: ERR } = console;
-const HTTP_METHODS = { GET: 'GET', HEAD: 'HEAD', POST: 'POST', PUT: 'PUT', DELETE: 'DELETE', CONNECT: 'CONNECT', OPTIONS: 'OPTIONS', TRACE: 'TRACE', PATCH: 'PATCH' };
+export const { log: LOG, table: TAB, warn: WRN, error: ERR } = console;
+export const HTTP_METHODS = {
+  GET: 'GET',
+  HEAD: 'HEAD',
+  POST: 'POST',
+  PUT: 'PUT',
+  DELETE: 'DELETE',
+  CONNECT: 'CONNECT',
+  OPTIONS: 'OPTIONS',
+  TRACE: 'TRACE',
+  PATCH: 'PATCH',
+};
 
 /**
- * @param {IncomingMessage} req
+ * @param {string} err
+ * @returns {Err}
+ */
+export function err(err) {
+  return { err, data: null };
+}
+
+/**
+ * @param {T} data
+ * @returns {Data<T>}
+ * @template T
+ */
+export function data(data) {
+  return { err: null, data };
+}
+
+/**
+ * @param {Promise<T>} promise
+ * @returns {AsyncErrorOr<T>}
+ * @template T
+ */
+export async function p2eo(promise) {
+  try {
+    return data(await promise);
+  } catch (e) {
+    return err(e);
+  }
+}
+
+/**
+ * @param {EZIncomingMessage} req
  * @param {resolverLUT} resolvers
  * @returns {FalseOr<resFunction>}
  */
-function getResFunction(req, resolvers) {
+export function getResFunction(req, resolvers) {
   let ss = req.uri.split('/');
   for (; ss.length > 1; ss.pop()) {
     let path = ss.join('/');
@@ -28,7 +66,7 @@ function getResFunction(req, resolvers) {
  * @param {resFunction} fn
  * @returns {void}
  */
-function addResFunctionWithParams(resolverTree, uri, fn) {
+export function addResFunctionWithParams(resolverTree, uri, fn) {
   const params = [];
   let tmp = resolverTree;
   let current_segment = [];
@@ -63,7 +101,7 @@ function addResFunctionWithParams(resolverTree, uri, fn) {
  * @param {Parameters} parameters
  * @returns {FalseOr<resFunction>}
  */
-function getResFunctionWithParams(uri, resolverTree, parameters) {
+export function getResFunctionWithParams(uri, resolverTree, parameters) {
   if (uri === '/') return false;
 
   const params = [];
@@ -101,7 +139,7 @@ function getResFunctionWithParams(uri, resolverTree, parameters) {
  * @param {resFunction} fn
  * @returns {void}
  */
-function addEndpointWithOrWithoutParams(lut_without_params, lut_with_params, uri, fn) {
+export function addEndpointWithOrWithoutParams(lut_without_params, lut_with_params, uri, fn) {
   if (uri.includes('/:')) addResFunctionWithParams(lut_with_params, uri, fn);
   else lut_without_params[uri] = fn;
 }
@@ -115,7 +153,7 @@ function addEndpointWithOrWithoutParams(lut_without_params, lut_with_params, uri
  * @param {LUT<string|number>} options.headers additional headers ('Content-Type' is overwritten by mime, default is an empty Object)
  * @returns {void}
  */
-function buildRes(res, data = undefined, { code = 200, mime = 'text/plain', headers = {} } = {}) {
+export function buildRes(res, data = undefined, { code = 200, mime = 'text/plain', headers = {} } = {}) {
   Object.defineProperty(headers, 'Content-Type', { value: mime });
   res.writeHead(code, headers);
   if (data !== undefined) res.write(data);
@@ -127,7 +165,7 @@ function buildRes(res, data = undefined, { code = 200, mime = 'text/plain', head
  * @param {ServerResponse} res response from the server
  * @returns {void}
  */
-function throw404(req, res) {
+export function throw404(req, res) {
   WRN('404 on', req.url);
   buildRes(res, '<!DOCTYPE html><head><meta charset="UTF-8"><title>404</title></head><body><h1>ERROR</h1><p>404 not found.</p></body></html>', {
     code: 404,
@@ -139,7 +177,7 @@ function throw404(req, res) {
  * @param {string} filePathOrName path, or name of  the file
  * @returns {string} mime-type of the file (default 'text/plain')
  */
-function getType(filePathOrName) {
+export function getType(filePathOrName) {
   const file_ending = filePathOrName.split('.').pop();
   if (mimeTypes.hasOwnProperty(file_ending)) return mimeTypes[file_ending];
   WRN('mime-type not found');
@@ -152,11 +190,11 @@ function getType(filePathOrName) {
  * @param {number} statusCode status code df the response (default 200)
  * @returns {void}
  */
-function serveFromFS(res, filePath, statusCode = 200) {
+export function serveFromFS(res, filePath, statusCode = 200) {
   LOG('reading file from FS:', filePath);
   readFile(filePath, (err, data) => {
-    const header = err ? { code: 500, mime: 'text/plain' } : { code: statusCode, mime: getType(filePath) };
-    buildRes(res, data || `error while loading file from fs:\n${err}`, header);
+    if (err !== null) buildRes(res, `error while loading file from fs:\n${err}`, { code: 500, mime: 'text/plain' });
+    else buildRes(res, data, { code: statusCode, mime: getType(filePath) });
   });
 }
 
@@ -164,7 +202,7 @@ function serveFromFS(res, filePath, statusCode = 200) {
  * @param {IncomingMessage} req
  * @return {Promise<ErrorOr<any>>}
  */
-function getBodyJSON(req) {
+export function getBodyJSON(req) {
   return new Promise((resolve) => {
     let buff = '';
 
@@ -185,20 +223,3 @@ function getBodyJSON(req) {
     });
   });
 }
-
-module.exports = {
-  LOG,
-  TAB,
-  WRN,
-  ERR,
-  HTTP_METHODS,
-  addEndpointWithOrWithoutParams,
-  getResFunction,
-  addResFunctionWithParams,
-  getResFunctionWithParams,
-  buildRes,
-  getType,
-  getBodyJSON,
-  serveFromFS,
-  throw404,
-};

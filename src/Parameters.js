@@ -1,8 +1,6 @@
 'use strict';
 
-/** @type {import('../types')}*/
-
-class Parameters {
+export class Parameters {
   /**@type {LUT<string>} */
   #query = {};
   /**@type {LUT<string>} */
@@ -89,5 +87,3 @@ class Parameters {
   //#endregion
   //#endregion
 }
-
-module.exports = { Parameters };

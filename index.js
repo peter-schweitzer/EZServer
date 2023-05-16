@@ -1,24 +1,24 @@
 'use strict';
-//#region imports and global const's
-const { createServer } = require('node:http');
 
-const { Parameters } = require('./src/Parameters.js');
-const {
-  LOG,
-  WRN,
-  ERR,
+//#region imports and global const's
+import { createServer } from 'node:http';
+
+import { Parameters } from './src/Parameters.js';
+import {
   addEndpointWithOrWithoutParams,
+  buildRes,
+  ERR,
+  getBodyJSON,
   getResFunction,
   getResFunctionWithParams,
-  getBodyJSON,
   getType,
-  buildRes,
+  HTTP_METHODS,
+  LOG,
   serveFromFS,
   throw404,
-  HTTP_METHODS,
-} = require('./src/utils.js');
+  WRN,
+} from './src/utils.js';
 
-/** @type {import('./types')} */
 //#endregion
 
 class App {
@@ -424,4 +424,4 @@ class App {
   //#endregion
 }
 
-module.exports = { App, buildRes, getType, serveFromFS, getBodyJSON, throw404, HTTP_METHODS, Parameters };
+export { App, buildRes, getType, serveFromFS, getBodyJSON, throw404, HTTP_METHODS, Parameters };

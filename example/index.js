@@ -1,4 +1,4 @@
-const { App, buildRes, serveFromFS } = require('../');
+import { App, buildRes, serveFromFS } from '../';
 
 const app = new App();
 app.listen('65535');
@@ -79,5 +79,3 @@ app.useGenericFunction('name', '/generic/rest-endpoint');
 //supports routs
 app.useGenericRestFunction('get', 'name', '/generic/route', true);
 app.useGenericFunction('name', '/generic/rest-route', true);
-
-/** @typedef {import('../index').resFunction} resFunction */
