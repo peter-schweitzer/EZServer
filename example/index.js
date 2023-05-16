@@ -1,4 +1,4 @@
-import { App, buildRes, serveFromFS } from '../';
+import { App, buildRes, serveFromFS } from '../index.js';
 
 const app = new App();
 app.listen('65535');
@@ -25,6 +25,12 @@ app.delete('/delete', (req, res) => {
 });
 app.patch('/patch', (req, res) => {
   buildRes(res, 'patch');
+});
+app.options('/options', (req, res) => {
+  buildRes(res, 'options');
+});
+app.head('/head', (req, res) => {
+  buildRes(res);
 });
 
 // add() ignores the HTTP-method, hence it's less specific
@@ -67,9 +73,11 @@ app.addRoute('/route', (req, res) => {
 // This is an easy way to use the same function multiple times without spamming your own file with functions
 app.addGenericRestFunction('get', 'name', (req, res) => {
   console.log('rest-name:', req.url);
+  buildRes(res);
 });
 app.addGenericFunction('name', (req, res) => {
   console.log('name:', req.url);
+  buildRes(res);
 });
 
 //supports endpoints
