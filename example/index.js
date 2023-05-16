@@ -32,7 +32,7 @@ app.add('/', (req, res) => {
   serveFromFS(res, './html/home.html');
 });
 
-app.add('/favicon.ico', () => buildRes(res, '', { code: 404, mime: 'text/plain' }));
+app.add('/favicon.ico', (req, res) => buildRes(res, '', { code: 404, mime: 'text/plain' }));
 
 /**
  ** ================ EZServer Supports Routs ===================
