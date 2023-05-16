@@ -75,6 +75,7 @@ class App {
     PATCH: {},
   };
 
+  /** @type {resolverLUT} */
   #endpoints_with_params = {};
   //#endregion
   //#endregion
@@ -136,20 +137,20 @@ class App {
     this.m_http_server = createServer((req, res) => {
       const [uri, query_str] = decodeURIComponent(req.url).split('?');
 
-      Object.defineProperty(req, 'uri', { value: uri });
+      const ez_incoming_msg = Object.assign({}, req, { uri });
 
       const parameters = new Parameters();
       if (!!query_str) parameters.add_query(query_str);
 
       (
-        this.#rest_endpoint(req) ||
-        this.#endpoint(req) ||
-        this.#rest_endpoint_with_param(req, parameters) ||
-        this.#endpoint_with_param(req, parameters) ||
-        this.#rest_route(req) ||
-        this.#route(req) ||
+        this.#rest_endpoint(ez_incoming_msg) ||
+        this.#endpoint(ez_incoming_msg) ||
+        this.#rest_endpoint_with_param(ez_incoming_msg, parameters) ||
+        this.#endpoint_with_param(ez_incoming_msg, parameters) ||
+        this.#rest_route(ez_incoming_msg) ||
+        this.#route(ez_incoming_msg) ||
         throw404
-      )(req, res, parameters);
+      )(ez_incoming_msg, res, parameters);
     });
   }
 
@@ -163,17 +164,19 @@ class App {
     this.m_http_server.listen(port, () => LOG(`server listening on port ${port}`));
   }
 
-  /** @returns {boolean} false if the server isn't open when close is called */
-  close() {
-    new Promise((resolve, reject) => this.m_http_server.close((err) => (err ? reject('error on close', err) : resolve('server is closed'))))
-      .catch((err) => {
-        ERR(err);
-        return false;
-      })
-      .then((wrn) => {
-        WRN(wrn);
-        return true;
+  /** @returns {Promise<boolean>} never rejects; false if the server isn't open when close() is called */
+  async close() {
+    return await new Promise((resolve, _) => {
+      this.m_http_server.close((err) => {
+        if (err !== null) {
+          ERR(err);
+          resolve(false);
+        } else {
+          WRN('server is closed');
+          resolve(true);
+        }
       });
+    });
   }
   //#endregion
 
@@ -182,7 +185,7 @@ class App {
   /**
    * @param {string} uri uri to resolve
    * @param {resFunction} fn function for resolve the request
-   * @returns {boolean} wether the function was successfully registered
+   * @returns {void}
    */
   get(uri, fn) {
     LOG('added get:', uri);
@@ -192,7 +195,7 @@ class App {
   /**
    * @param {string} uri uri to resolve
    * @param {resFunction} fn function for resolve the request
-   * @returns {boolean} wether the function was successfully registered
+   * @returns {void}
    */
   head(uri, fn) {
     LOG('added head:', uri);
@@ -202,7 +205,7 @@ class App {
   /**
    * @param {string} uri uri to resolve
    * @param {resFunction} fn function for resolve the request
-   * @returns {boolean} wether the function was successfully registered
+   * @returns {void}
    */
   post(uri, fn) {
     LOG('added post:', uri);
@@ -212,7 +215,7 @@ class App {
   /**
    * @param {string} uri uri to resolve
    * @param {resFunction} fn function for resolve the request
-   * @returns {boolean} wether the function was successfully registered
+   * @returns {void}
    */
   put(uri, fn) {
     LOG('added put:', uri);
@@ -222,7 +225,7 @@ class App {
   /**
    * @param {string} uri uri to resolve
    * @param {resFunction} fn function for resolve the request
-   * @returns {boolean} wether the function was successfully registered
+   * @returns {void}
    */
   delete(uri, fn) {
     LOG('added delete:', uri);
@@ -232,7 +235,7 @@ class App {
   /**
    * @param {string} uri uri to resolve
    * @param {resFunction} fn function for resolve the request
-   * @returns {boolean} wether the function was successfully registered
+   * @returns {void}
    */
   connect(uri, fn) {
     LOG('added connect:', uri);
@@ -242,7 +245,7 @@ class App {
   /**
    * @param {string} uri uri to resolve
    * @param {resFunction} fn function for resolve the request
-   * @returns {boolean} wether the function was successfully registered
+   * @returns {void}
    */
   options(uri, fn) {
     LOG('added options:', uri);
@@ -252,7 +255,7 @@ class App {
   /**
    * @param {string} uri uri to resolve
    * @param {resFunction} fn function for resolve the request
-   * @returns {boolean} wether the function was successfully registered
+   * @returns {void}
    */
   trace(uri, fn) {
     LOG('added trace:', uri);
@@ -262,7 +265,7 @@ class App {
   /**
    * @param {string} uri uri to resolve
    * @param {resFunction} fn function for resolve the request
-   * @returns {boolean} wether the function was successfully registered
+   * @returns {void}
    */
   patch(uri, fn) {
     LOG('added patch:', uri);
@@ -270,20 +273,23 @@ class App {
   }
 
   /**
-   * @param {IncomingMessage}
+   * @param {EZIncomingMessage} req
    * @returns {FalseOr<resFunction>}
    */
   #rest_endpoint({ uri, method }) {
+    //@ts-ignore T1345
     return method in HTTP_METHODS ? this.#rest_endpoints[method][uri] : !!WRN('invalid request method');
   }
 
   /**
-   * @param {IncomingMessage}
-   * @param {Parameters} parameters
+   * @param {EZIncomingMessage} req
+   * @param {Params} parameters
    * @returns {FalseOr<resFunction>}
    */
   #rest_endpoint_with_param({ uri, method }, parameters) {
-    return method in HTTP_METHODS ? getResFunctionWithParams(uri, this.#rest_endpoints_with_params[method], parameters) : !!WRN('invalid request method');
+    if (method in HTTP_METHODS) return getResFunctionWithParams(uri, this.#rest_endpoints_with_params[method], parameters);
+    WRN('invalid request method');
+    return false;
   }
   //#endregion
 
@@ -291,7 +297,7 @@ class App {
   /**
    * @param {string} uri uri to resolve
    * @param {resFunction} fn function for resolve the request
-   * @returns {boolean} wether the function was successfully registered
+   * @returns {void}
    */
   add(uri, fn) {
     LOG('added:', uri);
@@ -299,7 +305,7 @@ class App {
   }
 
   /**
-   * @param {IncomingMessage}
+   * @param {EZIncomingMessage} req
    * @returns {FalseOr<resFunction>}
    */
   #endpoint({ uri }) {
@@ -307,8 +313,8 @@ class App {
   }
 
   /**
-   * @param {IncomingMessage}
-   * @param {Parameters}
+   * @param {EZIncomingMessage} req
+   * @param {Params} parameters
    * @returns {FalseOr<resFunction>}
    */
   #endpoint_with_param({ uri }, parameters) {
@@ -323,22 +329,28 @@ class App {
    * @param {string} method http-method of the request
    * @param {string} uri start of the uri to resolve
    * @param {resFunction} fn function for resolve the request
-   * @returns {boolean} wether the function was successfully registered
+   * @returns {FalseOr<void>} wether the function was successfully registered
    */
   addRestRoute(method, uri, fn) {
     const m = method.toUpperCase();
-    if (!m in HTTP_METHODS) return !!WRN('invalid method', m);
+    if (!(m in HTTP_METHODS)) {
+      WRN('invalid method', m);
+      return false;
+    }
 
-    LOG('adding rest-route for method ' + m, uri);
-    return !!(this.#rest_routes[m][uri] = fn);
+    LOG(`adding rest-route '${uri}' for method '${m}'`);
+    this.#rest_routes[m][uri] = fn;
   }
 
   /**
-   * @param {IncomingMessage} req
+   * @param {EZIncomingMessage} req
    * @returns {FalseOr<resFunction>}
    */
   #rest_route(req) {
-    return HTTP_METHODS.hasOwnProperty(req.method) ? getResFunction(req, this.#rest_routes[req.method]) : !!WRN('invalid request method');
+    if (HTTP_METHODS.hasOwnProperty(req.method)) return getResFunction(req, this.#rest_routes[req.method]);
+
+    WRN('invalid request method');
+    return false;
   }
   //#endregion
 
@@ -346,15 +358,15 @@ class App {
   /**
    * @param {string} uri start of the uri to resolve
    * @param {resFunction} fn function for resolve the request
-   * @returns {boolean} wether the function was successfully registered
+   * @returns {void}
    */
   addRoute(uri, fn) {
     LOG('adding route', uri);
-    return !!(this.#routs[uri] = fn);
+    this.#routs[uri] = fn;
   }
 
   /**
-   * @param {IncomingMessage} req
+   * @param {EZIncomingMessage} req
    * @returns {FalseOr<resFunction>}
    */
   #route(req) {
@@ -369,13 +381,23 @@ class App {
    * @param {string} method http-method
    * @param {string} functionName name of the generic function
    * @param {resFunction} fn function for resolve the request
-   * @returns {boolean} wether the function was successfully registered
+   * @returns {FalseOr<void>} wether the function was successfully registered
    */
-  addGenericRestFunction(method, functionName, fn) {
+  addGenericRestFunction(method, functionName = '', fn) {
     const m = method.toUpperCase();
-    if (!(m in HTTP_METHODS)) return !!WRN('invalid method', m);
-    if (!functionName) return !!WRN('invalid functionName', functionName);
-    return LOG('adding generic rest function for method ' + method, functionName) || !(this.#generic_rest_functions[m][functionName] = fn);
+
+    if (!(m in HTTP_METHODS)) {
+      WRN('invalid method', m);
+      return false;
+    }
+
+    if (!functionName.length) {
+      WRN(`invalid functionName '${functionName}'`);
+      return false;
+    }
+
+    LOG('adding generic rest function for method ' + method, functionName);
+    this.#generic_rest_functions[m][functionName] = fn;
   }
 
   /**
@@ -383,16 +405,23 @@ class App {
    * @param {string} functionName name of the generic function
    * @param {string} uri uri to resolve
    * @param {boolean} isRoute wether to register a route or endpoint
-   * @returns {boolean} wether the function was successfully registered
+   * @returns {FalseOr<void>} wether the function was successfully registered
    */
   useGenericRestFunction(method, functionName, uri, isRoute = false) {
     const m = method.toUpperCase();
-    if (!(m in HTTP_METHODS)) return !!WRN('invalid method', m);
+    if (!(m in HTTP_METHODS)) {
+      WRN('invalid method', m);
+      return false;
+    }
 
     const fn = this.#generic_rest_functions[m][functionName];
-    if (!fn) return !!WRN('invalid function name');
+    if (!fn) {
+      WRN('invalid function name');
+      return false;
+    }
 
-    return !!(isRoute ? (this.#rest_routes[m][uri] = fn) : (this.#rest_endpoints[m][uri] = fn));
+    if (isRoute) this.#rest_routes[m][uri] = fn;
+    else this.#rest_endpoints[m][uri] = fn;
   }
   //#endregion
 
@@ -400,24 +429,31 @@ class App {
   /**
    * @param {string} functionName name of the generic function
    * @param {resFunction} fn function for resolve the request
-   * @returns {boolean} wether the function was successfully registered
+   * @returns {FalseOr<void>} wether the function was successfully registered
    */
-  addGenericFunction(functionName, fn) {
-    if (!functionName) return !!WRN('invalid functionName', functionName);
-    return !!(this.#generic_functions[functionName] = fn);
+  addGenericFunction(functionName = '', fn) {
+    if (!functionName.length) {
+      WRN('invalid functionName', functionName);
+      return false;
+    }
+    this.#generic_functions[functionName] = fn;
   }
 
   /**
    * @param {string} functionName name of the generic function
    * @param {string} uri uri to resolve
    * @param {boolean} isRoute wether to register a route or endpoint
-   * @returns {boolean} wether the function was successfully registered
+   * @returns {FalseOr<void>} wether the function was successfully registered
    */
   useGenericFunction(functionName, uri, isRoute = false) {
     const fn = this.#generic_functions[functionName];
-    if (!fn) return !!WRN('invalid function name');
+    if (!fn) {
+      WRN('invalid function name');
+      return false;
+    }
 
-    return !!(isRoute ? (this.#routs[uri] = fn) : (this.#endpoints[uri] = fn));
+    if (isRoute) this.#routs[uri] = fn;
+    else this.#endpoints[uri] = fn;
   }
   //#endregion
   //#endregion

@@ -97,8 +97,8 @@ export function addResFunctionWithParams(resolverTree, uri, fn) {
 
 /**
  * @param {string} uri
- * @param {Object.<string, any>} resolverTree
- * @param {Parameters} parameters
+ * @param {LUT<any>} resolverTree
+ * @param {Params} parameters
  * @returns {FalseOr<resFunction>}
  */
 export function getResFunctionWithParams(uri, resolverTree, parameters) {
@@ -147,27 +147,28 @@ export function addEndpointWithOrWithoutParams(lut_without_params, lut_with_para
 /**
  * @param {ServerResponse} res response from the server
  * @param {any} data data of the response
- * @param {Object} options optional options
- * @param {number} options.code status code of the response (default is 200)
- * @param {string} options.mime mime-type of the response (default is 'text/plain')
- * @param {LUT<string|number>} options.headers additional headers ('Content-Type' is overwritten by mime, default is an empty Object)
+ * @param {Object} [options] optional options
+ * @param {number} [options.code] status code of the response (default is 200)
+ * @param {string} [options.mime] mime-type of the response (default is 'text/plain')
+ * @param {LUT<string|number>} [options.headers] additional headers ('Content-Type' is overwritten by mime, default is an empty Object)
  * @returns {void}
  */
 export function buildRes(res, data = undefined, { code = 200, mime = 'text/plain', headers = {} } = {}) {
   Object.defineProperty(headers, 'Content-Type', { value: mime });
   res.writeHead(code, headers);
+  // FIXME: write() can error, but it takes a callback => no good way to propagate the error to the caller :(
   if (data !== undefined) res.write(data);
   res.end();
 }
 
 /**
- * @param {IncomingMessage} req request from the client
+ * @param {EZIncomingMessage} req request from the client
  * @param {ServerResponse} res response from the server
  * @returns {void}
  */
 export function throw404(req, res) {
   WRN('404 on', req.url);
-  buildRes(res, '<!DOCTYPE html><head><meta charset="UTF-8"><title>404</title></head><body><h1>ERROR</h1><p>404 not found.</p></body></html>', {
+  buildRes(res, `<!DOCTYPE html><head><meta charset="UTF-8"><title>404</title></head><body><h1>ERROR</h1><p>404 '${req.uri}' not found.</p></body></html>`, {
     code: 404,
     mime: 'text/html',
   });
@@ -200,26 +201,21 @@ export function serveFromFS(res, filePath, statusCode = 200) {
 
 /**
  * @param {IncomingMessage} req
- * @return {Promise<ErrorOr<any>>}
+ * @return {AsyncErrorOr<any>}
  */
 export function getBodyJSON(req) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, _) => {
     let buff = '';
 
     req.on('data', (chunk) => (buff += chunk));
 
     req.on('end', () => {
-      try {
-        resolve({ data: JSON.parse(buff), err: null });
-      } catch (e) {
-        ERR('error in getBodyJSON:', e);
-        resolve({ data: null, err: `${e.name}:\n${e.message}` });
-      }
+      resolve(!buff.length ? data('') : p2eo(JSON.parse(buff)));
     });
 
-    req.on('error', (err) => {
+    req.on('error', (e) => {
       ERR('error in getBodyJSON:', e);
-      resolve({ data: null, err: `${e.name}:\n${e.message}` });
+      resolve(err(`${e.name}:\n${e.message}`));
     });
   });
 }

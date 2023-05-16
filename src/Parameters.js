@@ -42,7 +42,7 @@ export class Parameters {
    * @param {string?} defaultValue
    * @returns {string?}
    */
-  query(name = null, defaultValue = null) {
+  query(name = '', defaultValue = null) {
     try {
       return this.#query[name] || defaultValue;
     } catch {
@@ -55,9 +55,9 @@ export class Parameters {
    * @param {number?} defaultValue
    * @returns {number?}
    */
-  queryNumber(name = null, defaultValue = null) {
-    const str = this.query(name, defaultValue);
-    if (!str) return defaultValue;
+  queryNumber(name = '', defaultValue = null) {
+    const str = this.query(name, '');
+    if (!str.length) return defaultValue;
     const num = parseFloat(str);
     return isNaN(num) ? defaultValue : num;
   }
@@ -78,9 +78,9 @@ export class Parameters {
    * @param {number?} defaultValue
    * @returns {number?}
    */
-  routeNumber(name = null, defaultValue = null) {
-    const str = this.route(name, defaultValue);
-    if (!str) return defaultValue;
+  routeNumber(name = '', defaultValue = null) {
+    const str = this.route(name, '');
+    if (!str.length) return defaultValue;
     const num = parseFloat(str);
     return isNaN(num) ? defaultValue : num;
   }
