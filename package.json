@@ -1,10 +1,18 @@
 {
+  "author": "Peter Schweitzer",
   "name": "@peter-schweitzer/ezserver",
-  "version": "3.0.1",
-  "description": "npm module for fast backend/REST-API development with no (exactly 0!) dependencies (somewhat inspired by the express framework)",
+  "version": "3.0.2",
+  "license": "MIT",
+  "main": "index.js",
   "type": "module",
-  "scripts": {
-    "example": "cd example && node ."
+  "description": "npm module for fast backend/REST-API development with no (exactly 0!) dependencies (somewhat inspired by the express framework)",
+  "homepage": "https://github.com/peter-schweitzer/EZServer",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/peter-schweitzer/EZServer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/peter-schweitzer/EZServer/issues"
   },
   "keywords": [
     "simple",
@@ -16,15 +24,8 @@
     "backend",
     "framework"
   ],
-  "author": "Peter Schweitzer",
-  "homepage": "https://github.com/peter-schweitzer/EZServer",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/peter-schweitzer/EZServer.git"
-  },
-  "bugs": {
-    "url": "https://github.com/peter-schweitzer/EZServer/issues"
+  "scripts": {
+    "example": "cd example && node ."
   },
   "reveal": true
 }
