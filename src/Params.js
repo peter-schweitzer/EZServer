@@ -1,6 +1,6 @@
 'use strict';
 
-export class Parameters {
+export class Params {
   /**@type {LUT<string>} */
   #query = {};
   /**@type {LUT<string>} */

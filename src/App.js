@@ -1,7 +1,7 @@
 //#region imports and global const's
 import { createServer } from 'node:http';
 
-import { Parameters } from './Parameters.js';
+import { Params } from './Params.js';
 import { addEndpointWithOrWithoutParams, ERR, getResFunction, getResFunctionWithParams, HTTP_METHODS, LOG, throw404, WRN } from './utils.js';
 
 //#endregion
@@ -124,7 +124,7 @@ export class App {
 
       const ez_incoming_msg = Object.assign({}, req, { uri });
 
-      const parameters = new Parameters();
+      const parameters = new Params();
       if (!!query_str) parameters.add_query(query_str);
 
       (

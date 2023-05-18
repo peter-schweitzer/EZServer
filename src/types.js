@@ -28,7 +28,7 @@
  */
 
 /**
- * @typedef {import('./Parameters').Parameters} Params
+ * @typedef {import('./Params').Params} Params
  */
 
 /**
