@@ -1,6 +1,6 @@
 # EZServer
 
-<span style="color: #ff2020">EZServer versions prior to `2.0.0` are deprecated! version 3.0.0 (or newer) is recommended<span>
+<span style="color: #ff2020">EZServer versions prior to `2.0.0` are deprecated! version 3.0.3 (or newer) is recommended<span>
 
 simple, ultra light weight node.js module with 0 dependencies for simple backend/REST-API development
 
