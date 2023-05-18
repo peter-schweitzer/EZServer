@@ -7,6 +7,7 @@
   "type": "module",
   "description": "npm module for fast backend/REST-API development with no (exactly 0!) dependencies (somewhat inspired by the express framework)",
   "homepage": "https://github.com/peter-schweitzer/EZServer",
+  "types": "types.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/peter-schweitzer/EZServer.git"
