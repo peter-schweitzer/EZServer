@@ -1,6 +1,6 @@
 # EZServer
 
-<span style="color: #ff2020">EZServer versions prior to `3.0.3` are no longer available! version 3.0.5 (or newer) is recommended</span>
+<span style="color: #ff2020">EZServer versions prior to `3.0.3` are no longer available! version 3.0.6 (or newer) is recommended</span>
 
 simple, ultra light weight node.js module with 0 dependencies for simple backend/REST-API development
 
