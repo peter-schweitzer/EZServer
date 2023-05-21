@@ -1,5 +1,3 @@
-'use strict';
-
 export class Params {
   /**@type {LUT<string>} */
   #query = {};

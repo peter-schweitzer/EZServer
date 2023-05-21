@@ -1,5 +1,19 @@
 /**
+ * @typedef {import('http').Server} Server
+ * @typedef {import('http').IncomingMessage} IncomingMessage
+ * @typedef {import('http').ServerResponse} ServerResponse
+ *
+ * @typedef {import('./Params').Params} Params
+ *
+ * @typedef {IncomingMessage & {uri: string}} EZIncomingMessage
  * @typedef {{err: string, data: null}} Err
+ * @typedef {(req: EZIncomingMessage, res: ServerResponse, params: Params) => void} resFunction
+ * @typedef {LUT<resFunction>} resolverLUT
+ */
+
+/**
+ * @typedef {{[x: string]: T}} LUT<T>
+ * @template T
  */
 
 /**
@@ -20,29 +34,4 @@
 /**
  * @typedef {false|T} FalseOr<T>
  * @template T
- */
-
-/**
- * @typedef {{[x: string]: T}} LUT<T>
- * @template T
- */
-
-/**
- * @typedef {import('./Params').Params} Params
- */
-
-/**
- * @typedef {IncomingMessage & {uri: string}} EZIncomingMessage
- */
-
-/**
- * @typedef {(req: EZIncomingMessage, res: ServerResponse, params: Params) => void} resFunction
- */
-
-/** @typedef {LUT<resFunction>} resolverLUT */
-
-/**
- * @typedef {import('http').Server} Server
- * @typedef {import('http').IncomingMessage} IncomingMessage
- * @typedef {import('http').ServerResponse} ServerResponse
  */

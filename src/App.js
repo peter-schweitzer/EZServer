@@ -1,4 +1,4 @@
-//#region imports and global const's
+//#region imports
 import { createServer } from 'node:http';
 
 import { Params } from './Params.js';
@@ -10,7 +10,7 @@ export class App {
   /** @type {Server}*/
   m_http_server;
 
-  //#region resolverLUT data objects
+  //#region resolverLUT data-objects
   //#region endpoints
   //#region without param
   #rest_endpoints = {
