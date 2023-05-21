@@ -66,7 +66,7 @@ export function getResFunction(req, resolvers) {
  * @param {resFunction} fn
  * @returns {void}
  */
-export function addResFunctionWithParams(resolverTree, uri, fn) {
+function addResFunctionWithParams(resolverTree, uri, fn) {
   const params = [];
   let tmp = resolverTree;
   let current_segment = [];
@@ -178,7 +178,7 @@ export function throw404(req, res) {
  * @param {string} filePathOrName path, or name of  the file
  * @returns {string} mime-type of the file (default 'text/plain')
  */
-export function getType(filePathOrName) {
+function getType(filePathOrName) {
   const file_ending = filePathOrName.split('.').pop();
   if (mimeTypes.hasOwnProperty(file_ending)) return mimeTypes[file_ending];
   WRN('mime-type not found');
