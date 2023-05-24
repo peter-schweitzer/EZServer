@@ -1,37 +1,17 @@
 export class Params {
   /**@type {LUT<string>} */
-  #query = {};
+  #query;
   /**@type {LUT<string>} */
-  #route = {};
-
-  //#region adding params
-  /**
-   * @param {string} query_string
-   * @returns {boolean} was successful
-   */
-  add_query(query_string) {
-    if (!!query_string)
-      for (const kv of query_string.split('&')) {
-        const [key, value] = kv.split('=');
-        if (!key || !value) return false;
-        Object.defineProperty(this.#query, key, { value });
-      }
-    return true;
-  }
+  #route;
 
   /**
-   * @param {string[]} key_arr
-   * @param {string[]} val_arr
-   * @returns {boolean} was successful
+   * @param {LUT<string>} query
+   * @param {LUT<string>} route
    */
-  add_route(key_arr, val_arr) {
-    if (key_arr.length !== val_arr.length) return false;
-    for (let i = 0; i < key_arr.length; i++) this.#route[key_arr[i]] = val_arr[i];
-    return true;
+  constructor(query, route) {
+    this.#query = query;
+    this.#route = route;
   }
-  //#endregion
-
-  constructor() {}
 
   //#region getting params
   //#region query

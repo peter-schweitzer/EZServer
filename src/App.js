@@ -1,9 +1,9 @@
 //#region imports
 import { createServer } from 'node:http';
 
-import { Params } from './Params.js';
 import { addEndpointWithOrWithoutParams, ERR, getResFunction, getResFunctionWithParams, HTTP_METHODS, LOG, throw404, WRN } from './utils.js';
 
+import { ParamsBuilder } from './ParamsBuilder.js';
 //#endregion
 
 export class App {
@@ -124,18 +124,18 @@ export class App {
 
       const ez_incoming_msg = Object.assign({}, req, { uri });
 
-      const parameters = new Params();
-      if (!!query_str) parameters.add_query(query_str);
+      const params_builder = new ParamsBuilder();
+      params_builder.add_query_parameters(query_str);
 
       (
         this.#rest_endpoint(ez_incoming_msg) ||
         this.#endpoint(ez_incoming_msg) ||
-        this.#rest_endpoint_with_param(ez_incoming_msg, parameters) ||
-        this.#endpoint_with_param(ez_incoming_msg, parameters) ||
+        this.#rest_endpoint_with_param(ez_incoming_msg, params_builder) ||
+        this.#endpoint_with_param(ez_incoming_msg, params_builder) ||
         this.#rest_route(ez_incoming_msg) ||
         this.#route(ez_incoming_msg) ||
         throw404
-      )(ez_incoming_msg, res, parameters);
+      )(ez_incoming_msg, res, params_builder.build());
     });
   }
 
@@ -268,11 +268,11 @@ export class App {
 
   /**
    * @param {EZIncomingMessage} req
-   * @param {Params} parameters
+   * @param {ParamsBuilder} params
    * @returns {FalseOr<resFunction>}
    */
-  #rest_endpoint_with_param({ uri, method }, parameters) {
-    if (method in HTTP_METHODS) return getResFunctionWithParams(uri, this.#rest_endpoints_with_params[method], parameters);
+  #rest_endpoint_with_param({ uri, method }, params) {
+    if (method in HTTP_METHODS) return getResFunctionWithParams(uri, this.#rest_endpoints_with_params[method], params);
     WRN('invalid request method');
     return false;
   }
@@ -299,11 +299,11 @@ export class App {
 
   /**
    * @param {EZIncomingMessage} req
-   * @param {Params} parameters
+   * @param {ParamsBuilder} params_builder
    * @returns {FalseOr<resFunction>}
    */
-  #endpoint_with_param({ uri }, parameters) {
-    return getResFunctionWithParams(uri, this.#endpoints_with_params, parameters);
+  #endpoint_with_param({ uri }, params_builder) {
+    return getResFunctionWithParams(uri, this.#endpoints_with_params, params_builder);
   }
   //#endregion
   //#endregion

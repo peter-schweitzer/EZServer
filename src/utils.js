@@ -98,10 +98,10 @@ function addResFunctionWithParams(resolverTree, uri, fn) {
 /**
  * @param {string} uri
  * @param {LUT<any>} resolverTree
- * @param {Params} parameters
+ * @param {ParamsBuilder} params_builder
  * @returns {FalseOr<resFunction>}
  */
-export function getResFunctionWithParams(uri, resolverTree, parameters) {
+export function getResFunctionWithParams(uri, resolverTree, params_builder) {
   if (uri === '/') return false;
 
   const params = [];
@@ -128,7 +128,7 @@ export function getResFunctionWithParams(uri, resolverTree, parameters) {
 
   if (!tmp.hasOwnProperty('fn') || !tmp.hasOwnProperty('params')) return false;
 
-  parameters.add_route(tmp.params, params);
+  params_builder.add_route_parameters(tmp.params, params);
   return tmp.fn || false;
 }
 

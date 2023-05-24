@@ -3,17 +3,14 @@
  * @typedef {import('http').IncomingMessage} IncomingMessage
  * @typedef {import('http').ServerResponse} ServerResponse
  *
+ * @typedef {import('./ParamsBuilder').ParamsBuilder} ParamsBuilder
  * @typedef {import('./Params').Params} Params
  *
  * @typedef {IncomingMessage & {uri: string}} EZIncomingMessage
- * @typedef {{err: string, data: null}} Err
  * @typedef {(req: EZIncomingMessage, res: ServerResponse, params: Params) => void} resFunction
  * @typedef {LUT<resFunction>} resolverLUT
- */
-
-/**
- * @typedef {{[x: string]: T}} LUT<T>
- * @template T
+ *
+ * @typedef {{err: string, data: null}} Err
  */
 
 /**
@@ -28,6 +25,11 @@
 
 /**
  * @typedef {Promise<Err|Data<T>>} AsyncErrorOr<T> The Promise should always resolves, never reject!
+ * @template T
+ */
+
+/**
+ * @typedef {{[x: string]: T}} LUT<T>
  * @template T
  */
 
