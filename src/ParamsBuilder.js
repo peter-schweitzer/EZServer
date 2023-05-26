@@ -6,19 +6,17 @@ export class ParamsBuilder {
   /**@type {LUT<string>} */
   #route = {};
 
-  constructor() {}
-
   /**
    * @param {string} query_string
    * @returns {void}
    */
   add_query_parameters(query_string = '') {
-    if (query_string.length)
-      for (const kv of query_string.split('&')) {
-        const [key, value] = kv.split('=');
-        if (!key.length || !value?.length) return;
-        this.#query[key] = value;
-      }
+    if (!query_string.length) return;
+    for (const kv of query_string.split('&')) {
+      const [key, value] = kv.split('=');
+      if (!key.length || !value?.length) return;
+      this.#query[key] = value;
+    }
   }
 
   /**
