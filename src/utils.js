@@ -181,7 +181,7 @@ export function throw404(req, res) {
 function getType(filePathOrName) {
   const file_ending = filePathOrName.split('.').pop();
   if (Object.hasOwn(mime_types, file_ending)) return mime_types[file_ending];
-  WRN('mime-type not found');
+  WRN(`mime-type '${file_ending}' not found`);
   return 'text/plain';
 }
 
