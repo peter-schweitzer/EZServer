@@ -1,7 +1,7 @@
 //#region imports
 import { createServer } from 'node:http';
 
-import { addEndpointWithOrWithoutParams, ERR, getResFunction, getResFunctionWithParams, HTTP_METHODS, LOG, throw404, WRN } from './utils.js';
+import { ERR, HTTP_METHODS, LOG, WRN, add_endpoint_with_or_without_params, get_ResFunction, get_ResFunction_with_params, throw404 } from './utils.js';
 
 import { ParamsBuilder } from './ParamsBuilder.js';
 //#endregion
@@ -14,106 +14,106 @@ export class App {
   //#region endpoints
   //#region without param
   #rest_endpoints = {
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     GET: {},
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     HEAD: {},
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     POST: {},
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     PUT: {},
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     DELETE: {},
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     CONNECT: {},
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     OPTIONS: {},
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     TRACE: {},
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     PATCH: {},
   };
 
-  /** @type {resolverLUT} */
+  /** @type {ResolverLUT} */
   #endpoints = {};
   //#endregion
 
   //#region with param
   #rest_endpoints_with_params = {
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     GET: {},
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     HEAD: {},
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     POST: {},
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     PUT: {},
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     DELETE: {},
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     CONNECT: {},
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     OPTIONS: {},
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     TRACE: {},
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     PATCH: {},
   };
 
-  /** @type {resolverLUT} */
+  /** @type {ResolverLUT} */
   #endpoints_with_params = {};
   //#endregion
   //#endregion
 
   //#region routs
   #rest_routes = {
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     GET: {},
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     HEAD: {},
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     POST: {},
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     PUT: {},
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     DELETE: {},
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     CONNECT: {},
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     OPTIONS: {},
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     TRACE: {},
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     PATCH: {},
   };
 
-  /** @type {resolverLUT} */
+  /** @type {ResolverLUT} */
   #routs = {};
   //#endregion
 
   //#region general functions
   #generic_rest_functions = {
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     GET: {},
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     HEAD: {},
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     POST: {},
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     PUT: {},
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     DELETE: {},
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     CONNECT: {},
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     OPTIONS: {},
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     TRACE: {},
-    /** @type {resolverLUT} */
+    /** @type {ResolverLUT} */
     PATCH: {},
   };
 
-  /** @type {resolverLUT}*/
+  /** @type {ResolverLUT}*/
   #generic_functions = {};
   //#endregion
   //#endregion
@@ -169,97 +169,97 @@ export class App {
   //#region rest endpoints
   /**
    * @param {string} uri uri to resolve
-   * @param {resFunction} fn function for resolve the request
+   * @param {ResFunction} fn function for resolve the request
    * @returns {void}
    */
   get(uri, fn) {
     LOG('added get:', uri);
-    addEndpointWithOrWithoutParams(this.#rest_endpoints.GET, this.#rest_endpoints_with_params.GET, uri, fn);
+    add_endpoint_with_or_without_params(this.#rest_endpoints.GET, this.#rest_endpoints_with_params.GET, uri, fn);
   }
 
   /**
    * @param {string} uri uri to resolve
-   * @param {resFunction} fn function for resolve the request
+   * @param {ResFunction} fn function for resolve the request
    * @returns {void}
    */
   head(uri, fn) {
     LOG('added head:', uri);
-    addEndpointWithOrWithoutParams(this.#rest_endpoints.HEAD, this.#rest_endpoints_with_params.HEAD, uri, fn);
+    add_endpoint_with_or_without_params(this.#rest_endpoints.HEAD, this.#rest_endpoints_with_params.HEAD, uri, fn);
   }
 
   /**
    * @param {string} uri uri to resolve
-   * @param {resFunction} fn function for resolve the request
+   * @param {ResFunction} fn function for resolve the request
    * @returns {void}
    */
   post(uri, fn) {
     LOG('added post:', uri);
-    addEndpointWithOrWithoutParams(this.#rest_endpoints.POST, this.#rest_endpoints_with_params.POST, uri, fn);
+    add_endpoint_with_or_without_params(this.#rest_endpoints.POST, this.#rest_endpoints_with_params.POST, uri, fn);
   }
 
   /**
    * @param {string} uri uri to resolve
-   * @param {resFunction} fn function for resolve the request
+   * @param {ResFunction} fn function for resolve the request
    * @returns {void}
    */
   put(uri, fn) {
     LOG('added put:', uri);
-    addEndpointWithOrWithoutParams(this.#rest_endpoints.PUT, this.#rest_endpoints_with_params.PUT, uri, fn);
+    add_endpoint_with_or_without_params(this.#rest_endpoints.PUT, this.#rest_endpoints_with_params.PUT, uri, fn);
   }
 
   /**
    * @param {string} uri uri to resolve
-   * @param {resFunction} fn function for resolve the request
+   * @param {ResFunction} fn function for resolve the request
    * @returns {void}
    */
   delete(uri, fn) {
     LOG('added delete:', uri);
-    addEndpointWithOrWithoutParams(this.#rest_endpoints.DELETE, this.#rest_endpoints_with_params.DELETE, uri, fn);
+    add_endpoint_with_or_without_params(this.#rest_endpoints.DELETE, this.#rest_endpoints_with_params.DELETE, uri, fn);
   }
 
   /**
    * @param {string} uri uri to resolve
-   * @param {resFunction} fn function for resolve the request
+   * @param {ResFunction} fn function for resolve the request
    * @returns {void}
    */
   connect(uri, fn) {
     LOG('added connect:', uri);
-    addEndpointWithOrWithoutParams(this.#rest_endpoints.CONNECT, this.#rest_endpoints_with_params.CONNECT, uri, fn);
+    add_endpoint_with_or_without_params(this.#rest_endpoints.CONNECT, this.#rest_endpoints_with_params.CONNECT, uri, fn);
   }
 
   /**
    * @param {string} uri uri to resolve
-   * @param {resFunction} fn function for resolve the request
+   * @param {ResFunction} fn function for resolve the request
    * @returns {void}
    */
   options(uri, fn) {
     LOG('added options:', uri);
-    addEndpointWithOrWithoutParams(this.#rest_endpoints.OPTIONS, this.#rest_endpoints_with_params.OPTIONS, uri, fn);
+    add_endpoint_with_or_without_params(this.#rest_endpoints.OPTIONS, this.#rest_endpoints_with_params.OPTIONS, uri, fn);
   }
 
   /**
    * @param {string} uri uri to resolve
-   * @param {resFunction} fn function for resolve the request
+   * @param {ResFunction} fn function for resolve the request
    * @returns {void}
    */
   trace(uri, fn) {
     LOG('added trace:', uri);
-    addEndpointWithOrWithoutParams(this.#rest_endpoints.TRACE, this.#rest_endpoints_with_params.TRACE, uri, fn);
+    add_endpoint_with_or_without_params(this.#rest_endpoints.TRACE, this.#rest_endpoints_with_params.TRACE, uri, fn);
   }
 
   /**
    * @param {string} uri uri to resolve
-   * @param {resFunction} fn function for resolve the request
+   * @param {ResFunction} fn function for resolve the request
    * @returns {void}
    */
   patch(uri, fn) {
     LOG('added patch:', uri);
-    addEndpointWithOrWithoutParams(this.#rest_endpoints.PATCH, this.#rest_endpoints_with_params.PATCH, uri, fn);
+    add_endpoint_with_or_without_params(this.#rest_endpoints.PATCH, this.#rest_endpoints_with_params.PATCH, uri, fn);
   }
 
   /**
    * @param {EZIncomingMessage} req
-   * @returns {FalseOr<resFunction>}
+   * @returns {FalseOr<ResFunction>}
    */
   #rest_endpoint({ uri, method }) {
     //@ts-ignore T1345
@@ -269,10 +269,10 @@ export class App {
   /**
    * @param {EZIncomingMessage} req
    * @param {ParamsBuilder} params
-   * @returns {FalseOr<resFunction>}
+   * @returns {FalseOr<ResFunction>}
    */
   #rest_endpoint_with_param({ uri, method }, params) {
-    if (method in HTTP_METHODS) return getResFunctionWithParams(uri, this.#rest_endpoints_with_params[method], params);
+    if (method in HTTP_METHODS) return get_ResFunction_with_params(uri, this.#rest_endpoints_with_params[method], params);
     WRN('invalid request method');
     return false;
   }
@@ -281,17 +281,17 @@ export class App {
   //#region non rest endpoints
   /**
    * @param {string} uri uri to resolve
-   * @param {resFunction} fn function for resolve the request
+   * @param {ResFunction} fn function for resolve the request
    * @returns {void}
    */
   add(uri, fn) {
     LOG('added:', uri);
-    addEndpointWithOrWithoutParams(this.#endpoints, this.#endpoints_with_params, uri, fn);
+    add_endpoint_with_or_without_params(this.#endpoints, this.#endpoints_with_params, uri, fn);
   }
 
   /**
    * @param {EZIncomingMessage} req
-   * @returns {FalseOr<resFunction>}
+   * @returns {FalseOr<ResFunction>}
    */
   #endpoint({ uri }) {
     return this.#endpoints.hasOwnProperty(uri) ? this.#endpoints[uri] : false;
@@ -300,10 +300,10 @@ export class App {
   /**
    * @param {EZIncomingMessage} req
    * @param {ParamsBuilder} params_builder
-   * @returns {FalseOr<resFunction>}
+   * @returns {FalseOr<ResFunction>}
    */
   #endpoint_with_param({ uri }, params_builder) {
-    return getResFunctionWithParams(uri, this.#endpoints_with_params, params_builder);
+    return get_ResFunction_with_params(uri, this.#endpoints_with_params, params_builder);
   }
   //#endregion
   //#endregion
@@ -313,7 +313,7 @@ export class App {
   /**
    * @param {string} method http-method of the request
    * @param {string} uri start of the uri to resolve
-   * @param {resFunction} fn function for resolve the request
+   * @param {ResFunction} fn function for resolve the request
    * @returns {FalseOr<void>} wether the function was successfully registered
    */
   addRestRoute(method, uri, fn) {
@@ -329,10 +329,10 @@ export class App {
 
   /**
    * @param {EZIncomingMessage} req
-   * @returns {FalseOr<resFunction>}
+   * @returns {FalseOr<ResFunction>}
    */
   #rest_route(req) {
-    if (HTTP_METHODS.hasOwnProperty(req.method)) return getResFunction(req, this.#rest_routes[req.method]);
+    if (HTTP_METHODS.hasOwnProperty(req.method)) return get_ResFunction(req, this.#rest_routes[req.method]);
 
     WRN('invalid request method');
     return false;
@@ -342,7 +342,7 @@ export class App {
   //#region non rest routes
   /**
    * @param {string} uri start of the uri to resolve
-   * @param {resFunction} fn function for resolve the request
+   * @param {ResFunction} fn function for resolve the request
    * @returns {void}
    */
   addRoute(uri, fn) {
@@ -352,10 +352,10 @@ export class App {
 
   /**
    * @param {EZIncomingMessage} req
-   * @returns {FalseOr<resFunction>}
+   * @returns {FalseOr<ResFunction>}
    */
   #route(req) {
-    return getResFunction(req, this.#routs);
+    return get_ResFunction(req, this.#routs);
   }
   //#endregion
   //#endregion
@@ -365,7 +365,7 @@ export class App {
   /**
    * @param {string} method http-method
    * @param {string} functionName name of the generic function
-   * @param {resFunction} fn function for resolve the request
+   * @param {ResFunction} fn function for resolve the request
    * @returns {FalseOr<void>} wether the function was successfully registered
    */
   addGenericRestFunction(method, functionName = '', fn) {
@@ -413,7 +413,7 @@ export class App {
   //#region generic non rest functions
   /**
    * @param {string} functionName name of the generic function
-   * @param {resFunction} fn function for resolve the request
+   * @param {ResFunction} fn function for resolve the request
    * @returns {FalseOr<void>} wether the function was successfully registered
    */
   addGenericFunction(functionName = '', fn) {

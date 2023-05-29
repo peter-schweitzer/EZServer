@@ -7,8 +7,8 @@
  * @typedef {import('./Params').Params} Params
  *
  * @typedef {IncomingMessage & {uri: string}} EZIncomingMessage
- * @typedef {(req: EZIncomingMessage, res: ServerResponse, params: Params) => void} resFunction
- * @typedef {LUT<resFunction>} resolverLUT
+ * @typedef {(req: EZIncomingMessage, res: ServerResponse, params: Params) => void} ResFunction
+ * @typedef {LUT<ResFunction>} ResolverLUT
  *
  * @typedef {{err: string, data: null}} Err
  */

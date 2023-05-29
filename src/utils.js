@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs';
 
 /** @type {LUT<string>} */
-import mimeTypes from '../data/mimeTypes.json' assert { type: 'json' };
+import mime_types from '../data/mimeTypes.json' assert { type: 'json' };
 
 export const { log: LOG, table: TAB, warn: WRN, error: ERR } = console;
 export const HTTP_METHODS = {
@@ -48,10 +48,10 @@ export async function p2eo(promise) {
 
 /**
  * @param {EZIncomingMessage} req
- * @param {resolverLUT} resolvers
- * @returns {FalseOr<resFunction>}
+ * @param {ResolverLUT} resolvers
+ * @returns {FalseOr<ResFunction>}
  */
-export function getResFunction(req, resolvers) {
+export function get_ResFunction(req, resolvers) {
   let ss = req.uri.split('/');
   for (; ss.length > 1; ss.pop()) {
     let path = ss.join('/');
@@ -61,12 +61,12 @@ export function getResFunction(req, resolvers) {
 }
 
 /**
- * @param {Object.<string, any>} resolverTree
+ * @param {LUT<any>} resolverTree
  * @param {string} uri
- * @param {resFunction} fn
+ * @param {ResFunction} fn
  * @returns {void}
  */
-function addResFunctionWithParams(resolverTree, uri, fn) {
+function add_ResFunction_with_params(resolverTree, uri, fn) {
   const params = [];
   let tmp = resolverTree;
   let current_segment = [];
@@ -99,9 +99,9 @@ function addResFunctionWithParams(resolverTree, uri, fn) {
  * @param {string} uri
  * @param {LUT<any>} resolverTree
  * @param {ParamsBuilder} params_builder
- * @returns {FalseOr<resFunction>}
+ * @returns {FalseOr<ResFunction>}
  */
-export function getResFunctionWithParams(uri, resolverTree, params_builder) {
+export function get_ResFunction_with_params(uri, resolverTree, params_builder) {
   if (uri === '/') return false;
 
   const params = [];
@@ -133,14 +133,14 @@ export function getResFunctionWithParams(uri, resolverTree, params_builder) {
 }
 
 /**
- * @param {resolverLUT} lut_without_params
- * @param {resolverLUT} lut_with_params
+ * @param {ResolverLUT} lut_without_params
+ * @param {ResolverLUT} lut_with_params
  * @param {string} uri
- * @param {resFunction} fn
+ * @param {ResFunction} fn
  * @returns {void}
  */
-export function addEndpointWithOrWithoutParams(lut_without_params, lut_with_params, uri, fn) {
-  if (uri.includes('/:')) addResFunctionWithParams(lut_with_params, uri, fn);
+export function add_endpoint_with_or_without_params(lut_without_params, lut_with_params, uri, fn) {
+  if (uri.includes('/:')) add_ResFunction_with_params(lut_with_params, uri, fn);
   else lut_without_params[uri] = fn;
 }
 
@@ -180,7 +180,7 @@ export function throw404(req, res) {
  */
 function getType(filePathOrName) {
   const file_ending = filePathOrName.split('.').pop();
-  if (mimeTypes.hasOwnProperty(file_ending)) return mimeTypes[file_ending];
+  if (mime_types.hasOwnProperty(file_ending)) return mime_types[file_ending];
   WRN('mime-type not found');
   return 'text/plain';
 }
