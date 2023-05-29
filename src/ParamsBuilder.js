@@ -20,13 +20,12 @@ export class ParamsBuilder {
   }
 
   /**
-   * @param {string[]} key_arr
-   * @param {string[]} val_arr
+   * @param {string[]} uri_fragments
+   * @param {[string, number][]} params
    * @returns {void}
    */
-  add_route_parameters(key_arr, val_arr) {
-    if (key_arr.length !== val_arr.length) return;
-    for (let i = 0; i < key_arr.length; i++) this.#route[key_arr[i]] = val_arr[i];
+  add_route_parameters(uri_fragments, params) {
+    for (const param of params) this.#route[param[0]] = uri_fragments[param[1]];
   }
 
   /** @returns {Params} */

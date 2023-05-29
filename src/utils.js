@@ -68,68 +68,66 @@ export function get_ResFunction(req, resolvers) {
  */
 function add_ResFunction_with_params(resolverTree, uri, fn) {
   const params = [];
-  let tmp = resolverTree;
-  let current_segment = [];
+  let tree_ptr = resolverTree;
+  const uri_fragments = uri.split('/').slice(1);
 
-  const parts = uri.split('/').splice(1);
-  for (const part of parts) {
-    if (part[0] !== ':' && current_segment.push(part)) continue;
-    params.push(part.slice(1));
-
-    if (!!current_segment.length) {
-      const segment = current_segment.join('/');
-      tmp = Object.hasOwn(tmp, 'routes') ? tmp.routes : (tmp.routes = {});
-      tmp = Object.hasOwn(tmp, segment) ? tmp[segment] : (tmp[segment] = { param: {} });
-    }
-    current_segment = [];
-    tmp = Object.hasOwn(tmp, 'param') ? tmp.param : (tmp.param = {});
+  for (let i = 0; i < uri_fragments.length; i++) {
+    const uri_fragment = uri_fragments[i];
+    if (uri_fragment[0] === ':') {
+      params.push([uri_fragment.substring(1), i]);
+      tree_ptr = Object.hasOwn(tree_ptr, 'param') ? tree_ptr.param : (tree_ptr.param = {});
+    } else if (!Object.hasOwn(tree_ptr, 'routes')) tree_ptr = (tree_ptr.routes = { [uri_fragment]: {} })[uri_fragment];
+    else tree_ptr = Object.hasOwn(tree_ptr.routes, uri_fragment) ? tree_ptr[uri_fragment] : (tree_ptr[uri_fragment] = {});
   }
 
-  if (!!current_segment.length) {
-    const segment = current_segment.join('/');
-    tmp = Object.hasOwn(tmp, 'routes') ? tmp.routes : (tmp.routes = {});
-    tmp = Object.hasOwn(tmp, segment) ? tmp[segment] : (tmp[segment] = {});
-  }
+  tree_ptr.params = params;
+  tree_ptr.fn = fn;
+}
 
-  tmp.params = params;
-  tmp.fn = fn;
+/**
+ * @param {string[]} uri_fragments
+ * @param {number} uri_fragment_idx
+ * @param {LUT<any>} tree_ptr
+ * @returns {FalseOr<LUT<any>>}
+ */
+function walk_routes(uri_fragments, uri_fragment_idx, tree_ptr) {
+  if (Object.hasOwn(tree_ptr, 'routes') && Object.hasOwn(tree_ptr.routes, uri_fragments[uri_fragment_idx])) tree_ptr = tree_ptr.routes[uri_fragments[uri_fragment_idx]];
+  else return false;
+
+  if (++uri_fragment_idx === uri_fragments.length) return tree_ptr;
+  else return walk_routes(uri_fragments, uri_fragment_idx, tree_ptr) || walk_param(uri_fragments, uri_fragment_idx, tree_ptr);
+}
+
+/**
+ * @param {string[]} uri_fragments
+ * @param {number} uri_fragment_idx
+ * @param {LUT<any>} tree_ptr
+ * @returns {FalseOr<LUT<any>>}
+ */
+function walk_param(uri_fragments, uri_fragment_idx, tree_ptr) {
+  if (Object.hasOwn(tree_ptr, 'param')) tree_ptr = tree_ptr.param;
+  else return false;
+
+  if (++uri_fragment_idx === uri_fragments.length) return tree_ptr;
+  else return walk_routes(uri_fragments, uri_fragment_idx, tree_ptr) || walk_param(uri_fragments, uri_fragment_idx, tree_ptr);
 }
 
 /**
  * @param {string} uri
- * @param {LUT<any>} resolverTree
+ * @param {LUT<any>} tree_root
  * @param {ParamsBuilder} params_builder
  * @returns {FalseOr<ResFunction>}
  */
-export function get_ResFunction_with_params(uri, resolverTree, params_builder) {
+export function get_ResFunction_with_params(uri, tree_root, params_builder) {
   if (uri === '/') return false;
 
-  const params = [];
-  let tmp = resolverTree;
-  let rest = uri.split('/').slice(1); //.slice to remove empty string at the start of the array
+  const uri_fragments = uri.split('/').slice(1);
 
-  while (true) {
-    if (Object.hasOwn(tmp, 'routes')) {
-      const ss = rest;
-      for (rest = []; !!ss.length; rest.unshift(ss.pop())) {
-        const route = ss.join('/');
-        if (Object.hasOwn(tmp.routes, route)) {
-          tmp = tmp.routes[route];
-          break;
-        }
-      }
-    }
+  let false_or_ptr = walk_routes(uri_fragments, 0, tree_root) || walk_param(uri_fragments, 0, tree_root);
+  if (false_or_ptr === false || !Object.hasOwn(false_or_ptr, 'fn') || !Object.hasOwn(false_or_ptr, 'params')) return false;
 
-    if (!Object.hasOwn(tmp, 'param')) break;
-
-    tmp = tmp['param'];
-    params.push(rest.shift());
-  }
-
-  if (!Object.hasOwn(tmp, 'fn') || !Object.hasOwn(tmp, 'params')) return false;
-
-  params_builder.add_route_parameters(tmp.params, params);
-  return tmp.fn || false;
+  params_builder.add_route_parameters(uri_fragments, false_or_ptr.params);
+  return false_or_ptr.fn;
 }
 
 /**
