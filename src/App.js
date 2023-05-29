@@ -294,7 +294,7 @@ export class App {
    * @returns {FalseOr<ResFunction>}
    */
   #endpoint({ uri }) {
-    return this.#endpoints.hasOwnProperty(uri) ? this.#endpoints[uri] : false;
+    return Object.hasOwn(this.#endpoints, uri) ? this.#endpoints[uri] : false;
   }
 
   /**
@@ -332,7 +332,7 @@ export class App {
    * @returns {FalseOr<ResFunction>}
    */
   #rest_route(req) {
-    if (HTTP_METHODS.hasOwnProperty(req.method)) return get_ResFunction(req, this.#rest_routes[req.method]);
+    if (Object.hasOwn(HTTP_METHODS, req.method)) return get_ResFunction(req, this.#rest_routes[req.method]);
 
     WRN('invalid request method');
     return false;

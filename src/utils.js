@@ -55,7 +55,7 @@ export function get_ResFunction(req, resolvers) {
   let ss = req.uri.split('/');
   for (; ss.length > 1; ss.pop()) {
     let path = ss.join('/');
-    if (resolvers.hasOwnProperty(path)) return resolvers[path];
+    if (Object.hasOwn(resolvers, path)) return resolvers[path];
   }
   return resolvers['/'] || false;
 }
@@ -78,17 +78,17 @@ function add_ResFunction_with_params(resolverTree, uri, fn) {
 
     if (!!current_segment.length) {
       const segment = current_segment.join('/');
-      tmp = tmp.hasOwnProperty('routes') ? tmp.routes : (tmp.routes = {});
-      tmp = tmp.hasOwnProperty(segment) ? tmp[segment] : (tmp[segment] = { param: {} });
+      tmp = Object.hasOwn(tmp, 'routes') ? tmp.routes : (tmp.routes = {});
+      tmp = Object.hasOwn(tmp, segment) ? tmp[segment] : (tmp[segment] = { param: {} });
     }
     current_segment = [];
-    tmp = tmp.hasOwnProperty('param') ? tmp.param : (tmp.param = {});
+    tmp = Object.hasOwn(tmp, 'param') ? tmp.param : (tmp.param = {});
   }
 
   if (!!current_segment.length) {
     const segment = current_segment.join('/');
-    tmp = tmp.hasOwnProperty('routes') ? tmp.routes : (tmp.routes = {});
-    tmp = tmp.hasOwnProperty(segment) ? tmp[segment] : (tmp[segment] = {});
+    tmp = Object.hasOwn(tmp, 'routes') ? tmp.routes : (tmp.routes = {});
+    tmp = Object.hasOwn(tmp, segment) ? tmp[segment] : (tmp[segment] = {});
   }
 
   tmp.params = params;
@@ -109,24 +109,24 @@ export function get_ResFunction_with_params(uri, resolverTree, params_builder) {
   let rest = uri.split('/').slice(1); //.slice to remove empty string at the start of the array
 
   while (true) {
-    if (tmp.hasOwnProperty('routes')) {
+    if (Object.hasOwn(tmp, 'routes')) {
       const ss = rest;
       for (rest = []; !!ss.length; rest.unshift(ss.pop())) {
         const route = ss.join('/');
-        if (tmp.routes.hasOwnProperty(route)) {
+        if (Object.hasOwn(tmp.routes, route)) {
           tmp = tmp.routes[route];
           break;
         }
       }
     }
 
-    if (!tmp.hasOwnProperty('param')) break;
+    if (!Object.hasOwn(tmp, 'param')) break;
 
     tmp = tmp['param'];
     params.push(rest.shift());
   }
 
-  if (!tmp.hasOwnProperty('fn') || !tmp.hasOwnProperty('params')) return false;
+  if (!Object.hasOwn(tmp, 'fn') || !Object.hasOwn(tmp, 'params')) return false;
 
   params_builder.add_route_parameters(tmp.params, params);
   return tmp.fn || false;
@@ -180,7 +180,7 @@ export function throw404(req, res) {
  */
 function getType(filePathOrName) {
   const file_ending = filePathOrName.split('.').pop();
-  if (mime_types.hasOwnProperty(file_ending)) return mime_types[file_ending];
+  if (Object.hasOwn(mime_types, file_ending)) return mime_types[file_ending];
   WRN('mime-type not found');
   return 'text/plain';
 }
