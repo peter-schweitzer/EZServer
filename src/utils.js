@@ -47,12 +47,12 @@ export async function p2eo(promise) {
 }
 
 /**
- * @param {EZIncomingMessage} req
+ * @param {string} uri
  * @param {ResolverLUT} resolvers
  * @returns {FalseOr<ResFunction>}
  */
-export function get_ResFunction(req, resolvers) {
-  let ss = req.uri.split('/');
+export function get_ResFunction(uri, resolvers) {
+  let ss = uri.split('/');
   for (; ss.length > 1; ss.pop()) {
     let path = ss.join('/');
     if (Object.hasOwn(resolvers, path)) return resolvers[path];

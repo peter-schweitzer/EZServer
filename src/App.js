@@ -261,9 +261,11 @@ export class App {
    * @param {EZIncomingMessage} req
    * @returns {FalseOr<ResFunction>}
    */
-  #rest_endpoint({ uri, method }) {
-    //@ts-ignore T1345
-    return method in HTTP_METHODS ? this.#rest_endpoints[method][uri] : !!WRN('invalid request method');
+  #rest_endpoint({ uri, method: m }) {
+    if (Object.hasOwn(HTTP_METHODS, m)) return this.#rest_endpoints[m][uri] || false;
+
+    WRN('invalid request method');
+    return false;
   }
 
   /**
@@ -271,8 +273,9 @@ export class App {
    * @param {ParamsBuilder} params
    * @returns {FalseOr<ResFunction>}
    */
-  #rest_endpoint_with_param({ uri, method }, params) {
-    if (method in HTTP_METHODS) return get_ResFunction_with_params(uri, this.#rest_endpoints_with_params[method], params);
+  #rest_endpoint_with_param({ uri, method: m }, params) {
+    if (Object.hasOwn(HTTP_METHODS, m)) return get_ResFunction_with_params(uri, this.#rest_endpoints_with_params[m], params);
+
     WRN('invalid request method');
     return false;
   }
@@ -294,7 +297,7 @@ export class App {
    * @returns {FalseOr<ResFunction>}
    */
   #endpoint({ uri }) {
-    return Object.hasOwn(this.#endpoints, uri) ? this.#endpoints[uri] : false;
+    return this.#endpoints[uri] || false;
   }
 
   /**
@@ -331,8 +334,8 @@ export class App {
    * @param {EZIncomingMessage} req
    * @returns {FalseOr<ResFunction>}
    */
-  #rest_route(req) {
-    if (Object.hasOwn(HTTP_METHODS, req.method)) return get_ResFunction(req, this.#rest_routes[req.method]);
+  #rest_route({ uri, method: m }) {
+    if (Object.hasOwn(HTTP_METHODS, m)) return get_ResFunction(uri, this.#rest_routes[m]);
 
     WRN('invalid request method');
     return false;
@@ -354,8 +357,8 @@ export class App {
    * @param {EZIncomingMessage} req
    * @returns {FalseOr<ResFunction>}
    */
-  #route(req) {
-    return get_ResFunction(req, this.#routs);
+  #route({ uri }) {
+    return get_ResFunction(uri, this.#routs);
   }
   //#endregion
   //#endregion
