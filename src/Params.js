@@ -17,8 +17,9 @@ export class Params {
   //#region query
   /**
    * @param {string} name
-   * @param {string?} defaultValue
-   * @returns {string?}
+   * @param {T} defaultValue
+   * @returns {string|T}
+   * @template {string?} T
    */
   query(name = '', defaultValue = null) {
     try {
@@ -30,8 +31,9 @@ export class Params {
 
   /**
    * @param {string} name
-   * @param {number?} defaultValue
-   * @returns {number?}
+   * @param {T} defaultValue
+   * @returns {number|T}
+   * @template {number?} T
    */
   queryNumber(name = '', defaultValue = null) {
     const str = this.query(name, '');
@@ -44,8 +46,9 @@ export class Params {
   //#region route
   /**
    * @param {string} name
-   * @param {string?} defaultValue
-   * @returns {string?}
+   * @param {T} defaultValue
+   * @returns {string|T}
+   * @template {string?} T
    */
   route(name = null, defaultValue = null) {
     return this.#route[name] || defaultValue;
@@ -53,8 +56,9 @@ export class Params {
 
   /**
    * @param {string} name
-   * @param {number?} defaultValue
-   * @returns {number?}
+   * @param {T} defaultValue
+   * @returns {number|T}
+   * @template {number?} T
    */
   routeNumber(name = '', defaultValue = null) {
     const str = this.route(name, '');
