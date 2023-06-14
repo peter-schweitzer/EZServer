@@ -1,7 +1,7 @@
-import { App, buildRes, serveFromFS } from '../index.js';
+const { App, buildRes, serveFromFS } = require('../');
 
 const app = new App();
-app.listen('65535');
+app.listen(65535);
 
 /**
  ** ================ EZServer Supports Endpoints ===================

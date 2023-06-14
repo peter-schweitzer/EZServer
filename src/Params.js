@@ -1,4 +1,4 @@
-export class Params {
+class Params {
   /**@type {LUT<string>} */
   #query;
   /**@type {LUT<string>} */
@@ -69,3 +69,5 @@ export class Params {
   //#endregion
   //#endregion
 }
+
+module.exports = { Params };

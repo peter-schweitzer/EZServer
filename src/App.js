@@ -1,12 +1,10 @@
 //#region imports
-import { createServer } from 'node:http';
-
-import { ERR, HTTP_METHODS, LOG, WRN, add_endpoint_with_or_without_params, get_ResFunction, get_ResFunction_with_params, throw404 } from './utils.js';
-
-import { ParamsBuilder } from './ParamsBuilder.js';
+const { createServer } = require('node:http');
+const { ERR, HTTP_METHODS, LOG, WRN, add_endpoint_with_or_without_params, get_ResFunction, get_ResFunction_with_params, throw404 } = require('./utils.js');
+const { ParamsBuilder } = require('./ParamsBuilder.js');
 //#endregion
 
-export class App {
+class App {
   /** @type {Server}*/
   m_http_server;
 
@@ -447,3 +445,5 @@ export class App {
   //#endregion
   //#endregion
 }
+
+module.exports = { App };
