@@ -1,0 +1,9 @@
+repos:
+  - repo: local
+    hooks:
+      - id: test:multi-module
+        name: multi module
+        entry: ./test/multi-module/run.sh
+        language: system
+        always_run: true
+        pass_filenames: false

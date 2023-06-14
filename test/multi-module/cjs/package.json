@@ -1,0 +1,6 @@
+{
+  "name": "ezserver-test-multi-module-cjs",
+  "type": "commonjs",
+  "main": "index.js",
+  "author": "Peter Schweitzer"
+}

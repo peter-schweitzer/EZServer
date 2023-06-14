@@ -26,7 +26,9 @@
     "framework"
   ],
   "scripts": {
-    "example": "node ./example/index.js"
+    "example": "node ./example/index.js",
+    "test": "./test/run.sh",
+    "test:multi-module": "./test/multi-module/run.sh"
   },
   "exports": {
     "node": {
