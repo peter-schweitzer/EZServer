@@ -1,3 +1,3 @@
-const { App } = require('../../../index');
+const { App } = require('@peter-schweitzer/ezserver');
 console.log('App:', App);
 process.exit(0);

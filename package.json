@@ -31,11 +31,9 @@
     "test:multi-module": "./test/multi-module/run.sh"
   },
   "exports": {
-    "node": {
-      "import": "./index.mjs",
-      "require": "./index.js"
-    },
-    "default": "./index.js"
+    "types": "./types.d.ts",
+    "import": "./index.mjs",
+    "require": "./index.js"
   },
   "reveal": true
 }

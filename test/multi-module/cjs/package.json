@@ -2,5 +2,8 @@
   "name": "ezserver-test-multi-module-cjs",
   "type": "commonjs",
   "main": "index.js",
-  "author": "Peter Schweitzer"
+  "author": "Peter Schweitzer",
+  "dependencies": {
+    "@peter-schweitzer/ezserver": "develop"
+  }
 }
