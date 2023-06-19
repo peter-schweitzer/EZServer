@@ -1,3 +1,15 @@
+# git
 .git/
+.gitignore
+
+#vscode
+.vscode/
+
+# pre-commit
+.pre-commit-config.yaml
+
+#tests
+tests/
+
+# TODO: include docuimentation again
 documentation/
-**todo.md
