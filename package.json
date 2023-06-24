@@ -35,5 +35,8 @@
     "import": "./index.mjs",
     "require": "./index.js"
   },
-  "reveal": true
+  "reveal": true,
+  "dependencies": {
+    "@peter-schweitzer/ez-utils": "^0.0.2"
+  }
 }

@@ -2,6 +2,7 @@ const { readFile } = require('node:fs');
 
 /** @type {LUT<string>} */
 const mime_types = require('../data/mimeTypes.json');
+const { data, p2eo, err } = require('@peter-schweitzer/ez-utils');
 
 const { log: LOG, table: TAB, warn: WRN, error: ERR } = console;
 const HTTP_METHODS = {
@@ -15,36 +16,6 @@ const HTTP_METHODS = {
   TRACE: 'TRACE',
   PATCH: 'PATCH',
 };
-
-/**
- * @param {string} err
- * @returns {Err}
- */
-function err(err) {
-  return { err, data: null };
-}
-
-/**
- * @param {T} data
- * @returns {Data<T>}
- * @template T
- */
-function data(data) {
-  return { err: null, data };
-}
-
-/**
- * @param {Promise<T>} promise
- * @returns {AsyncErrorOr<T>}
- * @template T
- */
-async function p2eo(promise) {
-  try {
-    return data(await promise);
-  } catch (e) {
-    return err(e);
-  }
-}
 
 /**
  * @param {string} uri
@@ -219,16 +190,7 @@ function getBodyJSON(req) {
 }
 
 module.exports = {
-  LOG,
-  TAB,
-  WRN,
-  ERR,
-
   HTTP_METHODS,
-
-  err,
-  data,
-  p2eo,
 
   get_ResFunction,
   get_ResFunction_with_params,

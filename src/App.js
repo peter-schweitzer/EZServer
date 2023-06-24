@@ -1,6 +1,8 @@
 //#region imports
 const { createServer } = require('node:http');
-const { ERR, HTTP_METHODS, LOG, WRN, add_endpoint_with_or_without_params, get_ResFunction, get_ResFunction_with_params, throw404 } = require('./utils.js');
+const { ERR, LOG, WRN } = require('@peter-schweitzer/ez-utils');
+
+const { HTTP_METHODS, add_endpoint_with_or_without_params, get_ResFunction, get_ResFunction_with_params, throw404 } = require('./utils.js');
 const { ParamsBuilder } = require('./ParamsBuilder.js');
 //#endregion
 
