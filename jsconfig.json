@@ -7,5 +7,5 @@
     "checkJs": true,
     "resolveJsonModule": true
   },
-  "exclude": ["node_modules", "**/node_modules/*"]
+  "exclude": ["node_modules", "tests", "**/node_modules/*"]
 }
