@@ -29,3 +29,5 @@ on `localhost:8080/hello-world` you should see the text "Hello, World!"
 The `req`-Object is passed from the node:http server, but is slightly modified.<br>
 EZServer adds the property `uri`, which is very similar to req.url, but URI-decoded and <i style="color: #ff2020">without</i> a query string.<br>
 To provide correct type annotations for the `req`-Object the `EZIncomingMessage` type is used.
+
+> for further documentation refer to the [example](./example/index.js)
