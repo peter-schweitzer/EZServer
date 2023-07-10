@@ -12,12 +12,12 @@ const { log: LOG, table: TAB, warn: WRN, error: ERR } = console;
  * @returns {FalseOr<ResFunction>}
  */
 function get_ResFunction(uri, resolvers) {
-  let ss = uri.split('/');
-  for (; ss.length > 1; ss.pop()) {
-    let path = ss.join('/');
+  let path = uri;
+  while (true) {
     if (Object.hasOwn(resolvers, path)) return resolvers[path];
+    if (path.length === 1) return false;
+    path = path.slice(0, path.lastIndexOf('/') || 1);
   }
-  return resolvers['/'] || false;
 }
 
 /**
