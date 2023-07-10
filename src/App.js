@@ -2,7 +2,7 @@
 const { createServer } = require('node:http');
 const { ERR, LOG, WRN } = require('@peter-schweitzer/ez-utils');
 
-const { HTTP_METHODS, add_endpoint_with_or_without_params, get_ResFunction, get_ResFunction_with_params, throw404 } = require('./utils.js');
+const { add_endpoint_with_or_without_params, get_ResFunction, get_ResFunction_with_params, throw404 } = require('./utils.js');
 const { ParamsBuilder } = require('./ParamsBuilder.js');
 //#endregion
 
@@ -262,9 +262,7 @@ class App {
    * @returns {FalseOr<ResFunction>}
    */
   #rest_endpoint({ uri, method: m }) {
-    if (Object.hasOwn(HTTP_METHODS, m)) return this.#rest_endpoints[m][uri] || false;
-
-    WRN('invalid request method');
+    if (Object.hasOwn(this.#rest_endpoints[m], uri)) return this.#rest_endpoints[m][uri];
     return false;
   }
 
@@ -274,10 +272,7 @@ class App {
    * @returns {FalseOr<ResFunction>}
    */
   #rest_endpoint_with_param({ uri, method: m }, params) {
-    if (Object.hasOwn(HTTP_METHODS, m)) return get_ResFunction_with_params(uri, this.#rest_endpoints_with_params[m], params);
-
-    WRN('invalid request method');
-    return false;
+    return get_ResFunction_with_params(uri, this.#rest_endpoints_with_params[m], params);
   }
   //#endregion
 
@@ -314,20 +309,14 @@ class App {
   //#region routs
   //#region rest routs
   /**
-   * @param {string} method http-method of the request
+   * @param {Methods} method http-method of the request
    * @param {string} uri start of the uri to resolve
    * @param {ResFunction} fn function for resolve the request
    * @returns {FalseOr<void>} wether the function was successfully registered
    */
   addRestRoute(method, uri, fn) {
-    const m = method.toUpperCase();
-    if (!(m in HTTP_METHODS)) {
-      WRN('invalid method', m);
-      return false;
-    }
-
-    LOG(`adding rest-route '${uri}' for method '${m}'`);
-    this.#rest_routes[m][uri] = fn;
+    LOG(`adding rest-route '${uri}' for method '${method}'`);
+    this.#rest_routes[method][uri] = fn;
   }
 
   /**
@@ -335,10 +324,7 @@ class App {
    * @returns {FalseOr<ResFunction>}
    */
   #rest_route({ uri, method: m }) {
-    if (Object.hasOwn(HTTP_METHODS, m)) return get_ResFunction(uri, this.#rest_routes[m]);
-
-    WRN('invalid request method');
-    return false;
+    return get_ResFunction(uri, this.#rest_routes[m]);
   }
   //#endregion
 
@@ -366,50 +352,37 @@ class App {
   //#region generic functions
   //#region generic rest functions
   /**
-   * @param {string} method http-method
+   * @param {Methods} method http-method
    * @param {string} functionName name of the generic function
    * @param {ResFunction} fn function for resolve the request
    * @returns {FalseOr<void>} wether the function was successfully registered
    */
   addGenericRestFunction(method, functionName = '', fn) {
-    const m = method.toUpperCase();
-
-    if (!(m in HTTP_METHODS)) {
-      WRN('invalid method', m);
-      return false;
-    }
-
     if (!functionName.length) {
-      WRN(`invalid functionName '${functionName}'`);
+      WRN(`invalid functionName, empty string`);
       return false;
     }
 
     LOG('adding generic rest function for method ' + method, functionName);
-    this.#generic_rest_functions[m][functionName] = fn;
+    this.#generic_rest_functions[method][functionName] = fn;
   }
 
   /**
-   * @param {string} method http-method
+   * @param {Methods} method http-method
    * @param {string} functionName name of the generic function
    * @param {string} uri uri to resolve
    * @param {boolean} isRoute wether to register a route or endpoint
    * @returns {FalseOr<void>} wether the function was successfully registered
    */
   useGenericRestFunction(method, functionName, uri, isRoute = false) {
-    const m = method.toUpperCase();
-    if (!(m in HTTP_METHODS)) {
-      WRN('invalid method', m);
-      return false;
-    }
-
-    const fn = this.#generic_rest_functions[m][functionName];
+    const fn = this.#generic_rest_functions[method][functionName];
     if (!fn) {
       WRN('invalid function name');
       return false;
     }
 
-    if (isRoute) this.#rest_routes[m][uri] = fn;
-    else this.#rest_endpoints[m][uri] = fn;
+    if (isRoute) this.#rest_routes[method][uri] = fn;
+    else this.#rest_endpoints[method][uri] = fn;
   }
   //#endregion
 

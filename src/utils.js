@@ -5,17 +5,6 @@ const mime_types = require('../data/mimeTypes.json');
 const { data, p2eo, err } = require('@peter-schweitzer/ez-utils');
 
 const { log: LOG, table: TAB, warn: WRN, error: ERR } = console;
-const HTTP_METHODS = {
-  GET: 'GET',
-  HEAD: 'HEAD',
-  POST: 'POST',
-  PUT: 'PUT',
-  DELETE: 'DELETE',
-  CONNECT: 'CONNECT',
-  OPTIONS: 'OPTIONS',
-  TRACE: 'TRACE',
-  PATCH: 'PATCH',
-};
 
 /**
  * @param {string} uri
@@ -190,8 +179,6 @@ function getBodyJSON(req) {
 }
 
 module.exports = {
-  HTTP_METHODS,
-
   get_ResFunction,
   get_ResFunction_with_params,
   add_endpoint_with_or_without_params,
