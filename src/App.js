@@ -292,7 +292,8 @@ class App {
    * @returns {FalseOr<ResFunction>}
    */
   #endpoint({ uri }) {
-    return this.#endpoints[uri] || false;
+    if (Object.hasOwn(this.#endpoints, uri)) return this.#endpoints[uri];
+    return false;
   }
 
   /**
@@ -394,7 +395,7 @@ class App {
    */
   addGenericFunction(functionName = '', fn) {
     if (!functionName.length) {
-      WRN('invalid functionName', functionName);
+      WRN(`invalid functionName '${functionName}'`);
       return false;
     }
     this.#generic_functions[functionName] = fn;
