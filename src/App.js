@@ -122,7 +122,7 @@ class App {
     this.m_http_server = createServer((req, res) => {
       const [uri, query_str] = decodeURIComponent(req.url).split('?');
 
-      const ez_incoming_msg = Object.assign({ uri }, req);
+      const ez_incoming_msg = Object.assign(req, { uri });
 
       const params_builder = new ParamsBuilder();
       params_builder.add_query_parameters(query_str);
