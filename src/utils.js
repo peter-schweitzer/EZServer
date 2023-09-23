@@ -104,18 +104,19 @@ function add_endpoint_with_or_without_params(lut_without_params, lut_with_params
 
 /**
  * @param {ServerResponse} res response from the server
- * @param {any} data data of the response
+ * @param {any} [chunk] data of the response
  * @param {Object} [options] optional options
  * @param {number} [options.code] status code of the response (default is 200)
  * @param {string} [options.mime] mime-type of the response (default is 'text/plain')
+ * todo: add a proper type for headers with all available key value pairs
  * @param {LUT<string|number>} [options.headers] additional headers ('Content-Type' is overwritten by mime, default is an empty Object)
  * @returns {void}
  */
-function buildRes(res, data = undefined, { code = 200, mime = 'text/plain', headers = {} } = {}) {
-  Object.defineProperty(headers, 'Content-Type', { value: mime });
+function buildRes(res, chunk = null, { code = 200, mime = 'text/plain', headers = {} } = {}) {
+  Object.assign(headers, { 'Content-Type': mime });
   res.writeHead(code, headers);
   // FIXME: write() can error, but it takes a callback => no good way to propagate the error to the caller :(
-  if (data !== undefined) res.write(data);
+  if (chunk !== null && chunk !== '') res.write(chunk);
   res.end();
 }
 
