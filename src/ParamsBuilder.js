@@ -12,9 +12,10 @@ class ParamsBuilder {
    */
   add_query_parameters(query_string = '') {
     if (!query_string.length) return;
+
     for (const kv of query_string.split('&')) {
       const [key, value] = kv.split('=');
-      if (!key.length || !value?.length) return;
+      if (!key.length || !value?.length) continue;
       this.#query[key] = value;
     }
   }
