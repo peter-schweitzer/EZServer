@@ -22,11 +22,8 @@ class Params {
    * @template {string?} T
    */
   query(name = '', defaultValue = null) {
-    try {
-      return this.#query[name] || defaultValue;
-    } catch {
-      return defaultValue;
-    }
+    if (Object.hasOwn(this.#query, name)) return this.#query[name];
+    else return defaultValue;
   }
 
   /**
@@ -38,6 +35,7 @@ class Params {
   queryNumber(name = '', defaultValue = null) {
     const str = this.query(name, '');
     if (!str.length) return defaultValue;
+
     const num = parseFloat(str);
     return isNaN(num) ? defaultValue : num;
   }
@@ -50,8 +48,9 @@ class Params {
    * @returns {string|T}
    * @template {string?} T
    */
-  route(name = null, defaultValue = null) {
-    return this.#route[name] || defaultValue;
+  route(name = '', defaultValue = null) {
+    if (Object.hasOwn(this.#route, name)) return this.#route[name];
+    else return defaultValue;
   }
 
   /**
@@ -63,6 +62,7 @@ class Params {
   routeNumber(name = '', defaultValue = null) {
     const str = this.route(name, '');
     if (!str.length) return defaultValue;
+
     const num = parseFloat(str);
     return isNaN(num) ? defaultValue : num;
   }

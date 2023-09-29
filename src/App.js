@@ -122,10 +122,11 @@ class App {
     this.m_http_server = createServer((req, res) => {
       const [uri, query_str] = decodeURIComponent(req.url).split('?');
 
-      const ez_incoming_msg = Object.assign(req, { uri });
-
       const params_builder = new ParamsBuilder();
       params_builder.add_query_parameters(query_str);
+
+      /**@type {EZIncomingMessage}*/
+      const ez_incoming_msg = Object.assign(req, { uri });
 
       (
         this.#rest_endpoint(ez_incoming_msg) ||
@@ -151,15 +152,10 @@ class App {
 
   /** @returns {Promise<boolean>} never rejects; false if the server isn't open when close() is called */
   async close() {
-    return await new Promise((resolve, _) => {
-      this.m_http_server.close((err) => {
-        if (err !== null) {
-          ERR(err);
-          resolve(false);
-        } else {
-          WRN('server is closed');
-          resolve(true);
-        }
+    return new Promise((resolve, _) => {
+      this.m_http_server.close(function (err = null) {
+        if (err === null) WRN('server closed'), resolve(true);
+        else ERR(err), WRN('server is closed'), resolve(false);
       });
     });
   }
@@ -173,8 +169,8 @@ class App {
    * @returns {void}
    */
   get(uri, fn) {
-    LOG('added get:', uri);
     add_endpoint_with_or_without_params(this.#rest_endpoints.GET, this.#rest_endpoints_with_params.GET, uri, fn);
+    LOG('added get:', uri);
   }
 
   /**
@@ -183,8 +179,8 @@ class App {
    * @returns {void}
    */
   head(uri, fn) {
-    LOG('added head:', uri);
     add_endpoint_with_or_without_params(this.#rest_endpoints.HEAD, this.#rest_endpoints_with_params.HEAD, uri, fn);
+    LOG('added head:', uri);
   }
 
   /**
@@ -193,8 +189,8 @@ class App {
    * @returns {void}
    */
   post(uri, fn) {
-    LOG('added post:', uri);
     add_endpoint_with_or_without_params(this.#rest_endpoints.POST, this.#rest_endpoints_with_params.POST, uri, fn);
+    LOG('added post:', uri);
   }
 
   /**
@@ -203,8 +199,8 @@ class App {
    * @returns {void}
    */
   put(uri, fn) {
-    LOG('added put:', uri);
     add_endpoint_with_or_without_params(this.#rest_endpoints.PUT, this.#rest_endpoints_with_params.PUT, uri, fn);
+    LOG('added put:', uri);
   }
 
   /**
@@ -213,8 +209,8 @@ class App {
    * @returns {void}
    */
   delete(uri, fn) {
-    LOG('added delete:', uri);
     add_endpoint_with_or_without_params(this.#rest_endpoints.DELETE, this.#rest_endpoints_with_params.DELETE, uri, fn);
+    LOG('added delete:', uri);
   }
 
   /**
@@ -223,8 +219,8 @@ class App {
    * @returns {void}
    */
   connect(uri, fn) {
-    LOG('added connect:', uri);
     add_endpoint_with_or_without_params(this.#rest_endpoints.CONNECT, this.#rest_endpoints_with_params.CONNECT, uri, fn);
+    LOG('added connect:', uri);
   }
 
   /**
@@ -233,8 +229,8 @@ class App {
    * @returns {void}
    */
   options(uri, fn) {
-    LOG('added options:', uri);
     add_endpoint_with_or_without_params(this.#rest_endpoints.OPTIONS, this.#rest_endpoints_with_params.OPTIONS, uri, fn);
+    LOG('added options:', uri);
   }
 
   /**
@@ -243,8 +239,8 @@ class App {
    * @returns {void}
    */
   trace(uri, fn) {
-    LOG('added trace:', uri);
     add_endpoint_with_or_without_params(this.#rest_endpoints.TRACE, this.#rest_endpoints_with_params.TRACE, uri, fn);
+    LOG('added trace:', uri);
   }
 
   /**
@@ -253,8 +249,8 @@ class App {
    * @returns {void}
    */
   patch(uri, fn) {
-    LOG('added patch:', uri);
     add_endpoint_with_or_without_params(this.#rest_endpoints.PATCH, this.#rest_endpoints_with_params.PATCH, uri, fn);
+    LOG('added patch:', uri);
   }
 
   /**
@@ -283,8 +279,8 @@ class App {
    * @returns {void}
    */
   add(uri, fn) {
-    LOG('added:', uri);
     add_endpoint_with_or_without_params(this.#endpoints, this.#endpoints_with_params, uri, fn);
+    LOG('added:', uri);
   }
 
   /**
@@ -313,11 +309,11 @@ class App {
    * @param {Methods} method http-method of the request
    * @param {string} uri start of the uri to resolve
    * @param {ResFunction} fn function for resolve the request
-   * @returns {FalseOr<void>} wether the function was successfully registered
+   * @returns {void}
    */
   addRestRoute(method, uri, fn) {
-    LOG(`adding rest-route '${uri}' for method '${method}'`);
     this.#rest_routes[method][uri] = fn;
+    LOG(`added rest-route '${uri}' for method '${method}'`);
   }
 
   /**
@@ -336,8 +332,8 @@ class App {
    * @returns {void}
    */
   addRoute(uri, fn) {
-    LOG('adding route', uri);
     this.#routs[uri] = fn;
+    LOG(`added route '${uri}'`);
   }
 
   /**
@@ -358,14 +354,11 @@ class App {
    * @param {ResFunction} fn function for resolve the request
    * @returns {FalseOr<void>} wether the function was successfully registered
    */
-  addGenericRestFunction(method, functionName = '', fn) {
-    if (!functionName.length) {
-      WRN(`invalid functionName, empty string`);
-      return false;
-    }
+  addGenericRestFunction(method, functionName, fn) {
+    if (!functionName.length) return WRN(`invalid functionName, empty string`), false;
 
-    LOG('adding generic rest function for method ' + method, functionName);
     this.#generic_rest_functions[method][functionName] = fn;
+    LOG(`added generic rest function '${functionName}' for method '${method}'`);
   }
 
   /**
@@ -376,14 +369,12 @@ class App {
    * @returns {FalseOr<void>} wether the function was successfully registered
    */
   useGenericRestFunction(method, functionName, uri, isRoute = false) {
-    const fn = this.#generic_rest_functions[method][functionName];
-    if (!fn) {
-      WRN('invalid function name');
-      return false;
-    }
+    const lut = this.#generic_rest_functions[method];
 
-    if (isRoute) this.#rest_routes[method][uri] = fn;
-    else this.#rest_endpoints[method][uri] = fn;
+    if (!Object.hasOwn(lut, functionName)) return WRN(`invalid function name '${functionName}'`), false;
+
+    (isRoute ? this.#rest_routes : this.#rest_endpoints)[method][uri] = lut[functionName];
+    LOG(`using generic rest function '${functionName}' for method '${method}'`);
   }
   //#endregion
 
@@ -393,12 +384,11 @@ class App {
    * @param {ResFunction} fn function for resolve the request
    * @returns {FalseOr<void>} wether the function was successfully registered
    */
-  addGenericFunction(functionName = '', fn) {
-    if (!functionName.length) {
-      WRN(`invalid functionName '${functionName}'`);
-      return false;
-    }
+  addGenericFunction(functionName, fn) {
+    if (!functionName.length) return WRN(`invalid function name '${functionName}'`), false;
+
     this.#generic_functions[functionName] = fn;
+    LOG(`added generic function '${functionName}'`);
   }
 
   /**
@@ -408,14 +398,10 @@ class App {
    * @returns {FalseOr<void>} wether the function was successfully registered
    */
   useGenericFunction(functionName, uri, isRoute = false) {
-    const fn = this.#generic_functions[functionName];
-    if (!fn) {
-      WRN('invalid function name');
-      return false;
-    }
+    if (!Object.hasOwn(this.#generic_functions, functionName)) return WRN(`invalid function name '${functionName}'`), false;
 
-    if (isRoute) this.#routs[uri] = fn;
-    else this.#endpoints[uri] = fn;
+    (isRoute ? this.#routs : this.#endpoints)[uri] = this.#generic_functions[functionName];
+    LOG(`using generic function '${functionName}'`);
   }
   //#endregion
   //#endregion
