@@ -2,9 +2,7 @@ const { readFile } = require('node:fs');
 
 /** @type {LUT<string>} */
 const mime_types = require('../data/mimeTypes.json');
-const { data, p2eo, err } = require('@peter-schweitzer/ez-utils');
-
-const { log: LOG, table: TAB, warn: WRN, error: ERR } = console;
+const { data, p2eo, err, WRN, LOG, ERR } = require('@peter-schweitzer/ez-utils');
 
 /**
  * @param {string} uri
