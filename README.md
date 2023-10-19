@@ -2,9 +2,10 @@
 
 <span style="color: #ff2020">EZServer versions prior to `3.0.3` are no longer available! version 3.0.6 (or newer) is recommended</span>
 
-simple, ultra light weight node.js module with 0 dependencies for simple backend/REST-API development
+simple, ultra light weight node.js module with (basically) 0 dependencies for simple backend/REST-API development
+_all implemented in around a thousand lines or less_
 
-> EZServer is developed on the current node version (v20)
+> EZServer is developed on the current node version (v21)
 > but should run on all active LTS versions
 
 ## Resolving requests
