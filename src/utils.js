@@ -158,7 +158,7 @@ function serveFromFS(res, filePath, statusCode = 200) {
 
 /**
  * @param {IncomingMessage} req
- * @return {AsyncErrorOr<string, any>}
+ * @return {AsyncErrorOr<any>}
  */
 function getBodyJSON(req) {
   return new Promise((resolve, _) => {
