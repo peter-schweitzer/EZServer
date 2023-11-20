@@ -167,12 +167,18 @@ function getBodyJSON(req) {
     req.on('data', (chunk) => (buff += chunk));
 
     req.on('end', () => {
-      resolve(!buff.length ? data('') : p2eo(JSON.parse(buff)));
+      if (buff.length === 0) resolve(data(''));
+      try {
+        resolve(data(JSON.parse(buff)));
+      } catch (e) {
+        ERR('\x1b[32;1merror in getBodyJSON (JSON.parse):\x1b[0m', e);
+        resolve(err(typeof e === 'string' ? e : JSON.parse(e)));
+      }
     });
 
     req.on('error', (e) => {
-      ERR('error in getBodyJSON:', e);
-      resolve(err(`${e.name}:\n${e.message}`));
+      ERR("error in getBodyJSON (req.on 'error'):", e);
+      resolve(err(typeof e === 'string' ? e : JSON.stringify(e)));
     });
   });
 }
