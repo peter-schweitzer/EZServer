@@ -1,6 +1,6 @@
 # EZServer
 
-<span style="color: #ff2020">EZServer versions prior to `3.0.3` are no longer available! version 3.0.6 (or newer) is recommended</span>
+<span style="color: #ff2020">EZServer versions prior to `3.0.3` are no longer available! version 3.4.3 (or newer) is recommended</span>
 
 simple, ultra light weight node.js module with (basically) 0 dependencies for simple backend/REST-API development
 _all implemented in around a thousand lines or less_
@@ -18,7 +18,7 @@ import { App, buildRes } from '@peter-schweitzer/ezserver';
 
 const app = new App();
 
-app.add('/hello-world', (req, res) => {
+app.add('/hello-world', function (_req, res, _params) => {
   buildRes(res, 'Hello, World!');
 });
 
