@@ -5,7 +5,7 @@
   "license": "MIT",
   "main": "index.js",
   "type": "commonjs",
-  "description": "npm module for fast backend/REST-API development with no (exactly 0!) dependencies (somewhat inspired by the express framework)",
+  "description": "BLAZINGLY FAST npm module for backend/REST-API development with 0! dependencies, inspired by express",
   "homepage": "https://github.com/peter-schweitzer/EZServer",
   "types": "types.d.ts",
   "repository": {
