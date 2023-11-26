@@ -73,10 +73,10 @@ function walk_param(uri_fragments, uri_fragment_idx, tree_ptr) {
 /**
  * @param {string} uri
  * @param {LUT<any>} tree_root
- * @param {ParamsBuilder} params_builder
+ * @param {LUT<string>} route_params
  * @returns {FalseOr<ResFunction>}
  */
-export function get_ResFunction_with_params(uri, tree_root, params_builder) {
+export function get_ResFunction_with_params(uri, tree_root, route_params) {
   if (uri === '/') return false;
 
   const uri_fragments = uri.split('/').slice(1);
@@ -84,7 +84,7 @@ export function get_ResFunction_with_params(uri, tree_root, params_builder) {
   let false_or_ptr = walk_routes(uri_fragments, 0, tree_root) || walk_param(uri_fragments, 0, tree_root);
   if (false_or_ptr === false || !Object.hasOwn(false_or_ptr, 'fn') || !Object.hasOwn(false_or_ptr, 'params')) return false;
 
-  params_builder.add_route_parameters(uri_fragments, false_or_ptr.params);
+  set_route_parameters(uri_fragments, false_or_ptr.params, route_params);
   return false_or_ptr.fn;
 }
 
@@ -98,6 +98,33 @@ export function get_ResFunction_with_params(uri, tree_root, params_builder) {
 export function add_endpoint_with_or_without_params(lut_without_params, lut_with_params, uri, fn) {
   if (uri.includes('/:')) add_ResFunction_with_params(lut_with_params, uri, fn);
   else lut_without_params[uri] = fn;
+}
+
+/**
+ * @param {string} query_string
+ * @param {{}} [query={}]
+ * @returns {LUT<string>}
+ */
+export function set_query_parameters(query_string = '', query = {}) {
+  if (!query_string.length) return query;
+
+  for (const kv of query_string.split('&')) {
+    const [key, value] = kv.split('=');
+    if (!key.length || !value?.length) continue;
+    query[key] = value;
+  }
+
+  return query;
+}
+
+/**
+ * @param {string[]} uri_fragments
+ * @param {[string, number][]} params
+ * @param {{}} [route={}]
+ * @returns {void}
+ */
+export function set_route_parameters(uri_fragments, params, route = {}) {
+  for (const param of params) route[param[0]] = uri_fragments[param[1]];
 }
 
 /**

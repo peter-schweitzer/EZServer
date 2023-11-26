@@ -3,7 +3,6 @@
  * @typedef {import('http').IncomingMessage} IncomingMessage
  * @typedef {import('http').ServerResponse} ServerResponse
  *
- * @typedef {import('./ParamsBuilder').ParamsBuilder} ParamsBuilder
  * @typedef {import('./Params').Params} Params
  *
  * @typedef {IncomingMessage & {uri: string}} EZIncomingMessage

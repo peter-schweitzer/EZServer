@@ -2,8 +2,8 @@
 import { ERR, LOG, WRN } from '@peter-schweitzer/ez-utils';
 import { createServer } from 'node:http';
 
-import { ParamsBuilder } from './ParamsBuilder.js';
-import { add_endpoint_with_or_without_params, get_ResFunction, get_ResFunction_with_params, throw404 } from './utils.js';
+import { Params } from './Params.js';
+import { add_endpoint_with_or_without_params, get_ResFunction, get_ResFunction_with_params, set_query_parameters, throw404 } from './utils.js';
 //#endregion
 
 export class App {
@@ -122,21 +122,22 @@ export class App {
     this.m_http_server = createServer((req, res) => {
       const [uri, query_str] = decodeURIComponent(req.url).split('?');
 
-      const params_builder = new ParamsBuilder();
-      params_builder.add_query_parameters(query_str);
-
       /**@type {EZIncomingMessage}*/
       const ez_incoming_msg = Object.assign(req, { uri });
+
+      const query = set_query_parameters(query_str);
+      /**@type {LUT<string>}*/
+      const route = {};
 
       (
         this.#rest_endpoint(ez_incoming_msg) ||
         this.#endpoint(ez_incoming_msg) ||
-        this.#rest_endpoint_with_param(ez_incoming_msg, params_builder) ||
-        this.#endpoint_with_param(ez_incoming_msg, params_builder) ||
+        this.#rest_endpoint_with_param(ez_incoming_msg, route) ||
+        this.#endpoint_with_param(ez_incoming_msg, route) ||
         this.#rest_route(ez_incoming_msg) ||
         this.#route(ez_incoming_msg) ||
         throw404
-      )(ez_incoming_msg, res, params_builder.build());
+      )(ez_incoming_msg, res, new Params(query, route));
     });
   }
 
@@ -264,11 +265,11 @@ export class App {
 
   /**
    * @param {EZIncomingMessage} req
-   * @param {ParamsBuilder} params
+   * @param {LUT<string>} route_params
    * @returns {FalseOr<ResFunction>}
    */
-  #rest_endpoint_with_param({ uri, method: m }, params) {
-    return get_ResFunction_with_params(uri, this.#rest_endpoints_with_params[m], params);
+  #rest_endpoint_with_param({ uri, method: m }, route_params) {
+    return get_ResFunction_with_params(uri, this.#rest_endpoints_with_params[m], route_params);
   }
   //#endregion
 
@@ -294,11 +295,11 @@ export class App {
 
   /**
    * @param {EZIncomingMessage} req
-   * @param {ParamsBuilder} params_builder
+   * @param {LUT<string>} route_params
    * @returns {FalseOr<ResFunction>}
    */
-  #endpoint_with_param({ uri }, params_builder) {
-    return get_ResFunction_with_params(uri, this.#endpoints_with_params, params_builder);
+  #endpoint_with_param({ uri }, route_params) {
+    return get_ResFunction_with_params(uri, this.#endpoints_with_params, route_params);
   }
   //#endregion
   //#endregion
