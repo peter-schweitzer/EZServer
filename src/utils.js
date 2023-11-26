@@ -1,15 +1,15 @@
-const { readFile } = require('node:fs');
+import { readFile } from 'node:fs';
 
+import { ERR, LOG, WRN, data, err } from '@peter-schweitzer/ez-utils';
 /** @type {LUT<string>} */
-const mime_types = require('../data/mimeTypes.json');
-const { data, p2eo, err, WRN, LOG, ERR } = require('@peter-schweitzer/ez-utils');
+import mime_types from '../data/mimeTypes.json' assert { 'type': 'json' };
 
 /**
  * @param {string} uri
  * @param {ResolverLUT} resolvers
  * @returns {FalseOr<ResFunction>}
  */
-function get_ResFunction(uri, resolvers) {
+export function get_ResFunction(uri, resolvers) {
   let path = uri;
   while (true) {
     if (Object.hasOwn(resolvers, path)) return resolvers[path];
@@ -76,7 +76,7 @@ function walk_param(uri_fragments, uri_fragment_idx, tree_ptr) {
  * @param {ParamsBuilder} params_builder
  * @returns {FalseOr<ResFunction>}
  */
-function get_ResFunction_with_params(uri, tree_root, params_builder) {
+export function get_ResFunction_with_params(uri, tree_root, params_builder) {
   if (uri === '/') return false;
 
   const uri_fragments = uri.split('/').slice(1);
@@ -95,7 +95,7 @@ function get_ResFunction_with_params(uri, tree_root, params_builder) {
  * @param {ResFunction} fn
  * @returns {void}
  */
-function add_endpoint_with_or_without_params(lut_without_params, lut_with_params, uri, fn) {
+export function add_endpoint_with_or_without_params(lut_without_params, lut_with_params, uri, fn) {
   if (uri.includes('/:')) add_ResFunction_with_params(lut_with_params, uri, fn);
   else lut_without_params[uri] = fn;
 }
@@ -110,7 +110,7 @@ function add_endpoint_with_or_without_params(lut_without_params, lut_with_params
  * @param {LUT<string|number>} [options.headers] additional headers ('Content-Type' is overwritten by mime, default is an empty Object)
  * @returns {void}
  */
-function buildRes(res, chunk = null, { code = 200, mime = 'text/plain', headers = {} } = {}) {
+export function buildRes(res, chunk = null, { code = 200, mime = 'text/plain', headers = {} } = {}) {
   Object.assign(headers, { 'Content-Type': mime });
   res.writeHead(code, headers);
   // FIXME: write() can error, but it takes a callback => no good way to propagate the error to the caller :(
@@ -123,7 +123,7 @@ function buildRes(res, chunk = null, { code = 200, mime = 'text/plain', headers 
  * @param {ServerResponse} res response from the server
  * @returns {void}
  */
-function throw404(req, res) {
+export function throw404(req, res) {
   WRN('404 on', req.url);
   buildRes(res, `<!DOCTYPE html><head><meta charset="UTF-8"><title>404</title></head><body><h1>ERROR</h1><p>404 '${req.uri}' not found.</p></body></html>`, {
     code: 404,
@@ -148,7 +148,7 @@ function getType(filePathOrName) {
  * @param {number} statusCode status code df the response (default 200)
  * @returns {void}
  */
-function serveFromFS(res, filePath, statusCode = 200) {
+export function serveFromFS(res, filePath, statusCode = 200) {
   LOG('reading file from FS:', filePath);
   readFile(filePath, (err, data) => {
     if (err !== null) buildRes(res, `error while loading file from fs:\n${err}`, { code: 500, mime: 'text/plain' });
@@ -160,7 +160,7 @@ function serveFromFS(res, filePath, statusCode = 200) {
  * @param {IncomingMessage} req
  * @return {AsyncErrorOr<any>}
  */
-function getBodyJSON(req) {
+export function getBodyJSON(req) {
   return new Promise((resolve, _) => {
     let buff = '';
 
@@ -182,14 +182,3 @@ function getBodyJSON(req) {
     });
   });
 }
-
-module.exports = {
-  get_ResFunction,
-  get_ResFunction_with_params,
-  add_endpoint_with_or_without_params,
-
-  throw404,
-  buildRes,
-  serveFromFS,
-  getBodyJSON,
-};

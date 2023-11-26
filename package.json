@@ -4,7 +4,11 @@
   "version": "3.4.3",
   "license": "MIT",
   "main": "index.js",
-  "type": "commonjs",
+  "type": "module",
+  "exports": {
+    "import": "./index.js",
+    "types": "./index.d.ts"
+  },
   "description": "BLAZINGLY FAST npm module for backend/REST-API development with 0! dependencies, inspired by express",
   "homepage": "https://github.com/peter-schweitzer/EZServer",
   "types": "types.d.ts",
@@ -29,11 +33,6 @@
     "example": "node ./example/index.js",
     "test:line-count": "./tests/line-count/run.sh",
     "test:multi-module": "./test/multi-module/run.sh"
-  },
-  "exports": {
-    "types": "./index.d.ts",
-    "import": "./index.mjs",
-    "require": "./index.js"
   },
   "reveal": true,
   "dependencies": {

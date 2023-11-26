@@ -1,12 +1,12 @@
 //#region imports
-const { createServer } = require('node:http');
-const { ERR, LOG, WRN } = require('@peter-schweitzer/ez-utils');
+import { ERR, LOG, WRN } from '@peter-schweitzer/ez-utils';
+import { createServer } from 'node:http';
 
-const { add_endpoint_with_or_without_params, get_ResFunction, get_ResFunction_with_params, throw404 } = require('./utils.js');
-const { ParamsBuilder } = require('./ParamsBuilder.js');
+import { ParamsBuilder } from './ParamsBuilder.js';
+import { add_endpoint_with_or_without_params, get_ResFunction, get_ResFunction_with_params, throw404 } from './utils.js';
 //#endregion
 
-class App {
+export class App {
   /** @type {Server}*/
   m_http_server;
 
@@ -407,5 +407,3 @@ class App {
   //#endregion
   //#endregion
 }
-
-module.exports = { App };

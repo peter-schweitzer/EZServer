@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  ** TOC:
  *  - setup
@@ -12,7 +14,7 @@
  ** ================ Setup ===================
  */
 
-const { App, buildRes, serveFromFS, getBodyJSON, throw404 } = require('../');
+import { App, buildRes, getBodyJSON, serveFromFS, throw404 } from '../index.js';
 
 const app = new App();
 app.listen(65535);
@@ -25,36 +27,36 @@ app.listen(65535);
 // Endpoints have the highest specificity, so have the highest priority
 
 // these are the most specific, as they only resolve a specific URI, requested with a specific methods
-app.get('/get', (req, res, params) => {
+app.get('/get', (_req, res, _params) => {
   buildRes(res, 'get');
 });
 
-app.put('/put', (req, res, params) => {
+app.put('/put', (_req, res, _params) => {
   buildRes(res, 'put');
 });
 
-app.post('/post', (req, res, params) => {
+app.post('/post', (_req, res, _params) => {
   buildRes(res, 'post');
 });
 
-app.delete('/delete', (req, res, params) => {
+app.delete('/delete', (_req, res, _params) => {
   buildRes(res, 'delete');
 });
-app.patch('/patch', (req, res, params) => {
+app.patch('/patch', (_req, res, _params) => {
   buildRes(res, 'patch');
 });
-app.options('/options', (req, res, params) => {
+app.options('/options', (_req, res, _params) => {
   buildRes(res, 'options');
 });
-app.head('/head', (req, res, params) => {
+app.head('/head', (_req, res, _params) => {
   buildRes(res);
 });
 
 // add() ignores the method, hence it's less specific than the examples above
-app.add('/', (req, res, params) => {
+app.add('/', (_req, res, _params) => {
   serveFromFS(res, './html/home.html');
 });
-app.add('/favicon.ico', (req, res, params) => {
+app.add('/favicon.ico', (_req, res, _params) => {
   buildRes(res, '', { code: 404, mime: 'text/plain' });
 });
 
@@ -64,24 +66,24 @@ app.add('/favicon.ico', (req, res, params) => {
  */
 
 //These resolve all requests, with the specified HTTP-method, to URI-routes beginning with the specified 'route' argument
-app.addRestRoute('GET', '/rest/get', (req, res, params) => {
+app.addRestRoute('GET', '/rest/get', (_req, res, _params) => {
   buildRes(res, 'get-route');
 });
-app.addRestRoute('PUT', '/rest/put', (req, res, params) => {
+app.addRestRoute('PUT', '/rest/put', (_req, res, _params) => {
   buildRes(res, 'put-route');
 });
-app.addRestRoute('POST', '/rest/post', (req, res, params) => {
+app.addRestRoute('POST', '/rest/post', (_req, res, _params) => {
   buildRes(res, 'post-route');
 });
-app.addRestRoute('DELETE', '/rest/delete', (req, res, params) => {
+app.addRestRoute('DELETE', '/rest/delete', (_req, res, _params) => {
   buildRes(res, 'delete-route');
 });
-app.addRestRoute('PATCH', '/rest/patch', (req, res, params) => {
+app.addRestRoute('PATCH', '/rest/patch', (_req, res, _params) => {
   buildRes(res, 'patch-route');
 });
 
 //addRoute ignores the HTTP-method (similar to add()), hence being less specific than addRestRoute()
-app.addRoute('/route', (req, res, params) => {
+app.addRoute('/route', (_req, res, _params) => {
   buildRes(res, `route`);
 });
 
@@ -91,11 +93,11 @@ app.addRoute('/route', (req, res, params) => {
  */
 
 // This is an easy way to use the same (generic) function multiple times
-app.addGenericRestFunction('GET', 'name', (req, res, params) => {
+app.addGenericRestFunction('GET', 'name', (req, res, _params) => {
   console.log('rest-name:', req.url);
   buildRes(res);
 });
-app.addGenericFunction('name', (req, res, params) => {
+app.addGenericFunction('name', (req, res, _params) => {
   console.log('name:', req.url);
   buildRes(res);
 });
@@ -133,17 +135,17 @@ app.useGenericFunction('name', '/generic/rest-route', true);
  */
 
 // going to '/echo-route-params/first-param/second-param' will return 'first-param second-param'
-app.add('echo-route-prams/:param1/:param2', (req, res, params) => {
+app.add('echo-route-prams/:param1/:param2', (_req, res, params) => {
   buildRes(res, `${params.route('param1')} ${params.route('param2')}`);
 });
 
 // going to '/sum/351/69' will return '420'
-app.add('sum/:a/:b', (req, res, params) => {
+app.add('sum/:a/:b', (_req, res, params) => {
   buildRes(res, `${params.routeNumber('a', 0) + params.routeNumber('b', 0)}`);
 });
 
 // going to '/echo-msg?msg=hello&msg2=world' will return 'hello world'
-app.add('echo-msg', (req, res, params) => {
+app.add('echo-msg', (_req, res, params) => {
   buildRes(res, `${params.query('msg', '')} ${params.query('msg2', '')}`);
 });
 
@@ -167,7 +169,7 @@ app.add('echo-msg', (req, res, params) => {
  * statusCode is the HTTP-status that should be send as part of the response (default 200 when omitted)
  */
 
-app.get('/echo-json', async (req, res, params) => {
+app.get('/echo-json', async (req, res, _params) => {
   const { err, data } = await getBodyJSON(req);
 
   if (err !== null) {
@@ -190,7 +192,7 @@ app.get('/echo-json', async (req, res, params) => {
  *   mime is the mime-type that gets send as part of the response
  *   headers is an object representing key (string) value (string or number) pairs that represent additional headers of the response
  */
-app.get('/hello', (req, res, params) => {
+app.get('/hello', (_req, res, _params) => {
   buildRes(res, 'Hello, World');
 });
 
@@ -205,7 +207,7 @@ app.get('/hello', (req, res, params) => {
  *
  * Note: serveFromFS uses buildRes() internally
  */
-app.get('/example', (req, res, params) => {
+app.get('/example', (_req, res, _params) => {
   serveFromFS(res, './example/index.js');
 });
 
@@ -220,6 +222,6 @@ app.get('/example', (req, res, params) => {
  *
  * Note: throw404() uses buildRes() internally
  */
-app.add('/404', (req, res, params) => {
+app.add('/404', (req, res, _params) => {
   throw404(req, res);
 });

@@ -1,6 +1,6 @@
-const { Params } = require('./Params.js');
+import { Params } from './Params.js';
 
-class ParamsBuilder {
+export class ParamsBuilder {
   /**@type {LUT<string>} */
   #query = {};
   /**@type {LUT<string>} */
@@ -34,5 +34,3 @@ class ParamsBuilder {
     return new Params(this.#query, this.#route);
   }
 }
-
-module.exports = { ParamsBuilder };

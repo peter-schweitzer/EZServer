@@ -1,4 +1,2 @@
-const { App } = require('./src/App.js');
-const { buildRes, getBodyJSON, serveFromFS, throw404 } = require('./src/utils.js');
-
-module.exports = { App, buildRes, getBodyJSON, serveFromFS, throw404 };
+export { App } from './src/App.js';
+export { buildRes, getBodyJSON, serveFromFS, throw404 } from './src/utils.js';
