@@ -1,15 +1,12 @@
 #!/bin/python3
-
 import json
 
-j: dict
-
-with open("package.json", "r") as f:
-  j = json.decoder.JSONDecoder().decode(f.read())
-
-
-if "dependencies" in j.keys(): del j["dependencies"]
-if "devDependencies" in j.keys(): del j["devDependencies"]
-
-with open("package.json", "w") as f:
-  f.write(json.encoder.JSONEncoder().encode(j))
+with open("package.json", "r+") as f:
+    j = json.decoder.JSONDecoder().decode(f.read())
+    if j.get("dependencies") is not None:
+        del j["dependencies"]
+    if j.get("devDependencies") is not None:
+        del j["devDependencies"]
+    f.seek(0)
+    f.write(json.encoder.JSONEncoder().encode(j))
+    f.truncate()
