@@ -14,7 +14,7 @@
  ** ================ Setup ===================
  */
 
-import { App, buildRes, getBodyJSON, serveFromFS, throw404 } from '../index.js';
+import { App, buildRes, getBodyJSON, serveFromFS, throw404, MIME } from '../index.js';
 
 const app = new App();
 app.listen(65535);
@@ -57,7 +57,7 @@ app.add('/', (_req, res, _params) => {
   serveFromFS(res, './html/home.html');
 });
 app.add('/favicon.ico', (_req, res, _params) => {
-  buildRes(res, '', { code: 404, mime: 'text/plain' });
+  buildRes(res, '', { code: 404, mime: MIME.TEXT });
 });
 
 /**
@@ -112,6 +112,16 @@ app.useGenericFunction('name', '/generic/rest-route', true);
 
 /**
  ** ================ Types ===================
+ */
+
+/**
+ ** MIME
+ * MIME is an Object that provides nice auto completion for the most commonly used mime types.
+ * Instead of writing them out every time you can just use STD_MIME and auto completion.
+ * This aim is to:
+ *  - decreases the amount of magic strings in your code
+ *  - avoid errors tue to miss typing
+ *  - spend less time repetitively typing the same few strings over and over
  */
 
 /**
@@ -176,7 +186,7 @@ app.get('/echo-json', async (req, res, _params) => {
     console.error(err);
     buildRes(res, "couldn't get JSON from request", { code: 500 });
   } else {
-    buildRes(res, data, { mime: 'application/json' });
+    buildRes(res, data, { mime: MIME.JSON });
   }
 });
 

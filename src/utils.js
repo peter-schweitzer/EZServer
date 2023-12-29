@@ -3,6 +3,7 @@ import { readFile } from 'node:fs';
 import { ERR, LOG, WRN, data, err } from '@peter-schweitzer/ez-utils';
 /** @type {LUT<string>} */
 import mime_types from '../data/mimeTypes.json' assert { 'type': 'json' };
+export const MIME = Object.freeze({ TEXT: 'text/plain;charset=UTF-8', HTML: 'text/html;charset=UTF-8', JSON: 'application/json' });
 
 /**
  * @param {string} uri
@@ -138,7 +139,7 @@ export function set_route_parameters(uri_fragments, params, route = {}) {
  * @param {LUT<string|number>} [options.headers] additional headers ('Content-Type' is overwritten by mime, default is an empty Object)
  * @returns {void}
  */
-export function buildRes(res, chunk = null, { code = 200, mime = 'text/plain', headers = {} } = {}) {
+export function buildRes(res, chunk = null, { code = 200, mime = MIME.TEXT, headers = {} } = {}) {
   Object.assign(headers, { 'Content-Type': mime });
   res.writeHead(code, headers);
   // FIXME: write() can error, but it takes a callback => no good way to propagate the error to the caller :(
@@ -155,7 +156,7 @@ export function throw404(req, res) {
   WRN('404 on', req.url);
   buildRes(res, `<!DOCTYPE html><head><meta charset="UTF-8"><title>404</title></head><body><h1>ERROR</h1><p>404 '${req.uri}' not found.</p></body></html>`, {
     code: 404,
-    mime: 'text/html',
+    mime: MIME.HTML,
   });
 }
 
@@ -167,7 +168,7 @@ function getType(filePathOrName) {
   const file_ending = filePathOrName.split('.').pop();
   if (Object.hasOwn(mime_types, file_ending)) return mime_types[file_ending];
   WRN(`mime-type for '${file_ending}' not found`);
-  return 'text/plain';
+  return MIME.TEXT;
 }
 
 /**
