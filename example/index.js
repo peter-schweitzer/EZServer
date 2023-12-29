@@ -135,17 +135,17 @@ app.useGenericFunction('name', '/generic/rest-route', true);
  */
 
 // going to '/echo-route-params/first-param/second-param' will return 'first-param second-param'
-app.add('echo-route-prams/:param1/:param2', (_req, res, params) => {
+app.add('/echo-route-prams/:param1/:param2', (_req, res, params) => {
   buildRes(res, `${params.route('param1')} ${params.route('param2')}`);
 });
 
 // going to '/sum/351/69' will return '420'
-app.add('sum/:a/:b', (_req, res, params) => {
+app.add('/sum/:a/:b', (_req, res, params) => {
   buildRes(res, `${params.routeNumber('a', 0) + params.routeNumber('b', 0)}`);
 });
 
 // going to '/echo-msg?msg=hello&msg2=world' will return 'hello world'
-app.add('echo-msg', (_req, res, params) => {
+app.add('/echo-msg', (_req, res, params) => {
   buildRes(res, `${params.query('msg', '')} ${params.query('msg2', '')}`);
 });
 
