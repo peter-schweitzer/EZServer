@@ -11,11 +11,10 @@ import mime_types from '../data/mimeTypes.json' assert { 'type': 'json' };
  */
 export function get_ResFunction(uri, resolvers) {
   let path = uri;
-  while (true) {
+  while (true)
     if (Object.hasOwn(resolvers, path)) return resolvers[path];
-    if (path.length === 1) return false;
-    path = path.slice(0, path.lastIndexOf('/') || 1);
-  }
+    else if (path.length === 1) return false;
+    else path = path.slice(0, path.lastIndexOf('/') || 1);
 }
 
 /**
@@ -49,8 +48,9 @@ function add_ResFunction_with_params(resolverTree, uri, fn) {
  * @returns {FalseOr<LUT<any>>}
  */
 function walk_routes(uri_fragments, uri_fragment_idx, tree_ptr) {
-  if (Object.hasOwn(tree_ptr, 'routes') && Object.hasOwn(tree_ptr.routes, uri_fragments[uri_fragment_idx])) tree_ptr = tree_ptr.routes[uri_fragments[uri_fragment_idx]];
-  else return false;
+  if (!Object.hasOwn(tree_ptr, 'routes') || !Object.hasOwn(tree_ptr.routes, uri_fragments[uri_fragment_idx])) return false;
+
+  tree_ptr = tree_ptr.routes[uri_fragments[uri_fragment_idx]];
 
   if (++uri_fragment_idx === uri_fragments.length) return tree_ptr;
   else return walk_routes(uri_fragments, uri_fragment_idx, tree_ptr) || walk_param(uri_fragments, uri_fragment_idx, tree_ptr);
@@ -63,8 +63,9 @@ function walk_routes(uri_fragments, uri_fragment_idx, tree_ptr) {
  * @returns {FalseOr<LUT<any>>}
  */
 function walk_param(uri_fragments, uri_fragment_idx, tree_ptr) {
-  if (Object.hasOwn(tree_ptr, 'param')) tree_ptr = tree_ptr.param;
-  else return false;
+  if (!Object.hasOwn(tree_ptr, 'param')) return false;
+
+  tree_ptr = tree_ptr.param;
 
   if (++uri_fragment_idx === uri_fragments.length) return tree_ptr;
   else return walk_routes(uri_fragments, uri_fragment_idx, tree_ptr) || walk_param(uri_fragments, uri_fragment_idx, tree_ptr);
@@ -165,7 +166,7 @@ export function throw404(req, res) {
 function getType(filePathOrName) {
   const file_ending = filePathOrName.split('.').pop();
   if (Object.hasOwn(mime_types, file_ending)) return mime_types[file_ending];
-  WRN(`mime-type '${file_ending}' not found`);
+  WRN(`mime-type for '${file_ending}' not found`);
   return 'text/plain';
 }
 
@@ -198,7 +199,7 @@ export function getBodyJSON(req) {
       try {
         resolve(data(JSON.parse(buff)));
       } catch (e) {
-        ERR('\x1b[32;1merror in getBodyJSON (JSON.parse):\x1b[0m', e);
+        ERR('\x1b[32;1m' + 'error in getBodyJSON (JSON.parse):' + '\x1b[0m', e);
         resolve(err(typeof e === 'string' ? e : JSON.parse(e)));
       }
     });
