@@ -1,8 +1,11 @@
+//#region imports
+import { ERR, LOG, WRN, data, err } from '@peter-schweitzer/ez-utils';
 import { readFile } from 'node:fs';
 
-import { ERR, LOG, WRN, data, err } from '@peter-schweitzer/ez-utils';
 /** @type {LUT<string>} */
 import mime_types from '../data/mimeTypes.json' assert { 'type': 'json' };
+//#endregion
+
 export const MIME = Object.freeze({ TEXT: 'text/plain;charset=UTF-8', HTML: 'text/html;charset=UTF-8', JSON: 'application/json' });
 
 /**
