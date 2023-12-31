@@ -129,15 +129,16 @@ export class App {
       /**@type {LUT<string>}*/
       const route = {};
 
-      (
+      const fn =
         this.#rest_endpoint(ez_incoming_msg) ||
         this.#endpoint(ez_incoming_msg) ||
         this.#rest_endpoint_with_param(ez_incoming_msg, route) ||
         this.#endpoint_with_param(ez_incoming_msg, route) ||
         this.#rest_route(ez_incoming_msg) ||
-        this.#route(ez_incoming_msg) ||
-        throw404
-      )(ez_incoming_msg, res, new Params(query, route));
+        this.#route(ez_incoming_msg);
+
+      if (fn === false) throw404(ez_incoming_msg, res);
+      else fn(ez_incoming_msg, res, new Params(query, route));
     });
   }
 
