@@ -36,7 +36,7 @@ export class Params {
     const str = this.query(name, '');
     if (!str.length) return defaultValue;
 
-    const num = parseFloat(str);
+    const num = Number(str);
     return isNaN(num) ? defaultValue : num;
   }
   //#endregion
@@ -63,7 +63,7 @@ export class Params {
     const str = this.route(name, '');
     if (!str.length) return defaultValue;
 
-    const num = parseFloat(str);
+    const num = Number(str);
     return isNaN(num) ? defaultValue : num;
   }
   //#endregion

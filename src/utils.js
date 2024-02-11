@@ -35,7 +35,7 @@ function add_ResFunction_with_params(resolverTree, uri, fn) {
   for (let i = 0; i < uri_fragments.length; i++) {
     const uri_fragment = uri_fragments[i];
     if (uri_fragment[0] === ':') {
-      params.push([uri_fragment.substring(1), i]);
+      params.push([uri_fragment.slice(1), i]);
       tree_ptr = Object.hasOwn(tree_ptr, 'param') ? tree_ptr.param : (tree_ptr.param = {});
     } else if (!Object.hasOwn(tree_ptr, 'routes')) tree_ptr = (tree_ptr.routes = { [uri_fragment]: {} })[uri_fragment];
     else tree_ptr = Object.hasOwn(tree_ptr.routes, uri_fragment) ? tree_ptr[uri_fragment] : (tree_ptr[uri_fragment] = {});
