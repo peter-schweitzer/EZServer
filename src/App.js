@@ -13,24 +13,16 @@ export class App {
   //#region resolverLUT data-objects
   //#region endpoints
   //#region without param
+  /** @type {{[x in Methods]: ResolverLUT}} */
   #rest_endpoints = {
-    /** @type {ResolverLUT} */
     GET: {},
-    /** @type {ResolverLUT} */
     HEAD: {},
-    /** @type {ResolverLUT} */
     POST: {},
-    /** @type {ResolverLUT} */
     PUT: {},
-    /** @type {ResolverLUT} */
     DELETE: {},
-    /** @type {ResolverLUT} */
     CONNECT: {},
-    /** @type {ResolverLUT} */
     OPTIONS: {},
-    /** @type {ResolverLUT} */
     TRACE: {},
-    /** @type {ResolverLUT} */
     PATCH: {},
   };
 
@@ -39,28 +31,20 @@ export class App {
   //#endregion
 
   //#region with param
+  /** @type {{[x in Methods]: ResolverTree}} */
   #rest_endpoints_with_params = {
-    /** @type {ResolverLUT} */
     GET: {},
-    /** @type {ResolverLUT} */
     HEAD: {},
-    /** @type {ResolverLUT} */
     POST: {},
-    /** @type {ResolverLUT} */
     PUT: {},
-    /** @type {ResolverLUT} */
     DELETE: {},
-    /** @type {ResolverLUT} */
     CONNECT: {},
-    /** @type {ResolverLUT} */
     OPTIONS: {},
-    /** @type {ResolverLUT} */
     TRACE: {},
-    /** @type {ResolverLUT} */
     PATCH: {},
   };
 
-  /** @type {ResolverLUT} */
+  /** @type {ResolverTree} */
   #endpoints_with_params = {};
   //#endregion
   //#endregion

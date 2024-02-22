@@ -1,6 +1,7 @@
 //#region imports
-import { ERR, LOG, WRN, data, err } from '@peter-schweitzer/ez-utils';
 import { readFile } from 'node:fs';
+
+import { ERR, LOG, WRN, data, err } from '@peter-schweitzer/ez-utils';
 
 /** @type {LUT<string>} */
 import mime_types from '../data/mimeTypes.json' assert { 'type': 'json' };
@@ -22,17 +23,19 @@ export function get_ResFunction(uri, resolvers) {
 }
 
 /**
- * @param {LUT<any>} resolverTree
+ * @param {ResolverTree} resolver_tree
  * @param {string} uri
  * @param {ResFunction} fn
  * @returns {void}
  */
-function add_ResFunction_with_params(resolverTree, uri, fn) {
-  const params = [];
-  let tree_ptr = resolverTree;
-  const uri_fragments = uri.split('/').slice(1);
+function add_ResFunction_with_params(resolver_tree, uri, fn) {
+  if (uri === '') return;
 
-  for (let i = 0; i < uri_fragments.length; i++) {
+  /** @type {[string, number][]} */
+  const params = [];
+  let tree_ptr = resolver_tree;
+  const uri_fragments = uri.split('/');
+  for (let i = 0; i < uri_fragments.length; ++i) {
     const uri_fragment = uri_fragments[i];
     if (uri_fragment[0] === ':') {
       params.push([uri_fragment.slice(1), i]);
@@ -46,62 +49,14 @@ function add_ResFunction_with_params(resolverTree, uri, fn) {
 }
 
 /**
- * @param {string[]} uri_fragments
- * @param {number} uri_fragment_idx
- * @param {LUT<any>} tree_ptr
- * @returns {FalseOr<LUT<any>>}
- */
-function walk_routes(uri_fragments, uri_fragment_idx, tree_ptr) {
-  if (!Object.hasOwn(tree_ptr, 'routes') || !Object.hasOwn(tree_ptr.routes, uri_fragments[uri_fragment_idx])) return false;
-
-  tree_ptr = tree_ptr.routes[uri_fragments[uri_fragment_idx]];
-
-  if (++uri_fragment_idx === uri_fragments.length) return tree_ptr;
-  else return walk_routes(uri_fragments, uri_fragment_idx, tree_ptr) || walk_param(uri_fragments, uri_fragment_idx, tree_ptr);
-}
-
-/**
- * @param {string[]} uri_fragments
- * @param {number} uri_fragment_idx
- * @param {LUT<any>} tree_ptr
- * @returns {FalseOr<LUT<any>>}
- */
-function walk_param(uri_fragments, uri_fragment_idx, tree_ptr) {
-  if (!Object.hasOwn(tree_ptr, 'param')) return false;
-
-  tree_ptr = tree_ptr.param;
-
-  if (++uri_fragment_idx === uri_fragments.length) return tree_ptr;
-  else return walk_routes(uri_fragments, uri_fragment_idx, tree_ptr) || walk_param(uri_fragments, uri_fragment_idx, tree_ptr);
-}
-
-/**
- * @param {string} uri
- * @param {LUT<any>} tree_root
- * @param {LUT<string>} route_params
- * @returns {FalseOr<ResFunction>}
- */
-export function get_ResFunction_with_params(uri, tree_root, route_params) {
-  if (uri === '/') return false;
-
-  const uri_fragments = uri.split('/').slice(1);
-
-  let false_or_ptr = walk_routes(uri_fragments, 0, tree_root) || walk_param(uri_fragments, 0, tree_root);
-  if (false_or_ptr === false || !Object.hasOwn(false_or_ptr, 'fn') || !Object.hasOwn(false_or_ptr, 'params')) return false;
-
-  set_route_parameters(uri_fragments, false_or_ptr.params, route_params);
-  return false_or_ptr.fn;
-}
-
-/**
- * @param {ResolverLUT} lut_without_params
- * @param {ResolverLUT} lut_with_params
+ * @param {ResolverTree} lut_without_params
+ * @param {ResolverTree} lut_with_params
  * @param {string} uri
  * @param {ResFunction} fn
  * @returns {void}
  */
 export function add_endpoint_with_or_without_params(lut_without_params, lut_with_params, uri, fn) {
-  if (uri.includes('/:')) add_ResFunction_with_params(lut_with_params, uri, fn);
+  if (uri.includes('/:')) add_ResFunction_with_params(lut_with_params, uri.slice(1), fn);
   else lut_without_params[uri] = fn;
 }
 
@@ -125,19 +80,53 @@ export function set_query_parameters(query_string = '', query = {}) {
 /**
  * @param {string[]} uri_fragments
  * @param {[string, number][]} params
- * @param {{}} [route={}]
+ * @param {LUT<string>} [route={}]
  * @returns {void}
  */
-export function set_route_parameters(uri_fragments, params, route = {}) {
+function set_route_parameters(uri_fragments, params, route = {}) {
   for (const param of params) route[param[0]] = uri_fragments[param[1]];
 }
 
 /**
+ * @param {string[]} uri_fragments
+ * @param {number} uri_fragment_idx
+ * @param {ResolverTree} tree_ptr
+ * @returns {FalseOr<ResolverTree>}
+ */
+function walk_tree(uri_fragments, uri_fragment_idx, tree_ptr) {
+  if (Object.hasOwn(tree_ptr, 'routes') && Object.hasOwn(tree_ptr.routes, uri_fragments[uri_fragment_idx])) tree_ptr = tree_ptr.routes[uri_fragments[uri_fragment_idx]];
+  else if (Object.hasOwn(tree_ptr, 'param')) tree_ptr = tree_ptr.param;
+  else return false;
+
+  if (++uri_fragment_idx === uri_fragments.length) return tree_ptr;
+  else return walk_tree(uri_fragments, uri_fragment_idx, tree_ptr);
+}
+
+/**
+ * @param {string} uri
+ * @param {ResolverTree} tree_root
+ * @param {LUT<string>} route_params
+ * @returns {FalseOr<ResFunction>}
+ */
+export function get_ResFunction_with_params(uri, tree_root, route_params) {
+  if (uri === '/') return false;
+
+  const uri_fragments = uri.split('/').slice(1);
+
+  let false_or_ptr = walk_tree(uri_fragments, 0, tree_root);
+  if (false_or_ptr === false || !Object.hasOwn(false_or_ptr, 'fn') || !Object.hasOwn(false_or_ptr, 'params')) return false;
+
+  set_route_parameters(uri_fragments, false_or_ptr.params, route_params);
+  return false_or_ptr.fn;
+}
+
+//#region utility functions
+/**
  * @param {ServerResponse} res response from the server
  * @param {any} [chunk] data of the response
  * @param {Object} [options] optional options
- * @param {number} [options.code] status code of the response (default is 200)
- * @param {string} [options.mime] mime-type of the response (default is 'text/plain')
+ * @param {number} [options.code=200] status code of the response
+ * @param {string} [options.mime="text/plain;charset=UTF-8"] mime-type of the response
  * todo: add a proper type for headers with all available key value pairs
  * @param {LUT<string|number>} [options.headers] additional headers ('Content-Type' is overwritten by mime, default is an empty Object)
  * @returns {void}
@@ -167,7 +156,7 @@ export function throw404(req, res) {
  * @param {string} filePathOrName path, or name of  the file
  * @returns {string} mime-type of the file (default 'text/plain')
  */
-function getType(filePathOrName) {
+function get_type(filePathOrName) {
   const file_ending = filePathOrName.split('.').pop();
   if (Object.hasOwn(mime_types, file_ending)) return mime_types[file_ending];
   WRN(`mime-type for '${file_ending}' not found`);
@@ -184,7 +173,7 @@ export function serveFromFS(res, filePath, statusCode = 200) {
   LOG('reading file from FS:', filePath);
   readFile(filePath, (err, data) => {
     if (err !== null) buildRes(res, `error while loading file from fs:\n${err}`, { code: 500, mime: 'text/plain' });
-    else buildRes(res, data, { code: statusCode, mime: getType(filePath) });
+    else buildRes(res, data, { code: statusCode, mime: get_type(filePath) });
   });
 }
 
@@ -214,3 +203,4 @@ export function getBodyJSON(req) {
     });
   });
 }
+//#endregion
