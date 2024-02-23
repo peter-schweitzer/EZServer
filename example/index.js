@@ -4,6 +4,9 @@
  ** TOC:
  *  - setup
  *  - endpoints
+ *    - without parameters
+ *    - with parameters
+ *    - with wildcard
  *  - routs
  *  - generic functions
  *  - types
@@ -14,7 +17,7 @@
  ** ================ Setup ===================
  */
 
-import { App, buildRes, getBodyJSON, serveFromFS, throw404, MIME } from '../index.js';
+import { App, MIME, buildRes, getBodyJSON, serveFromFS, throw404 } from '../index.js';
 
 const app = new App();
 app.listen(65535);
@@ -23,10 +26,12 @@ app.listen(65535);
  ** ================ Endpoints ===================
  */
 
-// An Endpoint resolves the specified URI exactly.
-// Endpoints have the highest specificity, so have the highest priority
+// An Endpoint resolves the specified URI.
 
-// these are the most specific, as they only resolve a specific URI, requested with a specific methods
+/* ================ without param =================== */
+// Endpoints without parameters have the highest specificity, so have the highest priority
+
+// these are the most specific, as they only resolve a specific URI, requested via a specific methods
 app.get('/get', (_req, res, _params) => {
   buildRes(res, 'get');
 });
@@ -60,9 +65,39 @@ app.add('/favicon.ico', (_req, res, _params) => {
   buildRes(res, '', { code: 404, mime: MIME.TEXT });
 });
 
+/* ================ with parameters =================== */
+
+// params are prefixed with ':' and can be registered with all above mentioned functions
+// endpoints with parameters are less specific than endpoints without
+
+// for more info on the Params class look at the types-section
+
+// going to '/echo-route-params/first-param/second-param' will return 'first-param second-param'
+app.add('/echo-route-prams/:param1/:param2', (_req, res, params) => {
+  buildRes(res, `${params.route('param1')} ${params.route('param2')}`);
+});
+
+// going to '/sum/351/69' will return '420'
+app.add('/sum/:a/:b', (_req, res, params) => {
+  buildRes(res, `${params.routeNumber('a', 0) + params.routeNumber('b', 0)}`);
+});
+
+/* ================ with wildcard =================== */
+
+// by having '/:*' as the last part of the URI the endpoint will resolve all requests that start with the URI
+// params will include the rest of the requested URI in route
+// params.route('*') will return an array of strings (the rest split on every '/')
+
+// going to '/wildcard/a/b/c' will return '3 (a-b-c)'
+// going to '/wildcard' will return '0 ()'
+app.add('/wildcard/:*', (_req, res, params) => {
+  const rest = params.route('*');
+  buildRes(res, `${rest.length} (${rest.join('-')})`);
+});
+
 /**
  ** ================ Routs ===================
- *! THESE WILL BE REMOVED IN EZServer 4.0.0
+ *! THESE WILL BE REMOVED IN EZServer 4.1.0
  */
 
 //These resolve all requests, with the specified HTTP-method, to URI-routes beginning with the specified 'route' argument
@@ -89,7 +124,7 @@ app.addRoute('/route', (_req, res, _params) => {
 
 /**
  ** ================ Generic Functions ===================
- *! THESE WILL BE REMOVED IN EZServer 4.0.0
+ *! THESE WILL BE REMOVED IN EZServer 4.1.0
  */
 
 // This is an easy way to use the same (generic) function multiple times
@@ -140,19 +175,9 @@ app.useGenericFunction('name', '/generic/rest-route', true);
 /**
  ** Params
  * every resFunction gets passed a params object as the third argument
- * params include all query parameters, as well as route parameters
+ * params include all query parameters, as well as route parameters when specified
  * route parameters are a component of the route and prefixed with ':' (e.g. '/:' signifies a route parameter)
  */
-
-// going to '/echo-route-params/first-param/second-param' will return 'first-param second-param'
-app.add('/echo-route-prams/:param1/:param2', (_req, res, params) => {
-  buildRes(res, `${params.route('param1')} ${params.route('param2')}`);
-});
-
-// going to '/sum/351/69' will return '420'
-app.add('/sum/:a/:b', (_req, res, params) => {
-  buildRes(res, `${params.routeNumber('a', 0) + params.routeNumber('b', 0)}`);
-});
 
 // going to '/echo-msg?msg=hello&msg2=world' will return 'hello world'
 app.add('/echo-msg', (_req, res, params) => {
