@@ -145,7 +145,7 @@ export function get_ResFunction_with_params(uri, tree_root, route_params) {
 /**
  * @param {string} uri
  * @param {{depth: number, root: ResolverTree}} tree_container
- * @param {LUT<string> & {'*': string[]}} route_params
+ * @param {LUT<string> & {'*'?: string[]}} route_params
  * @returns {FalseOr<ResFunction>}
  */
 export function get_ResFunction_with_wildcard(uri, { depth: n, root }, route_params) {

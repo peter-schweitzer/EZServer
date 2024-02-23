@@ -1,6 +1,7 @@
 //#region imports
-import { ERR, LOG, WRN } from '@peter-schweitzer/ez-utils';
 import { createServer } from 'node:http';
+
+import { ERR, LOG, WRN } from '@peter-schweitzer/ez-utils';
 
 import { Params } from './Params.js';
 import {
@@ -135,7 +136,7 @@ export class App {
       const ez_incoming_msg = Object.assign(req, { uri });
 
       const query = set_query_parameters(query_str);
-      /**@type {LUT<string>}*/
+      /**@type {LUT<string> & {"*"?: string[]}}*/
       const route = {};
 
       const fn =
@@ -286,7 +287,7 @@ export class App {
 
   /**
    * @param {EZIncomingMessage} req
-   * @param {LUT<string> & {'*': string[]}} route_params
+   * @param {LUT<string> & {'*'?: string[]}} route_params
    * @returns {FalseOr<ResFunction>}
    */
   #rest_endpoint_with_wildcard({ uri, method: m }, route_params) {
@@ -325,7 +326,7 @@ export class App {
 
   /**
    * @param {EZIncomingMessage} req
-   * @param {LUT<string> & {'*': string[]}} route_params
+   * @param {LUT<string> & {'*'?: string[]}} route_params
    * @returns {FalseOr<ResFunction>}
    */
   #endpoint_with_wildcard({ uri }, route_params) {
