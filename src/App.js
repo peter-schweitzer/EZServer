@@ -3,7 +3,14 @@ import { ERR, LOG, WRN } from '@peter-schweitzer/ez-utils';
 import { createServer } from 'node:http';
 
 import { Params } from './Params.js';
-import { add_endpoint_with_or_without_params, get_ResFunction, get_ResFunction_with_params, set_query_parameters, throw404 } from './utils.js';
+import {
+  add_endpoint_to_corresponding_lut,
+  get_ResFunction,
+  get_ResFunction_with_params,
+  get_ResFunction_with_wildcard,
+  set_query_parameters,
+  throw404,
+} from './utils.js';
 //#endregion
 
 export class App {
@@ -46,6 +53,24 @@ export class App {
 
   /** @type {ResolverTree} */
   #endpoints_with_params = {};
+  //#endregion
+
+  //#region with wildcard
+  /** @type {{[x in Methods]: {depth: number, root: ResolverTree}}} */
+  #rest_endpoints_with_wildcard = {
+    GET: { depth: -1, root: {} },
+    HEAD: { depth: -1, root: {} },
+    POST: { depth: -1, root: {} },
+    PUT: { depth: -1, root: {} },
+    DELETE: { depth: -1, root: {} },
+    CONNECT: { depth: -1, root: {} },
+    OPTIONS: { depth: -1, root: {} },
+    TRACE: { depth: -1, root: {} },
+    PATCH: { depth: -1, root: {} },
+  };
+
+  /** @type {{depth: number, root: ResolverTree}} */
+  #endpoints_with_wildcard = { depth: -1, root: {} };
   //#endregion
   //#endregion
 
@@ -118,6 +143,8 @@ export class App {
         this.#endpoint(ez_incoming_msg) ||
         this.#rest_endpoint_with_param(ez_incoming_msg, route) ||
         this.#endpoint_with_param(ez_incoming_msg, route) ||
+        this.#rest_endpoint_with_wildcard(ez_incoming_msg, route) ||
+        this.#endpoint_with_wildcard(ez_incoming_msg, route) ||
         this.#rest_route(ez_incoming_msg) ||
         this.#route(ez_incoming_msg);
 
@@ -155,7 +182,7 @@ export class App {
    * @returns {void}
    */
   get(uri, fn) {
-    add_endpoint_with_or_without_params(this.#rest_endpoints.GET, this.#rest_endpoints_with_params.GET, uri, fn);
+    add_endpoint_to_corresponding_lut(this.#rest_endpoints.GET, this.#rest_endpoints_with_params.GET, this.#rest_endpoints_with_wildcard.GET, uri, fn);
     LOG('added get:', uri);
   }
 
@@ -165,7 +192,7 @@ export class App {
    * @returns {void}
    */
   head(uri, fn) {
-    add_endpoint_with_or_without_params(this.#rest_endpoints.HEAD, this.#rest_endpoints_with_params.HEAD, uri, fn);
+    add_endpoint_to_corresponding_lut(this.#rest_endpoints.HEAD, this.#rest_endpoints_with_params.HEAD, this.#rest_endpoints_with_wildcard.HEAD, uri, fn);
     LOG('added head:', uri);
   }
 
@@ -175,7 +202,7 @@ export class App {
    * @returns {void}
    */
   post(uri, fn) {
-    add_endpoint_with_or_without_params(this.#rest_endpoints.POST, this.#rest_endpoints_with_params.POST, uri, fn);
+    add_endpoint_to_corresponding_lut(this.#rest_endpoints.POST, this.#rest_endpoints_with_params.POST, this.#rest_endpoints_with_wildcard.POST, uri, fn);
     LOG('added post:', uri);
   }
 
@@ -185,7 +212,7 @@ export class App {
    * @returns {void}
    */
   put(uri, fn) {
-    add_endpoint_with_or_without_params(this.#rest_endpoints.PUT, this.#rest_endpoints_with_params.PUT, uri, fn);
+    add_endpoint_to_corresponding_lut(this.#rest_endpoints.PUT, this.#rest_endpoints_with_params.PUT, this.#rest_endpoints_with_wildcard.PUT, uri, fn);
     LOG('added put:', uri);
   }
 
@@ -195,7 +222,7 @@ export class App {
    * @returns {void}
    */
   delete(uri, fn) {
-    add_endpoint_with_or_without_params(this.#rest_endpoints.DELETE, this.#rest_endpoints_with_params.DELETE, uri, fn);
+    add_endpoint_to_corresponding_lut(this.#rest_endpoints.DELETE, this.#rest_endpoints_with_params.DELETE, this.#rest_endpoints_with_wildcard.DELETE, uri, fn);
     LOG('added delete:', uri);
   }
 
@@ -205,7 +232,7 @@ export class App {
    * @returns {void}
    */
   connect(uri, fn) {
-    add_endpoint_with_or_without_params(this.#rest_endpoints.CONNECT, this.#rest_endpoints_with_params.CONNECT, uri, fn);
+    add_endpoint_to_corresponding_lut(this.#rest_endpoints.CONNECT, this.#rest_endpoints_with_params.CONNECT, this.#rest_endpoints_with_wildcard.CONNECT, uri, fn);
     LOG('added connect:', uri);
   }
 
@@ -215,7 +242,7 @@ export class App {
    * @returns {void}
    */
   options(uri, fn) {
-    add_endpoint_with_or_without_params(this.#rest_endpoints.OPTIONS, this.#rest_endpoints_with_params.OPTIONS, uri, fn);
+    add_endpoint_to_corresponding_lut(this.#rest_endpoints.OPTIONS, this.#rest_endpoints_with_params.OPTIONS, this.#rest_endpoints_with_wildcard.OPTIONS, uri, fn);
     LOG('added options:', uri);
   }
 
@@ -225,7 +252,7 @@ export class App {
    * @returns {void}
    */
   trace(uri, fn) {
-    add_endpoint_with_or_without_params(this.#rest_endpoints.TRACE, this.#rest_endpoints_with_params.TRACE, uri, fn);
+    add_endpoint_to_corresponding_lut(this.#rest_endpoints.TRACE, this.#rest_endpoints_with_params.TRACE, this.#rest_endpoints_with_wildcard.TRACE, uri, fn);
     LOG('added trace:', uri);
   }
 
@@ -235,7 +262,7 @@ export class App {
    * @returns {void}
    */
   patch(uri, fn) {
-    add_endpoint_with_or_without_params(this.#rest_endpoints.PATCH, this.#rest_endpoints_with_params.PATCH, uri, fn);
+    add_endpoint_to_corresponding_lut(this.#rest_endpoints.PATCH, this.#rest_endpoints_with_params.PATCH, this.#rest_endpoints_with_wildcard.PATCH, uri, fn);
     LOG('added patch:', uri);
   }
 
@@ -256,6 +283,15 @@ export class App {
   #rest_endpoint_with_param({ uri, method: m }, route_params) {
     return get_ResFunction_with_params(uri, this.#rest_endpoints_with_params[m], route_params);
   }
+
+  /**
+   * @param {EZIncomingMessage} req
+   * @param {LUT<string> & {'*': string[]}} route_params
+   * @returns {FalseOr<ResFunction>}
+   */
+  #rest_endpoint_with_wildcard({ uri, method: m }, route_params) {
+    return get_ResFunction_with_wildcard(uri, this.#rest_endpoints_with_wildcard[m], route_params);
+  }
   //#endregion
 
   //#region non rest endpoints
@@ -265,7 +301,7 @@ export class App {
    * @returns {void}
    */
   add(uri, fn) {
-    add_endpoint_with_or_without_params(this.#endpoints, this.#endpoints_with_params, uri, fn);
+    add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#endpoints_with_wildcard, uri, fn);
     LOG('added:', uri);
   }
 
@@ -285,6 +321,15 @@ export class App {
    */
   #endpoint_with_param({ uri }, route_params) {
     return get_ResFunction_with_params(uri, this.#endpoints_with_params, route_params);
+  }
+
+  /**
+   * @param {EZIncomingMessage} req
+   * @param {LUT<string> & {'*': string[]}} route_params
+   * @returns {FalseOr<ResFunction>}
+   */
+  #endpoint_with_wildcard({ uri }, route_params) {
+    return get_ResFunction_with_wildcard(uri, this.#endpoints_with_wildcard, route_params);
   }
   //#endregion
   //#endregion

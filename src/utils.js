@@ -70,12 +70,15 @@ function add_ResFunction_with_wildcard(resolver_tree, uri, fn) {
 /**
  * @param {ResolverTree} lut_without_params
  * @param {ResolverTree} lut_with_params
+ * @param {{depth: number, root: ResolverTree}} lut_with_wildcard
  * @param {string} uri
  * @param {ResFunction} fn
  * @returns {void}
  */
-export function add_endpoint_with_or_without_params(lut_without_params, lut_with_params, uri, fn) {
-  if (uri.includes('/:')) add_ResFunction_with_params(lut_with_params, uri.slice(1), fn);
+export function add_endpoint_to_corresponding_lut(lut_without_params, lut_with_params, lut_with_wildcard, uri, fn) {
+  if (uri.includes('/:'))
+    if (uri.endsWith('/:*')) add_ResFunction_with_wildcard(lut_with_wildcard, uri.slice(1), fn);
+    else add_ResFunction_with_params(lut_with_params, uri.slice(1), fn);
   else lut_without_params[uri] = fn;
 }
 
