@@ -5,6 +5,7 @@ import { ERR, LOG, WRN, data, err } from '@peter-schweitzer/ez-utils';
 
 /** @type {LUT<string>} */
 import mime_types from '../data/mimeTypes.json' assert { 'type': 'json' };
+import { RingBuffer } from './RingBuffer.js';
 //#endregion
 
 export const MIME = Object.freeze({ TEXT: 'text/plain;charset=UTF-8', HTML: 'text/html;charset=UTF-8', JSON: 'application/json' });
@@ -46,6 +47,24 @@ function add_ResFunction_with_params(resolver_tree, uri, fn) {
 
   tree_ptr.params = params;
   tree_ptr.fn = fn;
+}
+
+/**
+ * @param {{depth: number, root: ResolverTree}} resolver_tree
+ * @param {string} uri
+ * @param {ResFunction} fn
+ * @returns {void}
+ */
+function add_ResFunction_with_wildcard(resolver_tree, uri, fn) {
+  if (uri === '/:*') {
+    if (resolver_tree.depth === -1) resolver_tree.depth = 0;
+    resolver_tree.root.params = [];
+    resolver_tree.root.fn = fn;
+    return;
+  }
+
+  resolver_tree.depth = uri.split('/').length;
+  add_ResFunction_with_params(resolver_tree.root, uri.slice(0, -3), fn);
 }
 
 /**
@@ -118,6 +137,46 @@ export function get_ResFunction_with_params(uri, tree_root, route_params) {
 
   set_route_parameters(uri_fragments, false_or_ptr.params, route_params);
   return false_or_ptr.fn;
+}
+
+/**
+ * @param {string} uri
+ * @param {{depth: number, root: ResolverTree}} tree_container
+ * @param {LUT<string> & {'*': string[]}} route_params
+ * @returns {FalseOr<ResFunction>}
+ */
+export function get_ResFunction_with_wildcard(uri, { depth: n, root }, route_params) {
+  if (uri === '/' || n === 0) return false;
+
+  const uri_fragments = uri.slice(1).split('/');
+
+  /** @type {RingBuffer<{i: number, node: ResolverTree}>} */
+  const rbq = new RingBuffer(2 ** (Math.min(uri_fragments.length, n) - 1));
+  rbq.enqueue({ i: 0, node: root });
+
+  let fn,
+    params,
+    depth = -1;
+  do {
+    let { i, node } = rbq.dequeue();
+
+    if (Object.hasOwn(node, 'fn') && Object.hasOwn(node, 'params')) {
+      fn = node.fn;
+      params = node.params;
+      depth = i;
+    }
+
+    const uri_fragment = uri_fragments[i];
+
+    if (Object.hasOwn(node, 'param')) rbq.enqueue({ i: i + 1, node: node.param });
+    if (Object.hasOwn(node, 'routes') && Object.hasOwn(node.routes, uri_fragment)) rbq.enqueue({ i: i + 1, node: node.routes[uri_fragment] });
+  } while (rbq.length > 0);
+
+  if (depth === -1) return false;
+
+  set_route_parameters(uri_fragments, params, route_params);
+  route_params['*'] = uri_fragments.slice(depth);
+  return fn;
 }
 
 //#region utility functions
