@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  ** TOC:
  *  - setup
@@ -29,7 +27,7 @@ app.listen(65535);
 // An Endpoint resolves the specified URI.
 
 /* ================ without param =================== */
-// Endpoints without parameters have the highest specificity, so have the highest priority
+// Endpoints without parameters have the highest specificity, so they get matched first
 
 // these are the most specific, as they only resolve a specific URI, requested via a specific methods
 app.get('/get', (_req, res, _params) => {
@@ -47,12 +45,15 @@ app.post('/post', (_req, res, _params) => {
 app.delete('/delete', (_req, res, _params) => {
   buildRes(res, 'delete');
 });
+
 app.patch('/patch', (_req, res, _params) => {
   buildRes(res, 'patch');
 });
+
 app.options('/options', (_req, res, _params) => {
   buildRes(res, 'options');
 });
+
 app.head('/head', (_req, res, _params) => {
   buildRes(res);
 });
@@ -61,15 +62,15 @@ app.head('/head', (_req, res, _params) => {
 app.add('/', (_req, res, _params) => {
   serveFromFS(res, './html/home.html');
 });
+
 app.add('/favicon.ico', (_req, res, _params) => {
   buildRes(res, '', { code: 404, mime: MIME.TEXT });
 });
 
 /* ================ with parameters =================== */
 
-// params are prefixed with ':' and can be registered with all above mentioned functions
+//params are prefixed with ':' and can be registered with all above mentioned functions
 // endpoints with parameters are less specific than endpoints without
-
 // for more info on the Params class look at the types-section
 
 // going to '/echo-route-params/first-param/second-param' will return 'first-param second-param'
@@ -104,15 +105,19 @@ app.add('/wildcard/:*', (_req, res, params) => {
 app.addRestRoute('GET', '/rest/get', (_req, res, _params) => {
   buildRes(res, 'get-route');
 });
+
 app.addRestRoute('PUT', '/rest/put', (_req, res, _params) => {
   buildRes(res, 'put-route');
 });
+
 app.addRestRoute('POST', '/rest/post', (_req, res, _params) => {
   buildRes(res, 'post-route');
 });
+
 app.addRestRoute('DELETE', '/rest/delete', (_req, res, _params) => {
   buildRes(res, 'delete-route');
 });
+
 app.addRestRoute('PATCH', '/rest/patch', (_req, res, _params) => {
   buildRes(res, 'patch-route');
 });
@@ -132,6 +137,7 @@ app.addGenericRestFunction('GET', 'name', (req, res, _params) => {
   console.log('rest-name:', req.url);
   buildRes(res);
 });
+
 app.addGenericFunction('name', (req, res, _params) => {
   console.log('name:', req.url);
   buildRes(res);
@@ -227,6 +233,7 @@ app.get('/echo-json', async (req, res, _params) => {
  *   mime is the mime-type that gets send as part of the response
  *   headers is an object representing key (string) value (string or number) pairs that represent additional headers of the response
  */
+
 app.get('/hello', (_req, res, _params) => {
   buildRes(res, 'Hello, World');
 });
@@ -242,6 +249,7 @@ app.get('/hello', (_req, res, _params) => {
  *
  * Note: serveFromFS uses buildRes() internally
  */
+
 app.get('/example', (_req, res, _params) => {
   serveFromFS(res, './example/index.js');
 });
@@ -257,6 +265,7 @@ app.get('/example', (_req, res, _params) => {
  *
  * Note: throw404() uses buildRes() internally
  */
+
 app.add('/404', (req, res, _params) => {
   throw404(req, res);
 });
