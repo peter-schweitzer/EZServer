@@ -186,11 +186,11 @@ export function get_ResFunction_with_wildcard(uri, { depth: n, root }, route_par
 /**
  * @param {ServerResponse} res response from the server
  * @param {any} [chunk] data of the response
- * @param {Object} [options] optional options
+ * @param {Object} [options={}] optional options
  * @param {number} [options.code=200] status code of the response
  * @param {string} [options.mime="text/plain;charset=UTF-8"] mime-type of the response
  * todo: add a proper type for headers with all available key value pairs
- * @param {LUT<string|number>} [options.headers] additional headers ('Content-Type' is overwritten by mime, default is an empty Object)
+ * @param {LUT<string|number>} [options.headers={}] additional headers ('Content-Type' is overwritten by mime, default is an empty Object)
  * @returns {void}
  */
 export function buildRes(res, chunk = null, { code = 200, mime = MIME.TEXT, headers = {} } = {}) {

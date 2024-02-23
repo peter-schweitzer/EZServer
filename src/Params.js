@@ -1,12 +1,12 @@
 export class Params {
   /**@type {LUT<string>} */
   #query;
-  /**@type {LUT<string>} */
+  /**@type {LUT<string> & {"*"?: string[]}} */
   #route;
 
   /**
    * @param {LUT<string>} query
-   * @param {LUT<string>} route
+   * @param {LUT<string> & {"*"?: string[]}} route
    */
   constructor(query, route) {
     this.#query = query;
@@ -43,13 +43,17 @@ export class Params {
 
   //#region route
   /**
-   * @param {string} name
-   * @param {T} defaultValue
-   * @returns {string|T}
-   * @template {string?} T
+   * @param {S} [name='']
+   * @param {T} [defaultValue=null]
+   * @returns {S extends '' ? T : ((S extends '*' ? string[] : string) | T) }
+   * @template {string} [S='']
+   * @template {string} [T=null]
    */
+  // @ts-ignore ts(2322)
   route(name = '', defaultValue = null) {
+    // @ts-ignore ts(2322)
     if (Object.hasOwn(this.#route, name)) return this.#route[name];
+    // @ts-ignore ts(2322)
     else return defaultValue;
   }
 
