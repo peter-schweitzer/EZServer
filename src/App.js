@@ -74,7 +74,7 @@ export class App {
   //#endregion
   //#endregion
 
-  //#region routs
+  //#region routs //TODO remove in v4.1.0
   #rest_routes = {
     /** @type {ResolverLUT} */
     GET: {},
@@ -100,7 +100,7 @@ export class App {
   #routs = {};
   //#endregion
 
-  //#region general functions
+  //#region general functions //TODO remove in v4.1.0
   #generic_rest_functions = {
     /** @type {ResolverLUT} */
     GET: {},
@@ -145,8 +145,8 @@ export class App {
         this.#endpoint_with_param(ez_incoming_msg, route) ||
         this.#rest_endpoint_with_wildcard(ez_incoming_msg, route) ||
         this.#endpoint_with_wildcard(ez_incoming_msg, route) ||
-        this.#rest_route(ez_incoming_msg) ||
-        this.#route(ez_incoming_msg);
+        this.#rest_route(ez_incoming_msg) || //TODO remove in v4.1.0
+        this.#route(ez_incoming_msg); //TODO remove in v4.1.0
 
       if (fn === false) throw404(ez_incoming_msg, res);
       else fn(ez_incoming_msg, res, new Params(query, route));
@@ -334,9 +334,10 @@ export class App {
   //#endregion
   //#endregion
 
-  //#region routs
+  //#region routs //TODO remove in v4.1.0
   //#region rest routs
   /**
+   * @deprecated use the coresponding rest method with the '/:*' wildcard pattern instead. WILL BE REMOVED IN v4.1.0!
    * @param {Methods} method http-method of the request
    * @param {string} uri start of the uri to resolve
    * @param {ResFunction} fn function for resolve the request
@@ -358,6 +359,7 @@ export class App {
 
   //#region non rest routes
   /**
+   * @deprecated use the @see add() method with the '/:*' wildcard pattern instead. WILL BE REMOVED IN v4.1.0!
    * @param {string} uri start of the uri to resolve
    * @param {ResFunction} fn function for resolve the request
    * @returns {void}
@@ -377,9 +379,10 @@ export class App {
   //#endregion
   //#endregion
 
-  //#region generic functions
+  //#region generic functions //TODO remove in v4.1.0
   //#region generic rest functions
   /**
+   * @deprecated WILL BE REMOVED IN v4.1.0!
    * @param {Methods} method http-method
    * @param {string} functionName name of the generic function
    * @param {ResFunction} fn function for resolve the request
@@ -393,6 +396,7 @@ export class App {
   }
 
   /**
+   * @deprecated WILL BE REMOVED IN v4.1.0!
    * @param {Methods} method http-method
    * @param {string} functionName name of the generic function
    * @param {string} uri uri to resolve
@@ -411,6 +415,7 @@ export class App {
 
   //#region generic non rest functions
   /**
+   * @deprecated WILL BE REMOVED IN v4.1.0!
    * @param {string} functionName name of the generic function
    * @param {ResFunction} fn function for resolve the request
    * @returns {FalseOr<void>} wether the function was successfully registered
@@ -423,6 +428,7 @@ export class App {
   }
 
   /**
+   * @deprecated WILL BE REMOVED IN v4.1.0!
    * @param {string} functionName name of the generic function
    * @param {string} uri uri to resolve
    * @param {boolean} isRoute wether to register a route or endpoint
