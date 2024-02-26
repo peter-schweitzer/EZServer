@@ -247,7 +247,7 @@ export function getBodyJSON(req) {
   return new Promise((resolve, _) => {
     let buff = '';
 
-    req.on('data', (chunk) => (buff += chunk));
+    req.on('data', (chunk) => (buff += chunk.toString('utf8')));
 
     req.on('end', () => {
       if (buff.length === 0) resolve(data(''));
@@ -261,6 +261,27 @@ export function getBodyJSON(req) {
 
     req.on('error', (e) => {
       ERR("error in getBodyJSON (req.on 'error'):", e);
+      resolve(err(typeof e === 'string' ? e : JSON.stringify(e)));
+    });
+  });
+}
+
+/**
+ * @param {IncomingMessage} req
+ * @return {AsyncErrorOr<string>} - may return empty string
+ */
+export function getBodyText(req) {
+  return new Promise((resolve, _) => {
+    let buff = '';
+
+    req.on('data', (chunk) => (buff += chunk.toString('utf8')));
+
+    req.on('end', () => {
+      resolve(data(buff));
+    });
+
+    req.on('error', (e) => {
+      ERR('error in getBodyText:', e);
       resolve(err(typeof e === 'string' ? e : JSON.stringify(e)));
     });
   });
