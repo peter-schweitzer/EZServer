@@ -56,7 +56,7 @@ function add_ResFunction_with_params(resolver_tree, uri, fn) {
  * @returns {void}
  */
 function add_ResFunction_with_wildcard(resolver_tree, uri, fn) {
-  if (uri === '/:*') {
+  if (uri === ':*') {
     if (resolver_tree.depth === -1) resolver_tree.depth = 0;
     resolver_tree.root.params = [];
     resolver_tree.root.fn = fn;
@@ -149,7 +149,7 @@ export function get_ResFunction_with_params(uri, tree_root, route_params) {
  * @returns {FalseOr<ResFunction>}
  */
 export function get_ResFunction_with_wildcard(uri, { depth: n, root }, route_params) {
-  if (uri === '/' || n === 0) return false;
+  if (uri === '/' || n < 1) return false;
 
   const uri_fragments = uri.slice(1).split('/');
 
@@ -185,7 +185,7 @@ export function get_ResFunction_with_wildcard(uri, { depth: n, root }, route_par
 //#region utility functions
 /**
  * @param {ServerResponse} res response from the server
- * @param {any} [chunk] data of the response
+ * @param {string|Buffer|Uint8Array} [chunk] data of the response
  * @param {Object} [options={}] optional options
  * @param {number} [options.code=200] status code of the response
  * @param {string} [options.mime="text/plain;charset=UTF-8"] mime-type of the response
@@ -195,6 +195,7 @@ export function get_ResFunction_with_wildcard(uri, { depth: n, root }, route_par
  */
 export function buildRes(res, chunk = null, { code = 200, mime = MIME.TEXT, headers = {} } = {}) {
   Object.assign(headers, { 'Content-Type': mime });
+  if (!Object.hasOwn(headers, 'Content-Length') && chunk !== null) Object.assign(headers, { 'Content-Length': chunk.length.toString() });
   res.writeHead(code, headers);
   // FIXME: write() can error, but it takes a callback => no good way to propagate the error to the caller :(
   if (chunk !== null && chunk !== '') res.write(chunk);
