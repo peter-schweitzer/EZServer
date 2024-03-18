@@ -224,7 +224,7 @@ app.get('/echo-json', async (req, res, _params) => {
 /**
  ** buildRes(res, data, { code, mime, headers })
  *
- * buildRes() takes a ServerResponse, an 'any' and optionally an object (default is {code: 200, mime: 'text/plain', headers: {}})
+ * buildRes() takes a ServerResponse, an 'any' and optionally an object (default is {code: 200, mime: 'text/plain;charset=UTF-8', headers: {}})
  *
  * res is passed by EZServer as the second argument to every resFunction
  * data can be anything that should be send to resolve the request (typically a string)
