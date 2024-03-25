@@ -57,7 +57,7 @@ function add_ResFunction_with_params(resolver_tree, uri, fn) {
  */
 function add_ResFunction_with_wildcard(resolver_tree, uri, fn) {
   if (uri === ':*') {
-    if (resolver_tree.depth === -1) resolver_tree.depth = 0;
+    if (resolver_tree.depth === -1) resolver_tree.depth = 1;
     resolver_tree.root.params = [];
     resolver_tree.root.fn = fn;
     return;
