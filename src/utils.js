@@ -152,16 +152,21 @@ export function get_ResFunction_with_wildcard(uri, { depth: n, root }, route_par
   if (uri === '/' || n < 1) return false;
 
   const uri_fragments = uri.slice(1).split('/');
+  const max_traversal_depth = n < uri_fragments.length ? n : uri_fragments.length;
 
+  // heuristic approach to minimize memory usage for long URIs:
+  //   the longer the URI, the less likely to have multiple possible paths in the ResolverTree.
   /** @type {RingBuffer<{i: number, node: ResolverTree}>} */
-  const rbq = new RingBuffer(2 ** (Math.min(uri_fragments.length, n) - 1));
+  const rbq = new RingBuffer(2 ** (max_traversal_depth - (max_traversal_depth > 4 ? (max_traversal_depth - 1) >> 1 : 1)));
   rbq.enqueue({ i: 0, node: root });
 
-  let fn,
-    params,
-    depth = -1;
+  /** @type {ResFunction} */
+  let fn;
+  /** @type {[string, number][]} */
+  let params;
+  let depth = -1;
   do {
-    let { i, node } = rbq.dequeue();
+    const { i, node } = rbq.dequeue();
 
     if (Object.hasOwn(node, 'fn') && Object.hasOwn(node, 'params')) {
       fn = node.fn;

@@ -11,6 +11,10 @@ export class RingBuffer {
     return this.#length;
   }
 
+  get size() {
+    return this.#buf_arr.length;
+  }
+
   /** @type {number} */
   #h;
   /** @type {number} */
