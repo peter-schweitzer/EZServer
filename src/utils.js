@@ -50,27 +50,27 @@ function add_ResFunction_with_params(resolver_tree, uri, fn) {
 }
 
 /**
- * @param {{depth: number, root: ResolverTree}} resolver_tree
+ * @param {ResolverTreeContainer} tree_container
  * @param {string} uri
  * @param {ResFunction} fn
  * @returns {void}
  */
-function add_ResFunction_with_wildcard(resolver_tree, uri, fn) {
+function add_ResFunction_with_wildcard(tree_container, uri, fn) {
   if (uri === ':*') {
-    if (resolver_tree.depth === -1) resolver_tree.depth = 1;
-    resolver_tree.root.params = [];
-    resolver_tree.root.fn = fn;
+    if (tree_container.depth === -1) tree_container.depth = 1;
+    tree_container.root.params = [];
+    tree_container.root.fn = fn;
     return;
   }
 
-  resolver_tree.depth = uri.split('/').length;
-  add_ResFunction_with_params(resolver_tree.root, uri.slice(0, -3), fn);
+  tree_container.depth = uri.split('/').length;
+  add_ResFunction_with_params(tree_container.root, uri.slice(0, -3), fn);
 }
 
 /**
- * @param {ResolverTree} lut_without_params
+ * @param {ResolverLUT} lut_without_params
  * @param {ResolverTree} lut_with_params
- * @param {{depth: number, root: ResolverTree}} lut_with_wildcard
+ * @param {ResolverTreeContainer} lut_with_wildcard
  * @param {string} uri
  * @param {ResFunction} fn
  * @returns {void}
@@ -144,7 +144,7 @@ export function get_ResFunction_with_params(uri, tree_root, route_params) {
 
 /**
  * @param {string} uri
- * @param {{depth: number, root: ResolverTree}} tree_container
+ * @param {ResolverTreeContainer} tree_container
  * @param {LUT<string> & {'*'?: string[]}} route_params
  * @returns {FalseOr<ResFunction>}
  */
@@ -152,7 +152,7 @@ export function get_ResFunction_with_wildcard(uri, { depth: n, root }, route_par
   if (uri === '/' || n < 1) return false;
 
   const uri_fragments = uri.slice(1).split('/');
-  const max_traversal_depth = n < uri_fragments.length ? n : uri_fragments.length;
+  const max_traversal_depth = uri_fragments.length < n ? uri_fragments.length : n;
 
   // heuristic approach to minimize memory usage for long URIs:
   //   the longer the URI, the less likely to have multiple possible paths in the ResolverTree.

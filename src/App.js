@@ -57,7 +57,7 @@ export class App {
   //#endregion
 
   //#region with wildcard
-  /** @type {{[x in Methods]: {depth: number, root: ResolverTree}}} */
+  /** @type {{[x in Methods]: ResolverTreeContainer}} */
   #rest_endpoints_with_wildcard = {
     GET: { depth: -1, root: {} },
     HEAD: { depth: -1, root: {} },
@@ -70,7 +70,7 @@ export class App {
     PATCH: { depth: -1, root: {} },
   };
 
-  /** @type {{depth: number, root: ResolverTree}} */
+  /** @type {ResolverTreeContainer} */
   #endpoints_with_wildcard = { depth: -1, root: {} };
   //#endregion
   //#endregion
