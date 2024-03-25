@@ -57,7 +57,7 @@ function add_ResFunction_with_params(resolver_tree, uri, fn) {
  */
 function add_ResFunction_with_wildcard(tree_container, uri, fn) {
   if (uri === ':*') {
-    if (tree_container.depth === -1) tree_container.depth = 1;
+    if (tree_container.depth === 0) tree_container.depth = 1;
     tree_container.root.params = [];
     tree_container.root.fn = fn;
     return;
@@ -149,7 +149,7 @@ export function get_ResFunction_with_params(uri, tree_root, route_params) {
  * @returns {FalseOr<ResFunction>}
  */
 export function get_ResFunction_with_wildcard(uri, { depth: n, root }, route_params) {
-  if (uri === '/' || n < 1) return false;
+  if (uri === '/' || n === 0) return false;
 
   const uri_fragments = uri.slice(1).split('/');
   const max_traversal_depth = uri_fragments.length < n ? uri_fragments.length : n;

@@ -59,19 +59,19 @@ export class App {
   //#region with wildcard
   /** @type {{[x in Methods]: ResolverTreeContainer}} */
   #rest_endpoints_with_wildcard = {
-    GET: { depth: -1, root: {} },
-    HEAD: { depth: -1, root: {} },
-    POST: { depth: -1, root: {} },
-    PUT: { depth: -1, root: {} },
-    DELETE: { depth: -1, root: {} },
-    CONNECT: { depth: -1, root: {} },
-    OPTIONS: { depth: -1, root: {} },
-    TRACE: { depth: -1, root: {} },
-    PATCH: { depth: -1, root: {} },
+    GET: { depth: 0, root: {} },
+    HEAD: { depth: 0, root: {} },
+    POST: { depth: 0, root: {} },
+    PUT: { depth: 0, root: {} },
+    DELETE: { depth: 0, root: {} },
+    CONNECT: { depth: 0, root: {} },
+    OPTIONS: { depth: 0, root: {} },
+    TRACE: { depth: 0, root: {} },
+    PATCH: { depth: 0, root: {} },
   };
 
   /** @type {ResolverTreeContainer} */
-  #endpoints_with_wildcard = { depth: -1, root: {} };
+  #endpoints_with_wildcard = { depth: 0, root: {} };
   //#endregion
   //#endregion
 
