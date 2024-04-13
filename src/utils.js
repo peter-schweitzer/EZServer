@@ -297,4 +297,13 @@ export function getBodyText(req) {
     });
   });
 }
+
+/**
+ * @param {EZIncomingMessage} req
+ * @return {ErrorOr<LUT<string>>}
+ */
+export function getCookies(req) {
+  if (!Object.hasOwn(req.headers, 'cookie')) return err('no cookie header present');
+  else return data(Object.fromEntries(req.headers.cookie.split('; ').map((c) => c.split('='))));
+}
 //#endregion
