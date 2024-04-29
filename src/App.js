@@ -81,8 +81,8 @@ export class App {
       const fn =
         this.#rest_endpoint(ez_incoming_msg) ||
         this.#endpoint(ez_incoming_msg) ||
-        this.#rest_endpoint_with_param(ez_incoming_msg, route) ||
-        this.#endpoint_with_param(ez_incoming_msg, route) ||
+        this.#rest_endpoint_with_params(ez_incoming_msg, route) ||
+        this.#endpoint_with_params(ez_incoming_msg, route) ||
         this.#rest_endpoint_with_wildcard(ez_incoming_msg, route) ||
         this.#endpoint_with_wildcard(ez_incoming_msg, route);
 
@@ -209,7 +209,7 @@ export class App {
    */
   #rest_endpoint({ uri, method: m }) {
     if (Object.hasOwn(this.#rest_endpoints[m], uri)) return this.#rest_endpoints[m][uri];
-    return false;
+    else return false;
   }
 
   /**
@@ -217,7 +217,7 @@ export class App {
    * @param {LUT<string>} route_params
    * @returns {FalseOr<ResFunction>}
    */
-  #rest_endpoint_with_param({ uri, method: m }, route_params) {
+  #rest_endpoint_with_params({ uri, method: m }, route_params) {
     return get_ResFunction_with_params(uri, this.#rest_endpoints_with_params[m], route_params);
   }
 
@@ -248,7 +248,7 @@ export class App {
    */
   #endpoint({ uri }) {
     if (Object.hasOwn(this.#endpoints, uri)) return this.#endpoints[uri];
-    return false;
+    else return false;
   }
 
   /**
@@ -256,7 +256,7 @@ export class App {
    * @param {LUT<string>} route_params
    * @returns {FalseOr<ResFunction>}
    */
-  #endpoint_with_param({ uri }, route_params) {
+  #endpoint_with_params({ uri }, route_params) {
     return get_ResFunction_with_params(uri, this.#endpoints_with_params, route_params);
   }
 
