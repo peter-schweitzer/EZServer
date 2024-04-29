@@ -11,19 +11,6 @@ import { RingBuffer } from './RingBuffer.js';
 export const MIME = Object.freeze({ TEXT: 'text/plain;charset=UTF-8', HTML: 'text/html;charset=UTF-8', JSON: 'application/json' });
 
 /**
- * @param {string} uri
- * @param {ResolverLUT} resolvers
- * @returns {FalseOr<ResFunction>}
- */
-export function get_ResFunction(uri, resolvers) {
-  let path = uri;
-  while (true)
-    if (Object.hasOwn(resolvers, path)) return resolvers[path];
-    else if (path.length === 1) return false;
-    else path = path.slice(0, path.lastIndexOf('/') || 1);
-}
-
-/**
  * @param {ResolverTree} resolver_tree
  * @param {string} uri
  * @param {ResFunction} fn
