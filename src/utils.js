@@ -1,7 +1,7 @@
 //#region imports
 import { readFile } from 'node:fs';
 
-import { ERR, LOG, WRN, data, err } from '@peter-schweitzer/ez-utils';
+import { LOG, WRN, data, err } from '@peter-schweitzer/ez-utils';
 
 /** @type {LUT<string>} */
 import mime_types from '../data/mimeTypes.json' with { 'type': 'json' };
@@ -10,6 +10,7 @@ import { RingBuffer } from './RingBuffer.js';
 
 export const MIME = Object.freeze({ TEXT: 'text/plain;charset=UTF-8', HTML: 'text/html;charset=UTF-8', JSON: 'application/json' });
 
+//#region routing functions
 /**
  * @param {ResolverTree} resolver_tree
  * @param {string} uri
@@ -173,6 +174,7 @@ export function get_ResFunction_with_wildcard(uri, { depth: n, root }, route_par
   route_params['*'] = uri_fragments.slice(depth);
   return fn;
 }
+//#endregion
 
 //#region utility functions
 /**
@@ -241,27 +243,16 @@ export function serveFromFS(res, filePath, statusCode = 200) {
  * @param {IncomingMessage} req
  * @return {AsyncErrorOr<any>}
  */
-export function getBodyJSON(req) {
-  return new Promise((resolve, _) => {
-    let buff = '';
+export async function getBodyJSON(req) {
+  const eo_txt = await getBodyText(req);
+  if (eo_txt.err !== null) return eo_txt;
+  if (eo_txt.data === '') return err('request body is empty');
 
-    req.on('data', (chunk) => (buff += chunk.toString('utf8')));
-
-    req.on('end', () => {
-      if (buff.length === 0) resolve(data(''));
-      try {
-        resolve(data(JSON.parse(buff)));
-      } catch (e) {
-        ERR('\x1b[32;1m' + 'error in getBodyJSON (JSON.parse):' + '\x1b[0m', e);
-        resolve(err(typeof e === 'string' ? e : JSON.parse(e)));
-      }
-    });
-
-    req.on('error', (e) => {
-      ERR("error in getBodyJSON (req.on 'error'):", e);
-      resolve(err(typeof e === 'string' ? e : JSON.stringify(e)));
-    });
-  });
+  try {
+    return data(JSON.parse(eo_txt.data));
+  } catch (e) {
+    return err(`error while parsing request body: '${typeof e === 'string' ? e : JSON.stringify(e)}'`);
+  }
 }
 
 /**
@@ -273,15 +264,8 @@ export function getBodyText(req) {
     let buff = '';
 
     req.on('data', (chunk) => (buff += chunk.toString('utf8')));
-
-    req.on('end', () => {
-      resolve(data(buff));
-    });
-
-    req.on('error', (e) => {
-      ERR('error in getBodyText:', e);
-      resolve(err(typeof e === 'string' ? e : JSON.stringify(e)));
-    });
+    req.on('end', () => resolve(data(buff)));
+    req.on('error', (e) => resolve(err(`error '${e.name}' while accumulating request body: '${e.message}'`)));
   });
 }
 
