@@ -10,6 +10,7 @@ import { RingBuffer } from './RingBuffer.js';
 
 export const MIME = Object.freeze({ TEXT: 'text/plain;charset=UTF-8', HTML: 'text/html;charset=UTF-8', JSON: 'application/json' });
 
+//#region routing functions
 /**
  * @param {ResolverTree} resolver_tree
  * @param {string} uri
@@ -173,6 +174,7 @@ export function get_ResFunction_with_wildcard(uri, { depth: n, root }, route_par
   route_params['*'] = uri_fragments.slice(depth);
   return fn;
 }
+//#endregion
 
 //#region utility functions
 /**
@@ -239,33 +241,6 @@ export function serveFromFS(res, filePath, statusCode = 200) {
 
 /**
  * @param {IncomingMessage} req
- * @return {AsyncErrorOr<any>}
- */
-export function getBodyJSON(req) {
-  return new Promise((resolve, _) => {
-    let buff = '';
-
-    req.on('data', (chunk) => (buff += chunk.toString('utf8')));
-
-    req.on('end', () => {
-      if (buff.length === 0) resolve(data(''));
-      try {
-        resolve(data(JSON.parse(buff)));
-      } catch (e) {
-        ERR('\x1b[32;1m' + 'error in getBodyJSON (JSON.parse):' + '\x1b[0m', e);
-        resolve(err(typeof e === 'string' ? e : JSON.parse(e)));
-      }
-    });
-
-    req.on('error', (e) => {
-      ERR("error in getBodyJSON (req.on 'error'):", e);
-      resolve(err(typeof e === 'string' ? e : JSON.stringify(e)));
-    });
-  });
-}
-
-/**
- * @param {IncomingMessage} req
  * @return {AsyncErrorOr<string>} - may return empty string
  */
 export function getBodyText(req) {
@@ -273,16 +248,26 @@ export function getBodyText(req) {
     let buff = '';
 
     req.on('data', (chunk) => (buff += chunk.toString('utf8')));
-
-    req.on('end', () => {
-      resolve(data(buff));
-    });
-
-    req.on('error', (e) => {
-      ERR('error in getBodyText:', e);
-      resolve(err(typeof e === 'string' ? e : JSON.stringify(e)));
-    });
+    req.on('end', () => resolve(data(buff)));
+    req.on('error', (e) => resolve(err(`error '${e.name}' while accumulating request body: '${e.message}'`)));
   });
+}
+
+/**
+ * @param {IncomingMessage} req
+ * @return {AsyncErrorOr<any>}
+ */
+export async function getBodyJSON(req) {
+  const eo_txt = await getBodyText(req);
+  if (eo_txt.err !== null) return eo_txt;
+  if (eo_txt.data === '') return err('request body is empty');
+
+  try {
+    return data(JSON.parse(eo_txt.data));
+  } catch (e) {
+    ERR(`${'\x1b[32;1m'}error in getBodyJSON caused by JSON.parse:${'\x1b[0m'}\n  ${e}`);
+    return err(`error while parsing request body: '${typeof e === 'string' ? e : JSON.stringify(e)}'`);
+  }
 }
 
 /**
