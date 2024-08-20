@@ -1,14 +1,12 @@
-//#region imports
 import { createServer } from 'node:http';
 
 import { ERR, LOG, WRN } from '@peter-schweitzer/ez-utils';
 
 import { Params } from './Params.js';
 import { add_endpoint_to_corresponding_lut, get_ResFunction_with_params, get_ResFunction_with_wildcard, set_query_parameters, throw404 } from './utils.js';
-//#endregion
 
 export class App {
-  /** @type {Server}*/
+  /** @type {Server} */
   m_http_server;
 
   //#region endpoints
