@@ -2,12 +2,18 @@ import { createServer } from 'node:http';
 
 import { ERR, LOG, WRN } from '@peter-schweitzer/ez-utils';
 
+import { Middleware } from './Middleware.js';
 import { Params } from './Params.js';
-import { add_endpoint_to_corresponding_lut, get_ResFunction_with_params, get_ResFunction_with_wildcard, set_query_parameters, throw404 } from './utils.js';
+import { add_endpoint_to_corresponding_lut, buildRes, get_ResFunction_with_params, get_ResFunction_with_wildcard, set_query_parameters, throw404 } from './utils.js';
 
 export class App {
   /** @type {Server} */
   m_http_server;
+
+  //#region middleware stack
+  /** @type {Middleware[]} */
+  #middleware_stack = [];
+  //#endregion
 
   //#region endpoints
   //#region without param
@@ -84,12 +90,36 @@ export class App {
         this.#rest_endpoint_with_wildcard(ez_incoming_msg, route) ||
         this.#endpoint_with_wildcard(ez_incoming_msg, route);
 
-      if (fn === false) throw404(ez_incoming_msg, res);
-      else fn(ez_incoming_msg, res, new Params(query, route));
+      if (fn === false) return throw404(ez_incoming_msg, res);
+
+      for (const middleware of this.#middleware_stack) {
+        /** @type {string | undefined} */
+        // @ts-expect-error ts(2339) middleware_err is string or undefined (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining)
+        const middleware_err = middleware.handle(ez_incoming_msg, res, query, route)?.err;
+
+        if (middleware_err !== undefined) {
+          WRN(`Error in Middleware '${middleware.name}':\n  '${middleware_err}'`);
+          if (!middleware.strict) continue;
+          if (!res.writableEnded) buildRes(res, null, { code: 500 });
+          return;
+        } else if (res.writableEnded) return LOG(`res was closed by middleware '${middleware.name}'`);
+      }
+
+      fn(ez_incoming_msg, res, new Params(query, route));
     });
   }
 
   //#region functions
+  //#region middleware
+  /**
+   * @param {Middleware} middleware
+   * @returns {void}
+   */
+  use(middleware) {
+    this.#middleware_stack.push(middleware);
+  }
+  //#endregion
+
   //#region node:http Server functions
   /**
    * @param {number|string} port port the server will listen on
