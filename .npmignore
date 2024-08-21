@@ -12,6 +12,9 @@ package-lock.json
 # pre-commit
 .pre-commit-config.yaml
 
+#prettier config
+.prettierrc
+
 #tests
 tests/
 
