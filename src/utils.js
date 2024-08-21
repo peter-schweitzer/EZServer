@@ -271,7 +271,7 @@ export async function getBodyJSON(req) {
 }
 
 /**
- * @param {EZIncomingMessage} req
+ * @param {IncomingMessage} req
  * @return {ErrorOr<LUT<string>>}
  */
 export function getCookies(req) {
