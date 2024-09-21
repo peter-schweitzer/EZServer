@@ -1,14 +1,12 @@
 /**
  ** TOC:
- *  - setup
- *  - endpoints
- *    - without parameters
- *    - with parameters
- *    - with wildcard
- *  - routs
- *  - generic functions
- *  - types
- *  - utility functions
+ *  - setup .................... #L13
+ *  - endpoints ................ #L22
+ *    - without parameters ..... #L27
+ *    - with parameters ........ #L64
+ *    - with wildcard .......... #L80
+ *  - types .................... #L94
+ *  - utility functions ........ #L139
  */
 
 /**
@@ -29,7 +27,7 @@ app.listen(65535);
 /* ================ without param =================== */
 // Endpoints without parameters have the highest specificity, so they get matched first
 
-// these are the most specific, as they only resolve a specific URI, requested via a specific methods
+// these are the most specific, as they only resolve a specific URI, requested via a specific method (also supports head, connect and trace)
 app.get('/get', (_req, res, _params) => {
   buildRes(res, 'get');
 });
@@ -54,17 +52,13 @@ app.options('/options', (_req, res, _params) => {
   buildRes(res, 'options');
 });
 
-app.head('/head', (_req, res, _params) => {
-  buildRes(res);
-});
-
 // add() ignores the method, hence it's less specific than the examples above
 app.add('/', (_req, res, _params) => {
   serveFromFS(res, './html/home.html');
 });
 
 app.add('/favicon.ico', (_req, res, _params) => {
-  buildRes(res, '', { code: 404, mime: MIME.TEXT });
+  buildRes(res, null, { code: 404 });
 });
 
 /* ================ with parameters =================== */
@@ -95,61 +89,6 @@ app.add('/wildcard/:*', (_req, res, params) => {
   const rest = params.route('*');
   buildRes(res, `${rest.length} (${rest.join('-')})`);
 });
-
-/**
- ** ================ Routs ===================
- *! THESE WILL BE REMOVED IN EZServer 4.1.0
- */
-
-//These resolve all requests, with the specified HTTP-method, to URI-routes beginning with the specified 'route' argument
-app.addRestRoute('GET', '/rest/get', (_req, res, _params) => {
-  buildRes(res, 'get-route');
-});
-
-app.addRestRoute('PUT', '/rest/put', (_req, res, _params) => {
-  buildRes(res, 'put-route');
-});
-
-app.addRestRoute('POST', '/rest/post', (_req, res, _params) => {
-  buildRes(res, 'post-route');
-});
-
-app.addRestRoute('DELETE', '/rest/delete', (_req, res, _params) => {
-  buildRes(res, 'delete-route');
-});
-
-app.addRestRoute('PATCH', '/rest/patch', (_req, res, _params) => {
-  buildRes(res, 'patch-route');
-});
-
-//addRoute ignores the HTTP-method (similar to add()), hence being less specific than addRestRoute()
-app.addRoute('/route', (_req, res, _params) => {
-  buildRes(res, `route`);
-});
-
-/**
- ** ================ Generic Functions ===================
- *! THESE WILL BE REMOVED IN EZServer 4.1.0
- */
-
-// This is an easy way to use the same (generic) function multiple times
-app.addGenericRestFunction('GET', 'name', (req, res, _params) => {
-  console.log('rest-name:', req.url);
-  buildRes(res);
-});
-
-app.addGenericFunction('name', (req, res, _params) => {
-  console.log('name:', req.url);
-  buildRes(res);
-});
-
-//use as endpoint
-app.useGenericRestFunction('GET', 'name', '/generic/endpoint');
-app.useGenericFunction('name', '/generic/rest-endpoint');
-
-//use as rout
-app.useGenericRestFunction('GET', 'name', '/generic/route', true);
-app.useGenericFunction('name', '/generic/rest-route', true);
 
 /**
  ** ================ Types ===================
@@ -224,18 +163,18 @@ app.get('/echo-json', async (req, res, _params) => {
 /**
  ** buildRes(res, data, { code, mime, headers })
  *
- * buildRes() takes a ServerResponse, an 'any' and optionally an object (default is {code: 200, mime: 'text/plain;charset=UTF-8', headers: {}})
+ * buildRes() takes a ServerResponse, an optional string or Buffer (default is null) and optionally an object
  *
  * res is passed by EZServer as the second argument to every resFunction
- * data can be anything that should be send to resolve the request (typically a string)
- * the last argument is an optional object containing the properties code, mime and headers (you can pass any number of them)
- *   code is the HTTP-status that gets send as part of the response
- *   mime is the mime-type that gets send as part of the response
- *   headers is an object representing key (string) value (string or number) pairs that represent additional headers of the response
+ * data can be a string or Buffer, that should be send to resolve the request
+ * the last argument is an optional object containing the properties 'code', 'mime' and 'headers'
+ *   code is the HTTP-status that gets send as part of the response (defaults to 200)
+ *   mime is the mime-type that gets send as part of the response (defaults to "text/plain;charset=UTF-8")
+ *   headers is an object representing key (string) value (string or number) pairs that represent additional headers of the response (defaults to empty Object)
  */
 
 app.get('/hello', (_req, res, _params) => {
-  buildRes(res, 'Hello, World');
+  buildRes(res, 'Hello, World', { code: 200, mime: MIME.TEXT, headers: {} });
 });
 
 /**
@@ -245,7 +184,7 @@ app.get('/hello', (_req, res, _params) => {
  *
  * res is passed by EZServer as the second argument to every resFunction
  * filePath is the path to the file that should be send to resolve the request
- * statusCode is the HTTP-status that should be send as part of the response (default 200 when omitted)
+ * statusCode is the HTTP-status that should be send as part of the response (defaults to 200 when omitted)
  *
  * Note: serveFromFS uses buildRes() internally
  */
