@@ -66,26 +66,31 @@ export class App {
   //#endregion
 
   constructor() {
-    this.m_http_server = createServer((req, res) => {
-      const [uri, query_str] = decodeURIComponent(req.url).split('?');
-
-      /**@type {EZIncomingMessage}*/
-      const ez_incoming_msg = Object.assign(req, { uri });
-
-      const query = set_query_parameters(query_str);
+    this.m_http_server = createServer((/**@type {EZIncomingMessage}*/ req, res) => {
+      /** @type {LUT<string>} */
+      const query = {};
       /**@type {LUT<string> & {"*"?: string[]}}*/
       const route = {};
 
-      const fn =
-        this.#rest_endpoint(ez_incoming_msg) ||
-        this.#endpoint(ez_incoming_msg) ||
-        this.#rest_endpoint_with_params(ez_incoming_msg, route) ||
-        this.#endpoint_with_params(ez_incoming_msg, route) ||
-        this.#rest_endpoint_with_wildcard(ez_incoming_msg, route) ||
-        this.#endpoint_with_wildcard(ez_incoming_msg, route);
+      const url = req.url;
+      const uri_end_idx = url.indexOf('?');
+      if (uri_end_idx === -1) {
+        req.uri = decodeURIComponent(url);
+      } else {
+        req.uri = decodeURIComponent(url.slice(0, uri_end_idx - 1));
+        set_query_parameters(decodeURIComponent(url.slice(uri_end_idx + 1)), query);
+      }
 
-      if (fn === false) throw404(ez_incoming_msg, res);
-      else fn(ez_incoming_msg, res, new Params(query, route));
+      const fn =
+        this.#rest_endpoint(req) ||
+        this.#endpoint(req) ||
+        this.#rest_endpoint_with_params(req, route) ||
+        this.#endpoint_with_params(req, route) ||
+        this.#rest_endpoint_with_wildcard(req, route) ||
+        this.#endpoint_with_wildcard(req, route);
+
+      if (fn === false) throw404(req, res);
+      else fn(req, res, new Params(query, route));
     });
   }
 
