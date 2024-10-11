@@ -1,10 +1,10 @@
 //#region imports
-import { readFile } from 'node:fs';
+import { readFile } from 'node:fs/promises';
 
-import { ERR, LOG, WRN, data, err } from '@peter-schweitzer/ez-utils';
+import { ERR, LOG, WRN, data, err, p2eo } from '@peter-schweitzer/ez-utils';
 
 /** @type {LUT<string>} */
-import mime_types from '../data/mimeTypes.json' with { 'type': 'json' };
+import mime_types from '../data/mimeTypes.json' with { type: 'json' };
 import { RingBuffer } from './RingBuffer.js';
 //#endregion
 
@@ -215,28 +215,28 @@ export function throw404(req, res) {
 }
 
 /**
- * @param {string} filePathOrName path, or name of  the file
- * @returns {string} mime-type of the file (default 'text/plain')
- */
-function get_type(filePathOrName) {
-  const file_ending = filePathOrName.split('.').pop();
-  if (Object.hasOwn(mime_types, file_ending)) return mime_types[file_ending];
-  WRN(`mime-type for '${file_ending}' not found`);
-  return MIME.TEXT;
-}
-
-/**
  * @param {ServerResponse} res response from the Server
  * @param {string} filePath path of the file
- * @param {number} statusCode status code df the response (default 200)
- * @returns {void}
+ * @param {Object} [options={code: 200, mime: null}]
+ * @param {number} [options.code=200] status code of the response (default is 200)
+ * @param {string?} [options.mime=null] if set this overwrites the file-extension based lookup
+ * @returns {Promise<void>}
  */
-export function serveFromFS(res, filePath, statusCode = 200) {
+export async function serveFromFS(res, filePath, { code, mime } = { code: 200, mime: null }) {
   LOG('reading file from FS:', filePath);
-  readFile(filePath, (err, data) => {
-    if (err !== null) buildRes(res, `error while loading file from fs:\n${err}`, { code: 500, mime: MIME.TEXT });
-    else buildRes(res, data, { code: statusCode, mime: get_type(filePath) });
-  });
+  const { err, data } = await p2eo(readFile(filePath));
+  if (err !== null) return buildRes(res, `error while loading file from fs:\n${err}`, { code: 500, mime: MIME.TEXT });
+
+  if (mime === null) {
+    const file_ending = filePath.slice(filePath.lastIndexOf('.') + 1);
+    if (Object.hasOwn(mime_types, file_ending)) mime = mime_types[file_ending];
+    else {
+      WRN(`mime-type for '${file_ending}' not found`);
+      mime = MIME.TEXT;
+    }
+  }
+
+  buildRes(res, data, { code, mime });
 }
 
 /**
