@@ -98,9 +98,8 @@ export class App {
       if (fn === false) return throw404(req, res);
 
       for (const middleware of this.#middleware_stack) {
-        /** @type {string | undefined} */
-        // @ts-expect-error ts(2339) middleware_err is string or undefined (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining)
         const middleware_err = middleware.handle(req, res, query, route)?.err;
+
         if (middleware_err !== undefined) {
           WRN(`Error in Middleware '${middleware.name}':\n  '${middleware_err}'`);
           if (!middleware.strict) continue;

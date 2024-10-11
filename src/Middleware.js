@@ -27,9 +27,10 @@ export class Middleware {
    * @param {ServerResponse} res
    * @param {LUT<string>} query
    * @param {LUT<string> & {"*"?: string[]}} route
-   * @returns {Err|void}
+   * @returns {Err|undefined}
    */
   handle(req, res, query, route) {
-    return ERR(`fallback to default impl of Middleware (name: '${this.#name}')`);
+    ERR(`fallback to default impl of Middleware (name: '${this.#name}')`);
+    return;
   }
 }
