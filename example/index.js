@@ -68,7 +68,7 @@ app.add('/favicon.ico', (_req, res, _params) => {
 // for more info on the Params class look at the types-section
 
 // going to '/echo-route-params/first-param/second-param' will return 'first-param second-param'
-app.add('/echo-route-prams/:param1/:param2', (_req, res, params) => {
+app.add('/echo-route-params/:param1/:param2', (_req, res, params) => {
   buildRes(res, `${params.route('param1')} ${params.route('param2')}`);
 });
 
