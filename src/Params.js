@@ -16,10 +16,10 @@ export class Params {
   //#region getting params
   //#region query
   /**
+   * @template {string?} T
    * @param {string} name
    * @param {T} defaultValue
    * @returns {string|T}
-   * @template {string?} T
    */
   query(name = '', defaultValue = null) {
     if (Object.hasOwn(this.#query, name)) return this.#query[name];
@@ -27,27 +27,28 @@ export class Params {
   }
 
   /**
+   * @template {number?} T
    * @param {string} name
    * @param {T} defaultValue
    * @returns {number|T}
-   * @template {number?} T
    */
   queryNumber(name = '', defaultValue = null) {
     const str = this.query(name, '');
     if (!str.length) return defaultValue;
 
     const num = Number(str);
-    return isNaN(num) ? defaultValue : num;
+    if (Number.isNaN(num)) return defaultValue;
+    else return num;
   }
   //#endregion
 
   //#region route
   /**
+   * @template {string} [S='']
+   * @template {string} [T=null]
    * @param {S} [name='']
    * @param {T} [defaultValue=null]
    * @returns {S extends '' ? T : ((S extends '*' ? string[] : string) | T) }
-   * @template {string} [S='']
-   * @template {string} [T=null]
    */
   // @ts-ignore ts(2322)
   route(name = '', defaultValue = null) {
@@ -58,17 +59,18 @@ export class Params {
   }
 
   /**
+   * @template {number?} T
    * @param {string} name
    * @param {T} defaultValue
    * @returns {number|T}
-   * @template {number?} T
    */
   routeNumber(name = '', defaultValue = null) {
     const str = this.route(name, '');
     if (!str.length) return defaultValue;
 
     const num = Number(str);
-    return isNaN(num) ? defaultValue : num;
+    if (Number.isNaN(num)) return defaultValue;
+    else return num;
   }
   //#endregion
   //#endregion
