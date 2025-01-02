@@ -28,10 +28,12 @@ function add_ResFunction_with_params(root, uri, fn, method = null) {
     }
   }
 
-  const leaf = { fn, has_params: true, params };
-
   if (!Object.hasOwn(tree_ptr, 'twig')) tree_ptr.twig = {};
   const twig = tree_ptr.twig;
+
+  /** @type {TreeLeaf<true>} */
+  const leaf = { fn, has_params: true, params };
+
   if (method === null) twig.fn = leaf;
   else if (!Object.hasOwn(twig, 'rest')) twig.rest = { [method]: leaf };
   else twig.rest[method] = leaf;

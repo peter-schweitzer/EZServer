@@ -99,8 +99,8 @@ export class App {
    * @returns {void}
    */
   get(uri, fn) {
-    add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#rest_endpoints_with_wildcard.GET, uri, fn, 'GET');
     LOG('added get:', uri);
+    add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#rest_endpoints_with_wildcard.GET, uri, fn, 'GET');
   }
 
   /**
@@ -109,8 +109,8 @@ export class App {
    * @returns {void}
    */
   head(uri, fn) {
-    add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#rest_endpoints_with_wildcard.HEAD, uri, fn, 'HEAD');
     LOG('added head:', uri);
+    add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#rest_endpoints_with_wildcard.HEAD, uri, fn, 'HEAD');
   }
 
   /**
@@ -119,8 +119,8 @@ export class App {
    * @returns {void}
    */
   post(uri, fn) {
-    add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#rest_endpoints_with_wildcard.POST, uri, fn, 'POST');
     LOG('added post:', uri);
+    add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#rest_endpoints_with_wildcard.POST, uri, fn, 'POST');
   }
 
   /**
@@ -129,8 +129,8 @@ export class App {
    * @returns {void}
    */
   put(uri, fn) {
-    add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#rest_endpoints_with_wildcard.PUT, uri, fn, 'PUT');
     LOG('added put:', uri);
+    add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#rest_endpoints_with_wildcard.PUT, uri, fn, 'PUT');
   }
 
   /**
@@ -139,8 +139,8 @@ export class App {
    * @returns {void}
    */
   delete(uri, fn) {
-    add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#rest_endpoints_with_wildcard.DELETE, uri, fn, 'DELETE');
     LOG('added delete:', uri);
+    add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#rest_endpoints_with_wildcard.DELETE, uri, fn, 'DELETE');
   }
 
   /**
@@ -149,8 +149,8 @@ export class App {
    * @returns {void}
    */
   connect(uri, fn) {
-    add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#rest_endpoints_with_wildcard.CONNECT, uri, fn, 'CONNECT');
     LOG('added connect:', uri);
+    add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#rest_endpoints_with_wildcard.CONNECT, uri, fn, 'CONNECT');
   }
 
   /**
@@ -159,8 +159,8 @@ export class App {
    * @returns {void}
    */
   options(uri, fn) {
-    add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#rest_endpoints_with_wildcard.OPTIONS, uri, fn, 'OPTIONS');
     LOG('added options:', uri);
+    add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#rest_endpoints_with_wildcard.OPTIONS, uri, fn, 'OPTIONS');
   }
 
   /**
@@ -169,8 +169,8 @@ export class App {
    * @returns {void}
    */
   trace(uri, fn) {
-    add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#rest_endpoints_with_wildcard.TRACE, uri, fn, 'TRACE');
     LOG('added trace:', uri);
+    add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#rest_endpoints_with_wildcard.TRACE, uri, fn, 'TRACE');
   }
 
   /**
@@ -179,8 +179,8 @@ export class App {
    * @returns {void}
    */
   patch(uri, fn) {
-    add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#rest_endpoints_with_wildcard.PATCH, uri, fn, 'PATCH');
     LOG('added patch:', uri);
+    add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#rest_endpoints_with_wildcard.PATCH, uri, fn, 'PATCH');
   }
   //#endregion
 
@@ -191,8 +191,8 @@ export class App {
    * @returns {void}
    */
   add(uri, fn) {
-    const leaf = add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#endpoints_with_wildcard, uri, fn);
     LOG('added:', uri);
+    add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#endpoints_with_wildcard, uri, fn);
   }
   //#endregion
   //#endregion
