@@ -4,18 +4,20 @@
  * @typedef {import('http').ServerResponse} ServerResponse
  *
  * @typedef {import('./Params').Params} Params
- *
+ */
+
+/**
  * @typedef {"GET"|"HEAD"|"POST"|"PUT"|"DELETE"|"CONNECT"|"OPTIONS"|"TRACE"|"PATCH"} Methods
  * @typedef {IncomingMessage & {uri: string}} EZIncomingMessage
  * @typedef {(req: EZIncomingMessage, res: ServerResponse, params: Params) => void} ResFunction
+ */
+
+/**
  * @typedef {LUT<{fn?: ResFunction, rest?: {[method in Methods]?: ResFunction}}>} ResolverLUT
- * @typedef {"GET"|"HEAD"|"POST"|"PUT"|"DELETE"|"CONNECT"|"OPTIONS"|"TRACE"|"PATCH"} Methods
- *
  * @typedef {{fn: ResFunction, params: [number, string][]}} WildcardLeaf
  * @typedef {{route?: LUT<WildcardTreeNode>, param?: WildcardTreeNode, leaf?: WildcardLeaf}} WildcardTreeNode
  * @typedef {{depth: number, root: WildcardTreeNode}} ResolverTreeContainer
  */
-
 /**
  * @template {boolean} P
  * @typedef {{fn: ResFunction} & (P extends true ? {has_params: true, params: [number, string][]} : {has_params: false})} TreeLeaf<P>

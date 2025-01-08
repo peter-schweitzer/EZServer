@@ -13,7 +13,7 @@
  ** ================ Setup ===================
  */
 
-import { App, MIME, buildRes, getBodyJSON, serveFromFS, throw404 } from '../index.js';
+import { App, buildRes, getBodyJSON, MIME, serveFromFS, throw404 } from '../index.js';
 
 const app = new App();
 app.listen(65535);
@@ -25,6 +25,7 @@ app.listen(65535);
 // An Endpoint resolves the specified URI.
 
 /* ================ without param =================== */
+
 // Endpoints without parameters have the highest specificity, so they get matched first
 
 // these are the most specific, as they only resolve a specific URI, requested via a specific method (also supports head, connect and trace)

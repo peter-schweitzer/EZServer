@@ -38,18 +38,21 @@ export class App {
 
   constructor() {
     this.m_http_server = createServer((/**@type {EZIncomingMessage}*/ req, res) => {
+      //#region variables
       /** @type {LUT<string>} */
       const query = {};
       /**@type {LUT<string> & {"*"?: string[]}}*/
       const route = {};
+      //#endregion
 
+      //#region parsing out URL & query parameters
       const url = req.url;
       const uri_end_idx = url.indexOf('?');
-      if (uri_end_idx === -1) {
-        req.uri = decodeURIComponent(url);
-      } else {
+      if (uri_end_idx === -1) req.uri = decodeURIComponent(url);
+      else {
         req.uri = decodeURIComponent(url.slice(0, uri_end_idx));
 
+        //#region parsing out query parameters
         const query_string = decodeURIComponent(url.slice(uri_end_idx + 1));
         if (query_string.length > 0) {
           const pairs = query_string.split('&');
@@ -58,7 +61,9 @@ export class App {
             if (key.length !== 0 && value?.length !== 0) query[key] = value;
           }
         }
+        //#endregion
       }
+      //#endregion
 
       const fn =
         get_endpoint(this.#endpoints, req) ||

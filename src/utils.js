@@ -106,14 +106,14 @@ export async function getBodyJSON(req) {
  */
 export function getCookies(req) {
   if (!Object.hasOwn(req.headers, 'cookie')) return err('no cookie header present');
-  
+
   const cookies = req.headers.cookie;
-  if (cookies === null) return err("cookie header is null");
+  if (cookies === null) return err('cookie header is null');
 
   /** @type {LUT<string>} */
-  const cookie_lut = {}
+  const cookie_lut = {};
   for (const crumb of cookies.split('; ')) {
-    const [k, v] = crumb.split("=")
+    const [k, v] = crumb.split('=');
     cookie_lut[k] = v;
   }
   return data(cookie_lut);
