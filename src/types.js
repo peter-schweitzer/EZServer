@@ -13,14 +13,21 @@
  */
 
 /**
- * @typedef {LUT<{fn?: ResFunction, rest?: {[method in Methods]?: ResFunction}}>} ResolverLUT
- * @typedef {{fn: ResFunction, params: [number, string][]}} WildcardLeaf
+ * @typedef {{handle: (req: EZIncomingMessage, res: ServerResponse, query: LUT<string>) => Err?}} AppMiddleware
+ * @typedef {{handle: (req: EZIncomingMessage, res: ServerResponse, query: LUT<string>, route: LUT<string> & {"*"?: string[]}) => void|string}} Middleware
+ * @typedef {{use: (middleware: Middleware) => MiddlewareCurry}} MiddlewareCurry
+ */
+
+/**
+ * @typedef {{fn:  ResFunction, middleware: FalseOr<Middleware[]>}} ResolverLeaf
+ * @typedef {LUT<{fn?: ResolverLeaf, rest?: {[method in Methods]?: ResolverLeaf}}>} ResolverLUT
+ * @typedef {{fn: ResolverLeaf, params: [number, string][]}} WildcardLeaf
  * @typedef {{route?: LUT<WildcardTreeNode>, param?: WildcardTreeNode, leaf?: WildcardLeaf}} WildcardTreeNode
  * @typedef {{depth: number, root: WildcardTreeNode}} ResolverTreeContainer
  */
 /**
  * @template {boolean} P
- * @typedef {{fn: ResFunction} & (P extends true ? {has_params: true, params: [number, string][]} : {has_params: false})} TreeLeaf<P>
+ * @typedef {ResolverLeaf & (P extends true ? {has_params: true, params: [number, string][]} : {has_params: false})} TreeLeaf<P>
  */
 /**
  * @template {boolean} P

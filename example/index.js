@@ -1,18 +1,22 @@
 /**
  ** TOC:
- *  - setup .................... #L13
- *  - endpoints ................ #L22
- *    - without parameters ..... #L27
- *    - with parameters ........ #L64
- *    - with wildcard .......... #L80
- *  - types .................... #L94
- *  - utility functions ........ #L139
+ *  - setup .................... #L15
+ *  - endpoints ................ #L25
+ *    - without parameters ..... #L31
+ *    - with parameters ........ #L69
+ *    - with wildcard .......... #L85
+ *  - middleware ............... #L98
+ *    - general middleware ..... #L106
+ *    - specific middleware .... #L114
+ *  - types .................... #L126
+ *  - utility functions ........ #L177
  */
 
 /**
  ** ================ Setup ===================
  */
 
+import { LOG } from '@peter-schweitzer/ez-utils';
 import { App, buildRes, getBodyJSON, MIME, serveFromFS, throw404 } from '../index.js';
 
 const app = new App();
@@ -92,6 +96,34 @@ app.add('/wildcard/:*', (_req, res, params) => {
 });
 
 /**
+ ** ================ middleware ===================
+ */
+
+// Middleware gets called in order of adding them
+// Middleware gets passed the underlying 'query' and 'route' LUT
+// When the request gets resolved (i.e. by calling buildRes()) within middleware the rest of the middleware stack and the ResFunction (or 404 function) won't get called
+
+/* ================ general middleware =================== */
+
+// To use middleware that gets called on every request call app.use() with a Middleware
+// Calling app.use() also returns app so you can chain .use() calls and/or register middleware directly after instantiating
+
+// you can see the below debug output in the terminal on every request
+app.use({ handle: (req, res, query, route) => LOG(`handeling request for '${req.url}', with method '${req.method}'`) });
+
+/* ================ specific middleware =================== */
+
+// By calling use() on MiddlewareCurry you can add middleware to a specific ResFunction
+
+// going to '/middleware/echo' will return "method: 'GET', url: '/middleware/echo', uri: '/middleware/echo'"
+app
+  .add('/middleware/echo', (req, res, params) => buildRes(res, 'this should not be seen'))
+  .use({ handle: (req, res, query, route) => buildRes(res, `method: '${req.method}', url: '${req.url}', uri: '${req.uri}', query: '${JSON.stringify(query)}'`) });
+
+// going to '/middleware/error' will return 'middleware error'
+app.add('/middleware/error', (req, res, params) => buildRes(res, 'this should not be seen')).use({ handle: (req, res, query, params) => 'middleware error' });
+
+/**
  ** ================ Types ===================
  */
 
@@ -134,6 +166,12 @@ app.add('/echo-msg', (_req, res, params) => {
  ** EZIncomingMessage
  * EZIncoming is like IncomingMessage from node:http but has the property 'uri', which is like 'url' but without the query parameters
  * The query parameters are in the params object
+ */
+
+/**
+ ** MiddlewareCurry
+ * When registering a ResFunction the underlying data structure gets curried into the .use() function.
+ * Calling use() on a MiddlewareCurry returns the MiddlewareCurry object, so you can chain .use() calls to add multiple middlewares to the same ResFunction.
  */
 
 /**

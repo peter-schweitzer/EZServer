@@ -5,7 +5,7 @@ import { RingBuffer } from './RingBuffer.js';
  * @param {string} uri
  * @param {ResFunction} fn
  * @param {Methods} [method=null]
- * @returns {void}
+ * @returns {ResolverLeaf}
  */
 function add_ResFunction_with_params(root, uri, fn, method = null) {
   /** @type {TreeNode<boolean>} */
@@ -32,24 +32,26 @@ function add_ResFunction_with_params(root, uri, fn, method = null) {
   const twig = tree_ptr.twig;
 
   /** @type {TreeLeaf<true>} */
-  const leaf = { fn, has_params: true, params };
+  const leaf = { fn, middleware: false, has_params: true, params };
 
   if (method === null) twig.fn = leaf;
   else if (!Object.hasOwn(twig, 'rest')) twig.rest = { [method]: leaf };
   else twig.rest[method] = leaf;
+
+  return leaf;
 }
 
 /**
  * @param {ResolverTreeContainer} tree_container
  * @param {string} uri
  * @param {ResFunction} fn
- * @returns {void}
+ * @returns {ResolverLeaf}
  */
 function add_ResFunction_with_wildcard(tree_container, uri, fn) {
   if (uri === '/:*') {
     if (tree_container.depth === 0) tree_container.depth = 1;
-    tree_container.root.leaf = { fn, params: [] };
-    return;
+    tree_container.root.leaf = { fn: { fn, middleware: [] }, params: [] };
+    return tree_container.root.leaf.fn;
   }
 
   const parts = uri.slice(1, -3).split('/');
@@ -74,7 +76,8 @@ function add_ResFunction_with_wildcard(tree_container, uri, fn) {
     }
   }
 
-  tree_ptr.leaf = { fn, params };
+  tree_ptr.leaf = { fn: { fn, middleware: false }, params };
+  return tree_ptr.leaf.fn;
 }
 
 /**
@@ -84,28 +87,33 @@ function add_ResFunction_with_wildcard(tree_container, uri, fn) {
  * @param {string} uri
  * @param {ResFunction} fn
  * @param {Methods} method
- * @returns {void}
+ * @returns {ResolverLeaf}
  */
 export function add_endpoint_to_corresponding_lut(lut_without_params, tree_with_params, lut_with_wildcard, uri, fn, method = null) {
   if (uri.includes('/:'))
-    if (uri.includes('/:*/')) return;
-    // cant have wildcard in middle of uri and don't handle wildcards in this class
-    else if (uri.endsWith('/:*')) add_ResFunction_with_wildcard(lut_with_wildcard, uri, fn);
-    else add_ResFunction_with_params(tree_with_params, uri, fn, method);
+    if (uri.includes('/:*/')) return null;
+    // cant have wildcard in middle of uri
+    else if (uri.endsWith('/:*')) return add_ResFunction_with_wildcard(lut_with_wildcard, uri, fn);
+    else return add_ResFunction_with_params(tree_with_params, uri, fn, method);
   else {
     if (!Object.hasOwn(lut_without_params, uri)) lut_without_params[uri] = {};
-    const leaf = lut_without_params[uri];
+    const twig = lut_without_params[uri];
 
-    if (method === null) leaf.fn = fn;
-    else if (!Object.hasOwn(leaf, 'rest')) lut_without_params[uri].rest = { [method]: fn };
-    else leaf.rest[method] = fn;
+    /** @type {ResolverLeaf} */
+    const leaf = { fn, middleware: false };
+
+    if (method === null) twig.fn = leaf;
+    else if (!Object.hasOwn(twig, 'rest')) twig.rest = { [method]: leaf };
+    else twig.rest[method] = leaf;
+
+    return leaf;
   }
 }
 
 /**
  * @param {ResolverLUT} endpoints
  * @param {EZIncomingMessage} req
- * @returns {FalseOr<ResFunction>}
+ * @returns {FalseOr<ResolverLeaf>}
  */
 export function get_endpoint(endpoints, { uri, method }) {
   if (!Object.hasOwn(endpoints, uri)) return false;
@@ -120,11 +128,11 @@ export function get_endpoint(endpoints, { uri, method }) {
  * @param {TreeNode<false>} endpoints
  * @param {EZIncomingMessage} req
  * @param {LUT<string> & {'*'?: string[]}} route_params
- * @returns {FalseOr<ResFunction>}
+ * @returns {FalseOr<ResolverLeaf>}
  */
 export function get_endpoint_with_param(endpoints, { uri, method }, route_params) {
   if (uri === '/')
-    if (Object.hasOwn(endpoints, 'twig')) return endpoints.twig.fn.fn;
+    if (Object.hasOwn(endpoints, 'twig')) return endpoints.twig.fn;
     else return false;
 
   const parts = uri.slice(1).split('/');
@@ -162,7 +170,7 @@ export function get_endpoint_with_param(endpoints, { uri, method }, route_params
  * @param {ResolverTreeContainer} tree_container
  * @param {EZIncomingMessage} req
  * @param {LUT<string> & {'*'?: string[]}} route_params
- * @returns {FalseOr<ResFunction>}
+ * @returns {FalseOr<ResolverLeaf>}
  */
 export function get_endpoint_with_wildcard({ depth: n, root }, { uri }, route_params) {
   if (uri === '/' || n === 0) return false;
@@ -176,7 +184,7 @@ export function get_endpoint_with_wildcard({ depth: n, root }, { uri }, route_pa
   const rbq = new RingBuffer(2 ** (max_traversal_depth - (max_traversal_depth > 4 ? (max_traversal_depth - 1) >> 1 : 1)));
   rbq.enqueue({ i: 0, node: root });
 
-  /** @type {ResFunction} */
+  /** @type {ResolverLeaf} */
   let fn;
   /** @type {[number, string][]} */
   let params;
