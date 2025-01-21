@@ -149,13 +149,14 @@ export function get_endpoint_with_param(endpoints, { uri, method }, route_params
       if (!Object.hasOwn(ptr, 'twig')) continue;
       const twig = ptr.twig;
 
+      /** @type {TreeLeaf<boolean>} */
       let leaf;
       if (Object.hasOwn(twig, 'rest') && Object.hasOwn(twig.rest, method)) leaf = twig.rest[method];
       else if (Object.hasOwn(twig, 'fn')) leaf = twig.fn;
       else continue;
 
       if (leaf.has_params) for (const [idx, name] of leaf.params) route_params[name] = parts[idx];
-      return leaf.fn;
+      return leaf;
     }
 
     const next = i + 1;

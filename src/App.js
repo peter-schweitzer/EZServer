@@ -70,7 +70,7 @@ export class App {
       //#endregion
 
       //#region "global" middleware
-      if (this.#middleware.length > 0 && handle_middleware(this.#middleware, req, res, query, route)) return;
+      if (this.#middleware.length > 0 && !handle_middleware(this.#middleware, req, res, query, route)) return;
       //#endregion
 
       //#region routing
@@ -84,6 +84,7 @@ export class App {
       const { fn, middleware } = leaf;
 
       if (handle_middleware(middleware, req, res, query, route)) fn(req, res, new Params(query, route));
+      //#endregion
     });
   }
 
