@@ -71,40 +71,43 @@ export async function serveFromFS(res, filePath, { code, mime } = { code: 200, m
 
 /**
  * @param {IncomingMessage} req
+ * @param {{}} [obj={}] intended to be used for object pooling
  * @return {AsyncErrorOr<string>} - may return empty string
  */
-export function getBodyText(req) {
+export function getBodyText(req, obj = {}) {
   return new Promise((resolve, _) => {
     let buff = '';
 
     req.on('data', (chunk) => (buff += chunk.toString('utf8')));
-    req.on('end', () => resolve(data(buff)));
-    req.on('error', (e) => resolve(err(`error '${e.name}' while accumulating request body: '${e.message}'`)));
+    req.on('end', () => resolve(data(buff, obj)));
+    req.on('error', (e) => resolve(err(`error '${e.name}' while accumulating request body: '${e.message}'`, obj)));
   });
 }
 
 /**
  * @param {IncomingMessage} req
+ * @param {{}} [obj={}] intended to be used for object pooling
  * @return {AsyncErrorOr<any>}
  */
-export async function getBodyJSON(req) {
-  const eo_txt = await getBodyText(req);
+export async function getBodyJSON(req, obj = {}) {
+  const eo_txt = await getBodyText(req, obj);
   if (eo_txt.err !== null) return eo_txt;
   if (eo_txt.data === '') return err('request body is empty');
 
   try {
-    return data(JSON.parse(eo_txt.data));
+    return data(JSON.parse(eo_txt.data), obj);
   } catch (e) {
     ERR(`${'\x1b[32;1m'}error in getBodyJSON caused by JSON.parse:${'\x1b[0m'}\n  ${e}`);
-    return err(`error while parsing request body: '${typeof e === 'string' ? e : JSON.stringify(e)}'`);
+    return err(`error while parsing request body: '${typeof e === 'string' ? e : JSON.stringify(e)}'`, obj);
   }
 }
 
 /**
  * @param {IncomingMessage} req
+ * @param {{}} [obj={}] intended to be used for object pooling
  * @return {ErrorOr<LUT<string>>}
  */
-export function getCookies(req) {
+export function getCookies(req, obj = {}) {
   if (!Object.hasOwn(req.headers, 'cookie')) return err('no cookie header present');
 
   const cookies = req.headers.cookie;
