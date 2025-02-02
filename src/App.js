@@ -58,13 +58,12 @@ export class App {
 
         //#region parsing out query parameters
         const query_string = decodeURIComponent(url.slice(uri_end_idx + 1));
-        if (query_string.length > 0) {
-          const pairs = query_string.split('&');
-          for (const kv of pairs) {
+        if (query_string.length !== 0)
+          for (const kv of query_string.split('&')) {
             const [key, value] = kv.split('=');
-            if (key.length !== 0 && value?.length !== 0) query[key] = value;
+            if (key.length === 0 || value === undefined || value.length === 0) continue;
+            else query[key] = value;
           }
-        }
         //#endregion
       }
       //#endregion
