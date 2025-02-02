@@ -4,15 +4,14 @@ import { WRN } from '@peter-schweitzer/ez-utils';
 export class RingBuffer {
   /** @type {Array<T|undefined>} */
   #buf_arr;
+  get size() {
+    return this.#buf_arr.length;
+  }
 
   /** @type {number} */
   #length;
   get length() {
     return this.#length;
-  }
-
-  get size() {
-    return this.#buf_arr.length;
   }
 
   /** @type {number} */
