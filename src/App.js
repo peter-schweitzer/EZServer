@@ -37,11 +37,11 @@ export class App {
   //#endregion
   //#endregion
 
-  /** @type {Middleware[]} */
-  #middleware = [];
+  /** @type {FalseOr<Middleware[]>} */
+  #middleware = false;
 
   constructor() {
-    this.m_http_server = createServer((/**@type {EZIncomingMessage}*/ req, res) => {
+    this.m_http_server = createServer(async (/**@type {EZIncomingMessage}*/ req, res) => {
       //#region variables
       /** @type {LUT<string>} */
       const query = {};
@@ -69,7 +69,7 @@ export class App {
       //#endregion
 
       //#region "global" middleware
-      if (this.#middleware.length > 0 && !handle_middleware(this.#middleware, req, res, query, route)) return;
+      if (!(await handle_middleware(this.#middleware, req, res, query, route))) return;
       //#endregion
 
       //#region routing
@@ -82,7 +82,7 @@ export class App {
       if (leaf === false) return throw404(req, res);
       const { fn, middleware } = leaf;
 
-      if (handle_middleware(middleware, req, res, query, route)) fn(req, res, new Params(query, route));
+      if (await handle_middleware(middleware, req, res, query, route)) fn(req, res, new Params(query, route));
       //#endregion
     });
   }
@@ -228,6 +228,8 @@ export class App {
    * @returns {this}
    */
   use(middleware) {
+    if(this.#middleware === false) this.#middleware = [];
+    
     this.#middleware.push(middleware);
     return this;
   }

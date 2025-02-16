@@ -25,15 +25,15 @@ export function curry_middleware(leaf) {
  * @param {ServerResponse} res
  * @param {LUT<string>} query
  * @param {LUT<string> & {"*"?: string[]}} route
- * @returns {boolean} wether to do routing and or call ResFunction
+ * @returns {Promise<boolean>} wether to do routing and or call ResFunction
  */
-export function handle_middleware(middleware, req, res, query, route) {
+export async function handle_middleware(middleware, req, res, query, route) {
   if (middleware === false) return true;
 
-  for (const { handle } of middleware) {
+  for (const mw of middleware) {
     /**@type {undefined|string} */
     //@ts-ignore ts-server back at it again void != undefined :skull:
-    const middleware_err = handle(req, res, query, route);
+    const middleware_err = mw.handle(req, res, query, route);
     if (middleware_err !== undefined) {
       if (res.writableEnded) ERR(`error in middleware (request got resolved):\n  ${middleware_err}`);
       else buildRes(res, middleware_err, { code: 500 });
