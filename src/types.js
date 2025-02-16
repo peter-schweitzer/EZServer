@@ -14,7 +14,7 @@
 
 /**
  * @typedef {{handle: (req: EZIncomingMessage, res: ServerResponse, query: LUT<string>) => Err?}} AppMiddleware
- * @typedef {{handle: (req: EZIncomingMessage, res: ServerResponse, query: LUT<string>, route: LUT<string> & {"*"?: string[]}) => void|string}} Middleware
+ * @typedef {{handle: (req: EZIncomingMessage, res: ServerResponse, query: LUT<string>, route: LUT<string> & {"*"?: string[]}) => Promise<void|string>}} Middleware
  * @typedef {{use: (middleware: Middleware) => MiddlewareCurry}} MiddlewareCurry
  */
 
