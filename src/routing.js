@@ -182,7 +182,7 @@ export function get_endpoint_with_wildcard({ depth: n, root }, { uri }, route_pa
   // heuristic approach to minimize memory usage for long URIs:
   //   the longer the URI, the less likely to have multiple possible paths in the ResolverTree.
   /** @type {RingBuffer<{i: number, node: WildcardTreeNode}>} */
-  const rbq = new RingBuffer(2 ** (max_traversal_depth - (max_traversal_depth > 4 ? (max_traversal_depth - 1) >> 1 : 1)));
+  const rbq = new RingBuffer(1 << (max_traversal_depth - (max_traversal_depth > 4 ? (max_traversal_depth - 1) >> 1 : 1)));
   rbq.enqueue({ i: 0, node: root });
 
   /** @type {ResolverLeaf} */

@@ -228,8 +228,8 @@ export class App {
    * @returns {this}
    */
   use(middleware) {
-    if(this.#middleware === false) this.#middleware = [];
-    
+    if (this.#middleware === false) this.#middleware = [];
+
     this.#middleware.push(middleware);
     return this;
   }
