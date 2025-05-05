@@ -109,7 +109,7 @@ app.add('/wildcard/:*', (_req, res, params) => {
 // Calling app.use() also returns app so you can chain .use() calls and/or register middleware directly after instantiating
 
 // you can see the below debug output in the terminal on every request
-app.use({ handle: (req, res, query, route) => LOG(`handeling request for '${req.url}', with method '${req.method}'`) });
+app.use({ handle: async (req, res, query, route) => LOG(`handeling request for '${req.url}', with method '${req.method}'`) });
 
 /* ================ specific middleware =================== */
 
@@ -118,10 +118,10 @@ app.use({ handle: (req, res, query, route) => LOG(`handeling request for '${req.
 // going to '/middleware/echo' will return "method: 'GET', url: '/middleware/echo', uri: '/middleware/echo'"
 app
   .add('/middleware/echo', (req, res, params) => buildRes(res, 'this should not be seen'))
-  .use({ handle: (req, res, query, route) => buildRes(res, `method: '${req.method}', url: '${req.url}', uri: '${req.uri}', query: '${JSON.stringify(query)}'`) });
+  .use({ handle: async (req, res, query, route) => buildRes(res, `method: '${req.method}', url: '${req.url}', uri: '${req.uri}', query: '${JSON.stringify(query)}'`) });
 
 // going to '/middleware/error' will return 'middleware error'
-app.add('/middleware/error', (req, res, params) => buildRes(res, 'this should not be seen')).use({ handle: (req, res, query, params) => 'middleware error' });
+app.add('/middleware/error', (req, res, params) => buildRes(res, 'this should not be seen')).use({ handle: async (req, res, query, params) => 'middleware error' });
 
 /**
  ** ================ Types ===================
