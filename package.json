@@ -32,7 +32,9 @@
   "scripts": {
     "example": "cd example && node .",
     "test:line-count": "./tests/line-count/run.sh",
-    "test:multi-module": "./test/multi-module/run.sh"
+    "test:multi-module": "./tests/multi-module/run.sh",
+    "test:multi-module:cjs": "./tests/multi-module/cjs/run.sh",
+    "test:multi-module:jsm": "./tests/multi-module/jsm/run.sh"
   },
   "reveal": true,
   "dependencies": {
