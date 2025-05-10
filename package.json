@@ -39,5 +39,17 @@
   "reveal": true,
   "dependencies": {
     "@peter-schweitzer/ez-utils": "^0.6.2"
+  },
+  "devDependencies": {
+    "prettier": "^3.5.3"
+  },
+  "prettier": {
+    "printWidth": 200,
+    "singleQuote": true,
+    "bracketSameLine": true,
+    "experimentalTernaries": true,
+    "arrowParens": "avoid",
+    "useTabs": false,
+    "tabWidth": 2
   }
 }
