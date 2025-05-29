@@ -48,7 +48,7 @@
     "singleQuote": true,
     "bracketSameLine": true,
     "experimentalTernaries": true,
-    "arrowParens": "avoid",
+    "arrowParens": "always",
     "useTabs": false,
     "tabWidth": 2
   }
