@@ -7,15 +7,24 @@ repos:
         language: system
         always_run: true
         pass_filenames: false
+
       - id: test:multi-module:cjs
         name: multi module - cjs
         entry: ./tests/multi-module/cjs/run.sh
         language: system
         always_run: true
         pass_filenames: false
+
       - id: test:multi-module:jsm
         name: multi module - jsm
         entry: ./tests/multi-module/jsm/run.sh
+        language: system
+        always_run: true
+        pass_filenames: false
+
+      - id: test:batteries:memo
+        name: multi module - jsm
+        entry: ./tests/batteries/memo/run.sh
         language: system
         always_run: true
         pass_filenames: false

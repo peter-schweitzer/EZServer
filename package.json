@@ -34,7 +34,9 @@
     "test:line-count": "./tests/line-count/run.sh",
     "test:multi-module": "./tests/multi-module/run.sh",
     "test:multi-module:cjs": "./tests/multi-module/cjs/run.sh",
-    "test:multi-module:jsm": "./tests/multi-module/jsm/run.sh"
+    "test:multi-module:jsm": "./tests/multi-module/jsm/run.sh",
+    "test:batteries": "./tests/batteries/run.sh",
+    "test:batteries:memo": "./tests/batteries/memo/run.sh"
   },
   "reveal": true,
   "dependencies": {
