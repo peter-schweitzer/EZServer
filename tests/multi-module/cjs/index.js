@@ -1,5 +1,5 @@
 (async () => {
-  const { App } = await import('@peter-schweitzer/ezserver');
+  const { App } = await import('../../../index.js');
   console.log('App:', App);
   process.exit(0);
 })();
