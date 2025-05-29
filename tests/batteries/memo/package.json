@@ -1,0 +1,6 @@
+{
+  "name": "ezserver-test-batteries-memo",
+  "type": "module",
+  "main": "index.js",
+  "author": "Peter Schweitzer"
+}
