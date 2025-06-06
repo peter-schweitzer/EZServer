@@ -15,7 +15,7 @@ echo "$lineCounts" | sed -E "s|( +)([0-9]+) total$|\1\x1b[9${color};49;1m\2/1000
 if [ $# -gt 0 ] && [ $1 = "--batteries" ]; then
   cd ../batteries
 
-  batteryLineCounts=$(wc -l */*)
+  batteryLineCounts=$(wc -l */* *.*)
   total_cnt=$(($cnt + $(echo "$batteryLineCounts" | grep total | sed -E "s| *([0-9]+) total$|\1|")))
 
   if [[ $total_cnt -gt 1000 ]]
