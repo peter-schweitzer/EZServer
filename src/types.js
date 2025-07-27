@@ -10,11 +10,12 @@
  * @typedef {"GET"|"HEAD"|"POST"|"PUT"|"DELETE"|"CONNECT"|"OPTIONS"|"TRACE"|"PATCH"} Methods
  * @typedef {IncomingMessage & {uri: string}} EZIncomingMessage
  * @typedef {(req: EZIncomingMessage, res: ServerResponse, params: Params) => void} ResFunction
+ * @typedef {LUT<string> & {"*"?: string[]}} RouteLUT
  */
 
 /**
  * @typedef {{handle: (req: EZIncomingMessage, res: ServerResponse, query: LUT<string>) => Err?}} AppMiddleware
- * @typedef {{handle: (req: EZIncomingMessage, res: ServerResponse, query: LUT<string>, route: LUT<string> & {"*"?: string[]}) => Promise<void|string>}} Middleware
+ * @typedef {{handle: (req: EZIncomingMessage, res: ServerResponse, query: LUT<string>, route: RouteLUT) => Promise<void|string>}} Middleware
  * @typedef {{use: (middleware: Middleware) => MiddlewareCurry}} MiddlewareCurry
  */
 
