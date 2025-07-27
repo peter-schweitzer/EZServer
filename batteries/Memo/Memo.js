@@ -37,27 +37,24 @@ export class Memo {
     };
 
     res._shs = res.setHeaders;
-    res.setHeaders = headers => {
+    res.setHeaders = (headers) => {
       for (const [k, v] of headers) res._head[k] = `${v}`;
       return res._shs(headers);
     };
 
     res._wh = res.writeHead;
-    res.writeHead = (statusCode, statusMessage, headers) => {
-      const head =
-        headers !== undefined ? headers
-        : statusMessage !== undefined && typeof statusMessage !== 'string' ? statusMessage
-        : [];
+    res.writeHead = (statusCode, statusMessageOrHeaders, headers) => {
+      const head = headers ?? (typeof statusMessageOrHeaders === 'object' ? statusMessageOrHeaders : {});
 
       for (const k in head) res._head[k] = `${head[k]}`;
 
-      return res._wh(statusCode, statusMessage, headers);
+      return res._wh(statusCode, statusMessageOrHeaders, headers);
     };
 
     res._w = res.write;
     res.write = (chunk, callback) => {
       if (typeof chunk === 'string') res._body += chunk;
-      else res._body += chunk.toString();
+      else res._body += `${chunk}`;
 
       return res._w(chunk, callback);
     };
