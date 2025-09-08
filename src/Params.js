@@ -1,12 +1,12 @@
 export class Params {
   /**@type {LUT<string>} */
   #query;
-  /**@type {LUT<string> & {"*"?: string[]}} */
+  /**@type {RouteLUT} */
   #route;
 
   /**
    * @param {LUT<string>} query
-   * @param {LUT<string> & {"*"?: string[]}} route
+   * @param {RouteLUT} route
    */
   constructor(query, route) {
     this.#query = query;
@@ -48,7 +48,7 @@ export class Params {
    * @template {string} [T=null]
    * @param {S} [name='']
    * @param {T} [defaultValue=null]
-   * @returns {S extends '' ? T : ((S extends '*' ? string[] : string) | T) }
+   * @returns {S extends '' ? T : (RouteLUT[S] | T) }
    */
   // @ts-ignore ts(2322)
   route(name = '', defaultValue = null) {

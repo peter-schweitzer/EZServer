@@ -24,7 +24,7 @@ export function curry_middleware(leaf) {
  * @param {EZIncomingMessage} req
  * @param {ServerResponse} res
  * @param {LUT<string>} query
- * @param {LUT<string> & {"*"?: string[]}} route
+ * @param {RouteLUT} route
  * @returns {Promise<boolean>} wether to do routing and or call ResFunction
  */
 export async function handle_middleware(middleware, req, res, query, route) {

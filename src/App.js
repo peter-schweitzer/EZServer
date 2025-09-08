@@ -45,7 +45,7 @@ export class App {
       //#region variables
       /** @type {LUT<string>} */
       const query = {};
-      /**@type {LUT<string> & {"*"?: string[]}}*/
+      /**@type {RouteLUT}*/
       const route = {};
       //#endregion
 
