@@ -101,8 +101,8 @@ export class App {
   async close() {
     return new Promise((resolve, _) => {
       this.m_http_server.close(function (err = null) {
-        if (err === null) WRN('server closed'), resolve(true);
-        else ERR(err), WRN("'close()' called, but server is already closed"), resolve(false);
+        if (err === null) (WRN('server closed'), resolve(true));
+        else (ERR(err), WRN("'close()' called, but server is already closed"), resolve(false));
       });
     });
   }
