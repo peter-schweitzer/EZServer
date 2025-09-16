@@ -1,4 +1,4 @@
-import { RingBuffer } from './RingBuffer.js';
+import { RingBuffer, WildcardQueueNode } from './RingBuffer.js';
 
 /**
  * @param {TreeNode<false>} root
@@ -181,9 +181,9 @@ export function get_endpoint_with_wildcard({ depth: n, root }, { uri }, route_pa
 
   // heuristic approach to minimize memory usage for long URIs:
   //   the longer the URI, the less likely to have multiple possible paths in the ResolverTree.
-  /** @type {RingBuffer<{i: number, node: WildcardTreeNode}>} */
+  /** @type {RingBuffer<WildcardQueueNode>} */
   const rbq = new RingBuffer(1 << (max_traversal_depth - (max_traversal_depth > 4 ? (max_traversal_depth - 1) >> 1 : 1)));
-  rbq.enqueue({ i: 0, node: root });
+  rbq.enqueue(new WildcardQueueNode(0, root));
 
   /** @type {ResolverLeaf} */
   let fn;
@@ -201,8 +201,8 @@ export function get_endpoint_with_wildcard({ depth: n, root }, { uri }, route_pa
 
     const uri_fragment = uri_fragments[i];
 
-    if (Object.hasOwn(node, 'param')) rbq.enqueue({ i: i + 1, node: node.param });
-    if (Object.hasOwn(node, 'route') && Object.hasOwn(node.route, uri_fragment)) rbq.enqueue({ i: i + 1, node: node.route[uri_fragment] });
+    if (Object.hasOwn(node, 'param')) rbq.enqueue(new WildcardQueueNode(i + 1, node.param));
+    if (Object.hasOwn(node, 'route') && Object.hasOwn(node.route, uri_fragment)) rbq.enqueue(new WildcardQueueNode(i + 1, node.route[uri_fragment]));
   }
 
   if (depth === -1) return false;

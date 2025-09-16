@@ -29,10 +29,10 @@ export class RingBuffer {
     const initial_size = 1 << initial_size_exp;
 
     LOG(`got initial size ${initialSize}, initializing with ${initial_size} (2^${initial_size_exp})`);
-    this.#buf_arr = new Array(initial_size);
-    this.#mask = initial_size - 1;
 
+    this.#buf_arr = new Array(initial_size);
     this.#length = 0;
+    this.#mask = initial_size - 1;
     this.#h = 0;
     this.#t = 0;
   }
@@ -71,5 +71,21 @@ export class RingBuffer {
     const ret = this.#buf_arr[idx];
     this.#buf_arr[idx] = undefined;
     return ret;
+  }
+}
+
+export class WildcardQueueNode {
+  /** @type {number} */
+  i;
+  /** @type {WildcardTreeNode} */
+  node;
+
+  /**
+   * @param {number} i
+   * @param {WildcardTreeNode} node
+   */
+  constructor(i, node) {
+    this.i = i;
+    this.node = node;
   }
 }
