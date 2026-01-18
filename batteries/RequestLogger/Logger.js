@@ -4,10 +4,10 @@ export class Logger {
   constructor() {}
 
   /**
-   * @param req {EZIncomingMessage}
-   * @param res {ServerResponse}
-   * @param query {{[k: string]: string}}
-   * @param route {{[k: string]: string} & { '*'? : string[] }}
+   * @param {EZIncomingMessage} req
+   * @param {ServerResponse} res
+   * @param {{[k: string]: string}} query
+   * @param {{[k: string]: string} & { '*'? : string[] }} route
    * @returns {Promise<void|string>}
    */
   async handle(req, res, query, route) {
@@ -23,7 +23,7 @@ export class Logger {
     c._(' ');
 
     const start = Date.now();
-    res.on('close', (_) => {
+    res.on('close', () => {
       const dt = Date.now() - start;
       const code = res.statusCode;
 
