@@ -45,9 +45,12 @@ assert(cache[uri].status_code === ftc.status, 'err');
 assert(cache[uri].status_message === ftc.statusText, 'err');
 
 const ignore_headers = ['keep-alive', 'connection', 'date'];
+
+/** @type {LUT<any>} */
 const expected_head = {};
 for (const [k, v] of ftc.headers) if (!ignore_headers.includes(k)) expected_head[k] = v;
 
+/** @type {LUT<any>} */
 const actual_head = {};
 for (const k in cache[uri].head) actual_head[k.toLowerCase()] = cache[uri].head[k];
 
