@@ -15,7 +15,7 @@ export class App {
   /** @type {ResolverLUT} */
   #endpoints = {};
 
-  /** @type {TreeNode<false>} */
+  /** @type {TreeNode} */
   #endpoints_with_params = {};
 
   //#region with wildcard

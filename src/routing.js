@@ -1,14 +1,14 @@
 import { RingBuffer, WildcardQueueNode } from './RingBuffer.js';
 
 /**
- * @param {TreeNode<false>} root
+ * @param {TreeNode} root
  * @param {string} uri
  * @param {ResFunction} fn
  * @param {Methods} [method=null]
  * @returns {ResolverLeaf}
  */
 function add_ResFunction_with_params(root, uri, fn, method = null) {
-  /** @type {TreeNode<boolean>} */
+  /** @type {TreeNode} */
   let tree_ptr = root;
   /** @type {[number, string][]} */
   const params = [];
@@ -31,8 +31,8 @@ function add_ResFunction_with_params(root, uri, fn, method = null) {
   if (!Object.hasOwn(tree_ptr, 'twig')) tree_ptr.twig = {};
   const twig = tree_ptr.twig;
 
-  /** @type {TreeLeaf<true>} */
-  const leaf = { fn, middleware: false, has_params: true, params };
+  /** @type {TreeLeaf} */
+  const leaf = { fn, middleware: false, params };
 
   if (method === null) twig.fn = leaf;
   else if (!Object.hasOwn(twig, 'rest')) twig.rest = { [method]: leaf };
@@ -50,14 +50,13 @@ function add_ResFunction_with_params(root, uri, fn, method = null) {
 function add_ResFunction_with_wildcard(tree_container, uri, fn) {
   if (uri === '/:*') {
     if (tree_container.depth === 0) tree_container.depth = 1;
-    tree_container.root.leaf = { fn: { fn, middleware: [] }, params: [] };
+    tree_container.root.leaf = { fn: { fn, middleware: false }, params: [] };
     return tree_container.root.leaf.fn;
   }
 
   const parts = uri.slice(1, -3).split('/');
   if (parts.length > tree_container.depth) tree_container.depth = parts.length;
 
-  /** @type {WildcardTreeNode} */
   let tree_ptr = tree_container.root;
   /** @type {[number, string][]} */
   const params = [];
@@ -82,7 +81,7 @@ function add_ResFunction_with_wildcard(tree_container, uri, fn) {
 
 /**
  * @param {ResolverLUT} lut_without_params
- * @param {TreeNode<false>} tree_with_params
+ * @param {TreeNode} tree_with_params
  * @param {ResolverTreeContainer} lut_with_wildcard
  * @param {string} uri
  * @param {ResFunction} fn
@@ -125,7 +124,7 @@ export function get_endpoint(endpoints, { uri, method }) {
 }
 
 /**
- * @param {TreeNode<false>} endpoints
+ * @param {TreeNode} endpoints
  * @param {EZIncomingMessage} req
  * @param {LUT<string> & {'*'?: string[]}} route_params
  * @returns {FalseOr<ResolverLeaf>}
@@ -136,7 +135,7 @@ export function get_endpoint_with_param(endpoints, { uri, method }, route_params
     else return false;
 
   const parts = uri.slice(1).split('/');
-  /** @type {{i: number, ptr: TreeNode<boolean>}[]} */
+  /** @type {{i: number, ptr: TreeNode}[]} */
   const buff = [];
 
   if (Object.hasOwn(endpoints, 'param')) buff.push({ ptr: endpoints.param, i: 1 });
@@ -149,13 +148,13 @@ export function get_endpoint_with_param(endpoints, { uri, method }, route_params
       if (!Object.hasOwn(ptr, 'twig')) continue;
       const twig = ptr.twig;
 
-      /** @type {TreeLeaf<boolean>} */
+      /** @type {TreeLeaf} */
       let leaf;
       if (Object.hasOwn(twig, 'rest') && Object.hasOwn(twig.rest, method)) leaf = twig.rest[method];
       else if (Object.hasOwn(twig, 'fn')) leaf = twig.fn;
       else continue;
 
-      if (leaf.has_params) for (const [idx, name] of leaf.params) route_params[name] = parts[idx];
+      for (const [idx, name] of leaf.params) route_params[name] = parts[idx];
       return leaf;
     }
 
