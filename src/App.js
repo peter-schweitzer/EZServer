@@ -2,7 +2,7 @@ import { createServer } from 'node:http';
 
 import { data, err, ERR, LOG, WRN } from '@peter-schweitzer/ez-utils';
 
-import { handle_middleware, MiddlewareCurry } from './middleware.js';
+import { CurryedMiddleware, handle_middleware } from './middleware.js';
 import { Params } from './Params.js';
 import { add_endpoint_to_corresponding_lut, get_endpoint, get_endpoint_with_param, get_endpoint_with_wildcard } from './routing.js';
 import { throw404 } from './utils.js';
@@ -114,21 +114,21 @@ export class App {
    * @param {Methods} method
    * @param {string} uri
    * @param {ResFunction} fn
-   * @returns {ErrorOr<MiddlewareCurry>}
+   * @returns {ErrorOr<CurryedMiddleware>}
    */
   #register_rest_endpoint(method, uri, fn) {
     const { err: adding_error, data: leaf } = add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#rest_endpoints_with_wildcard[method], uri, fn, method);
     if (adding_error !== null) return (LOG(`error while adding '${uri}'`), err(`error while adding '${method} ${uri}':\n  ${adding_error}`));
 
     LOG(`added ${method.toLowerCase()}: '${uri}'`);
-    return data(curry_middleware(leaf));
+    return data(new CurryedMiddleware(leaf));
   }
 
   //#region rest endpoints
   /**
    * @param {string} uri uri to resolve
    * @param {ResFunction} fn function for resolve the request
-   * @returns {ErrorOr<MiddlewareCurry>}
+   * @returns {ErrorOr<CurryedMiddleware>}
    */
   get(uri, fn) {
     return this.#register_rest_endpoint('GET', uri, fn);
@@ -137,7 +137,7 @@ export class App {
   /**
    * @param {string} uri uri to resolve
    * @param {ResFunction} fn function for resolve the request
-   * @returns {ErrorOr<MiddlewareCurry>}
+   * @returns {ErrorOr<CurryedMiddleware>}
    */
   head(uri, fn) {
     return this.#register_rest_endpoint('HEAD', uri, fn);
@@ -146,7 +146,7 @@ export class App {
   /**
    * @param {string} uri uri to resolve
    * @param {ResFunction} fn function for resolve the request
-   * @returns {ErrorOr<MiddlewareCurry>}
+   * @returns {ErrorOr<CurryedMiddleware>}
    */
   post(uri, fn) {
     return this.#register_rest_endpoint('POST', uri, fn);
@@ -155,7 +155,7 @@ export class App {
   /**
    * @param {string} uri uri to resolve
    * @param {ResFunction} fn function for resolve the request
-   * @returns {ErrorOr<MiddlewareCurry>}
+   * @returns {ErrorOr<CurryedMiddleware>}
    */
   put(uri, fn) {
     return this.#register_rest_endpoint('PUT', uri, fn);
@@ -164,7 +164,7 @@ export class App {
   /**
    * @param {string} uri uri to resolve
    * @param {ResFunction} fn function for resolve the request
-   * @returns {ErrorOr<MiddlewareCurry>}
+   * @returns {ErrorOr<CurryedMiddleware>}
    */
   delete(uri, fn) {
     return this.#register_rest_endpoint('DELETE', uri, fn);
@@ -173,7 +173,7 @@ export class App {
   /**
    * @param {string} uri uri to resolve
    * @param {ResFunction} fn function for resolve the request
-   * @returns {ErrorOr<MiddlewareCurry>}
+   * @returns {ErrorOr<CurryedMiddleware>}
    */
   connect(uri, fn) {
     return this.#register_rest_endpoint('CONNECT', uri, fn);
@@ -182,7 +182,7 @@ export class App {
   /**
    * @param {string} uri uri to resolve
    * @param {ResFunction} fn function for resolve the request
-   * @returns {ErrorOr<MiddlewareCurry>}
+   * @returns {ErrorOr<CurryedMiddleware>}
    */
   options(uri, fn) {
     return this.#register_rest_endpoint('OPTIONS', uri, fn);
@@ -191,7 +191,7 @@ export class App {
   /**
    * @param {string} uri uri to resolve
    * @param {ResFunction} fn function for resolve the request
-   * @returns {ErrorOr<MiddlewareCurry>}
+   * @returns {ErrorOr<CurryedMiddleware>}
    */
   trace(uri, fn) {
     return this.#register_rest_endpoint('TRACE', uri, fn);
@@ -200,7 +200,7 @@ export class App {
   /**
    * @param {string} uri uri to resolve
    * @param {ResFunction} fn function for resolve the request
-   * @returns {ErrorOr<MiddlewareCurry>}
+   * @returns {ErrorOr<CurryedMiddleware>}
    */
   patch(uri, fn) {
     return this.#register_rest_endpoint('PATCH', uri, fn);
@@ -211,13 +211,13 @@ export class App {
   /**
    * @param {string} uri uri to resolve
    * @param {ResFunction} fn function for resolve the request
-   * @returns {ErrorOr<MiddlewareCurry>}
+   * @returns {ErrorOr<CurryedMiddleware>}
    */
   add(uri, fn) {
     const { err: adding_error, data: leaf } = add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#endpoints_with_wildcard, uri, fn);
     if (adding_error !== null) return (LOG(`error while adding '${uri}'`), err(`error while adding '${uri}':\n  ${adding_error}`));
     LOG(`added: '${uri}'`);
-    return data(curry_middleware(leaf));
+    return data(new CurryedMiddleware(leaf));
   }
   //#endregion
   //#endregion

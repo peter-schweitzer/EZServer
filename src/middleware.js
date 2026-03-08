@@ -1,22 +1,25 @@
 import { ERR } from '@peter-schweitzer/ez-utils';
 import { buildRes } from './utils.js';
 
-/**
- * @param {ResolverLeaf} leaf
- * @returns {MiddlewareCurry}
- */
-export function curry_middleware(leaf) {
-  const curry = {
-    get use() {
-      return (middleware) => {
-        if (leaf.middleware) leaf.middleware.push(middleware);
-        else leaf.middleware = [middleware];
-        return curry;
-      };
-    },
-  };
+export class CurryedMiddleware {
+  /** @type {ResolverLeaf} */
+  #leaf;
 
-  return Object.seal(curry);
+  /** @param {ResolverLeaf} leaf */
+  constructor(leaf) {
+    this.#leaf = leaf;
+  }
+
+  /**
+   * @param {Middleware} middleware
+   * @returns {CurryedMiddleware}
+   */
+  use(middleware) {
+    const mw = this.#leaf.middleware;
+    if (mw) mw.push(middleware);
+    else this.#leaf.middleware = [middleware];
+    return this;
+  }
 }
 
 /**
