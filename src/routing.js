@@ -1,10 +1,12 @@
+import { data, err } from '@peter-schweitzer/ez-utils';
+
 import { RingBuffer, WildcardQueueNode } from './RingBuffer.js';
 
 /**
  * @param {TreeNode} root
  * @param {string} uri
  * @param {ResFunction} fn
- * @param {Methods} [method=null]
+ * @param {Methods | null} [method=null]
  * @returns {ResolverLeaf}
  */
 function add_ResFunction_with_params(root, uri, fn, method = null) {
@@ -18,25 +20,18 @@ function add_ResFunction_with_params(root, uri, fn, method = null) {
     const part = parts[i];
 
     if (part[0] === ':') {
-      if (!Object.hasOwn(tree_ptr, 'param')) tree_ptr.param = {};
-      tree_ptr = tree_ptr.param;
+      tree_ptr = tree_ptr.param ??= {};
       params.push([i, part.slice(1)]);
-    } else {
-      if (!Object.hasOwn(tree_ptr, 'route')) tree_ptr.route = {};
-      if (!Object.hasOwn(tree_ptr.route, part)) tree_ptr.route[part] = {};
-      tree_ptr = tree_ptr.route[part];
-    }
+    } else tree_ptr = (tree_ptr.route ??= {})[part] ??= {};
   }
 
-  if (!Object.hasOwn(tree_ptr, 'twig')) tree_ptr.twig = {};
-  const twig = tree_ptr.twig;
+  const twig = (tree_ptr.twig ??= {});
 
   /** @type {TreeLeaf} */
   const leaf = { fn, middleware: false, params };
 
   if (method === null) twig.fn = leaf;
-  else if (!Object.hasOwn(twig, 'rest')) twig.rest = { [method]: leaf };
-  else twig.rest[method] = leaf;
+  else (twig.rest ??= {})[method] = leaf;
 
   return leaf;
 }
@@ -55,23 +50,22 @@ function add_ResFunction_with_wildcard(tree_container, uri, fn) {
   }
 
   const parts = uri.slice(1, -3).split('/');
-  if (parts.length > tree_container.depth) tree_container.depth = parts.length;
+  const parts_count = parts.length;
+  if (parts_count > tree_container.depth) tree_container.depth = parts_count;
 
   let tree_ptr = tree_container.root;
   /** @type {[number, string][]} */
   const params = [];
 
-  for (let i = 0; i < parts.length; i++) {
+  for (let i = 0; i < parts_count; i++) {
     const part = parts[i];
 
     if (part[0] === ':') {
-      if (!Object.hasOwn(tree_ptr, 'param')) tree_ptr.param = {};
-      tree_ptr = tree_ptr.param;
+      tree_ptr = tree_ptr.param ??= {};
       params.push([i, part.slice(1)]);
     } else {
-      if (!Object.hasOwn(tree_ptr, 'route')) tree_ptr.route = {};
-      if (!Object.hasOwn(tree_ptr.route, part)) tree_ptr.route[part] = {};
-      tree_ptr = tree_ptr.route[part];
+      tree_ptr = tree_ptr.route ??= {};
+      tree_ptr = tree_ptr[part] ??= {};
     }
   }
 
@@ -82,31 +76,29 @@ function add_ResFunction_with_wildcard(tree_container, uri, fn) {
 /**
  * @param {ResolverLUT} lut_without_params
  * @param {TreeNode} tree_with_params
- * @param {ResolverTreeContainer} lut_with_wildcard
+ * @param {ResolverTreeContainer} tree_container_with_wildcard
  * @param {string} uri
  * @param {ResFunction} fn
- * @param {Methods} method
- * @returns {ResolverLeaf}
+ * @param {Methods | null} [method=null]
+ * @param {Object} [eo_obj={}]
+ * @returns {ErrorOr<ResolverLeaf>}
  */
-export function add_endpoint_to_corresponding_lut(lut_without_params, tree_with_params, lut_with_wildcard, uri, fn, method = null) {
-  if (uri.includes('/:'))
-    if (uri.includes('/:*/')) return null;
-    // cant have wildcard in middle of uri
-    else if (uri.endsWith('/:*')) return add_ResFunction_with_wildcard(lut_with_wildcard, uri, fn);
-    else return add_ResFunction_with_params(tree_with_params, uri, fn, method);
-  else {
+export function add_endpoint_to_corresponding_lut(lut_without_params, tree_with_params, tree_container_with_wildcard, uri, fn, method = null, eo_obj = {}) {
+  // wildcard can only be at the end of the uri
+  if (uri.includes('/:*/')) return err('invalid wildcard symbol, wildcard can only appear at the end of the uri');
+
+  if (uri.includes('/:')) {
     if (!Object.hasOwn(lut_without_params, uri)) lut_without_params[uri] = {};
     const twig = lut_without_params[uri];
-
     /** @type {ResolverLeaf} */
     const leaf = { fn, middleware: false };
 
-    if (method === null) twig.fn = leaf;
-    else if (!Object.hasOwn(twig, 'rest')) twig.rest = { [method]: leaf };
-    else twig.rest[method] = leaf;
+    if (method === null) return data((twig.fn = leaf));
 
-    return leaf;
-  }
+    twig.rest ??= {};
+    return data((twig.rest[method] = leaf));
+  } else if (uri.endsWith('/:*')) return data(add_ResFunction_with_wildcard(tree_container_with_wildcard, uri, fn));
+  else return data(add_ResFunction_with_params(tree_with_params, uri, fn, method));
 }
 
 /**
@@ -118,9 +110,9 @@ export function get_endpoint(endpoints, { uri, method }) {
   if (!Object.hasOwn(endpoints, uri)) return false;
 
   const leaf = endpoints[uri];
+  // @ts-ignore leaf must have .rest[method]
   if (Object.hasOwn(leaf, 'rest') && Object.hasOwn(leaf.rest, method)) return leaf.rest[method];
-  else if (Object.hasOwn(leaf, 'fn')) return leaf.fn;
-  else return false;
+  else return leaf.fn ?? false;
 }
 
 /**
@@ -130,18 +122,19 @@ export function get_endpoint(endpoints, { uri, method }) {
  * @returns {FalseOr<ResolverLeaf>}
  */
 export function get_endpoint_with_param(endpoints, { uri, method }, route_params) {
-  if (uri === '/')
-    if (Object.hasOwn(endpoints, 'twig')) return endpoints.twig.fn;
-    else return false;
+  if (uri === '/') return endpoints?.twig?.fn ?? false;
 
   const parts = uri.slice(1).split('/');
   /** @type {{i: number, ptr: TreeNode}[]} */
   const buff = [];
 
+  // @ts-ignore ts(2322) endpoint must have .param
   if (Object.hasOwn(endpoints, 'param')) buff.push({ ptr: endpoints.param, i: 1 });
+  // @ts-ignore ts(2322) endpoint must have .route[parts[0]]
   if (Object.hasOwn(endpoints, 'route') && Object.hasOwn(endpoints.route, parts[0])) buff.push({ ptr: endpoints.route[parts[0]], i: 1 });
 
   while (buff.length > 0) {
+    // @ts-ignore ts(2339) buff is not empty
     const { i, ptr } = buff.pop();
 
     if (i === parts.length) {
@@ -190,6 +183,7 @@ export function get_endpoint_with_wildcard({ depth: n, root }, { uri }, route_pa
   let params;
   let depth = -1;
   while (rbq.length > 0) {
+    // @ts-ignore ts(2339) queue is not empty
     const { i, node } = rbq.dequeue();
 
     if (Object.hasOwn(node, 'leaf')) {
@@ -206,7 +200,9 @@ export function get_endpoint_with_wildcard({ depth: n, root }, { uri }, route_pa
 
   if (depth === -1) return false;
 
+  // @ts-ignore ts(2454) params is set
   for (const [idx, name] of params) route_params[name] = uri_fragments[idx];
   route_params['*'] = uri_fragments.slice(depth);
+  // @ts-ignore ts(2454) fn is set
   return fn;
 }

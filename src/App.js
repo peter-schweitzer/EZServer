@@ -1,8 +1,8 @@
 import { createServer } from 'node:http';
 
-import { ERR, LOG, WRN } from '@peter-schweitzer/ez-utils';
+import { data, err, ERR, LOG, WRN } from '@peter-schweitzer/ez-utils';
 
-import { curry_middleware, handle_middleware } from './middleware.js';
+import { handle_middleware, MiddlewareCurry } from './middleware.js';
 import { Params } from './Params.js';
 import { add_endpoint_to_corresponding_lut, get_endpoint, get_endpoint_with_param, get_endpoint_with_wildcard } from './routing.js';
 import { throw404 } from './utils.js';
@@ -102,112 +102,108 @@ export class App {
   /** @returns {Promise<boolean>} never rejects; false if the server isn't open when close() is called */
   async close() {
     return new Promise((resolve, _) => {
-      this.m_http_server.close(function (err = null) {
-        if (err === null) (WRN('server closed'), resolve(true));
+      this.m_http_server.close(function (err) {
+        if (err === undefined) (WRN('server closed'), resolve(true));
         else (ERR(err), WRN("'close()' called, but server is already closed"), resolve(false));
       });
     });
   }
   //#endregion
 
+  /**
+   * @param {Methods} method
+   * @param {string} uri
+   * @param {ResFunction} fn
+   * @returns {ErrorOr<MiddlewareCurry>}
+   */
+  #register_rest_endpoint(method, uri, fn) {
+    const { err: adding_error, data: leaf } = add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#rest_endpoints_with_wildcard[method], uri, fn, method);
+    if (adding_error !== null) return (LOG(`error while adding '${uri}'`), err(`error while adding '${method} ${uri}':\n  ${adding_error}`));
+
+    LOG(`added ${method.toLowerCase()}: '${uri}'`);
+    return data(curry_middleware(leaf));
+  }
+
   //#region rest endpoints
   /**
    * @param {string} uri uri to resolve
    * @param {ResFunction} fn function for resolve the request
-   * @returns {MiddlewareCurry}
+   * @returns {ErrorOr<MiddlewareCurry>}
    */
   get(uri, fn) {
-    LOG('added get:', uri);
-    const leaf = add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#rest_endpoints_with_wildcard.GET, uri, fn, 'GET');
-    return curry_middleware(leaf);
+    return this.#register_rest_endpoint('GET', uri, fn);
   }
 
   /**
    * @param {string} uri uri to resolve
    * @param {ResFunction} fn function for resolve the request
-   * @returns {MiddlewareCurry}
+   * @returns {ErrorOr<MiddlewareCurry>}
    */
   head(uri, fn) {
-    LOG('added head:', uri);
-    const leaf = add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#rest_endpoints_with_wildcard.HEAD, uri, fn, 'HEAD');
-    return curry_middleware(leaf);
+    return this.#register_rest_endpoint('HEAD', uri, fn);
   }
 
   /**
    * @param {string} uri uri to resolve
    * @param {ResFunction} fn function for resolve the request
-   * @returns {MiddlewareCurry}
+   * @returns {ErrorOr<MiddlewareCurry>}
    */
   post(uri, fn) {
-    LOG('added post:', uri);
-    const leaf = add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#rest_endpoints_with_wildcard.POST, uri, fn, 'POST');
-    return curry_middleware(leaf);
+    return this.#register_rest_endpoint('POST', uri, fn);
   }
 
   /**
    * @param {string} uri uri to resolve
    * @param {ResFunction} fn function for resolve the request
-   * @returns {MiddlewareCurry}
+   * @returns {ErrorOr<MiddlewareCurry>}
    */
   put(uri, fn) {
-    LOG('added put:', uri);
-    const leaf = add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#rest_endpoints_with_wildcard.PUT, uri, fn, 'PUT');
-    return curry_middleware(leaf);
+    return this.#register_rest_endpoint('PUT', uri, fn);
   }
 
   /**
    * @param {string} uri uri to resolve
    * @param {ResFunction} fn function for resolve the request
-   * @returns {MiddlewareCurry}
+   * @returns {ErrorOr<MiddlewareCurry>}
    */
   delete(uri, fn) {
-    LOG('added delete:', uri);
-    const leaf = add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#rest_endpoints_with_wildcard.DELETE, uri, fn, 'DELETE');
-    return curry_middleware(leaf);
+    return this.#register_rest_endpoint('DELETE', uri, fn);
   }
 
   /**
    * @param {string} uri uri to resolve
    * @param {ResFunction} fn function for resolve the request
-   * @returns {MiddlewareCurry}
+   * @returns {ErrorOr<MiddlewareCurry>}
    */
   connect(uri, fn) {
-    LOG('added connect:', uri);
-    const leaf = add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#rest_endpoints_with_wildcard.CONNECT, uri, fn, 'CONNECT');
-    return curry_middleware(leaf);
+    return this.#register_rest_endpoint('CONNECT', uri, fn);
   }
 
   /**
    * @param {string} uri uri to resolve
    * @param {ResFunction} fn function for resolve the request
-   * @returns {MiddlewareCurry}
+   * @returns {ErrorOr<MiddlewareCurry>}
    */
   options(uri, fn) {
-    LOG('added options:', uri);
-    const leaf = add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#rest_endpoints_with_wildcard.OPTIONS, uri, fn, 'OPTIONS');
-    return curry_middleware(leaf);
+    return this.#register_rest_endpoint('OPTIONS', uri, fn);
   }
 
   /**
    * @param {string} uri uri to resolve
    * @param {ResFunction} fn function for resolve the request
-   * @returns {MiddlewareCurry}
+   * @returns {ErrorOr<MiddlewareCurry>}
    */
   trace(uri, fn) {
-    LOG('added trace:', uri);
-    const leaf = add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#rest_endpoints_with_wildcard.TRACE, uri, fn, 'TRACE');
-    return curry_middleware(leaf);
+    return this.#register_rest_endpoint('TRACE', uri, fn);
   }
 
   /**
    * @param {string} uri uri to resolve
    * @param {ResFunction} fn function for resolve the request
-   * @returns {MiddlewareCurry}
+   * @returns {ErrorOr<MiddlewareCurry>}
    */
   patch(uri, fn) {
-    LOG('added patch:', uri);
-    const leaf = add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#rest_endpoints_with_wildcard.PATCH, uri, fn, 'PATCH');
-    return curry_middleware(leaf);
+    return this.#register_rest_endpoint('PATCH', uri, fn);
   }
   //#endregion
 
@@ -215,12 +211,13 @@ export class App {
   /**
    * @param {string} uri uri to resolve
    * @param {ResFunction} fn function for resolve the request
-   * @returns {MiddlewareCurry}
+   * @returns {ErrorOr<MiddlewareCurry>}
    */
   add(uri, fn) {
-    LOG('added:', uri);
-    const leaf = add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#endpoints_with_wildcard, uri, fn);
-    return curry_middleware(leaf);
+    const { err: adding_error, data: leaf } = add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#endpoints_with_wildcard, uri, fn);
+    if (adding_error !== null) return (LOG(`error while adding '${uri}'`), err(`error while adding '${uri}':\n  ${adding_error}`));
+    LOG(`added: '${uri}'`);
+    return data(curry_middleware(leaf));
   }
   //#endregion
   //#endregion

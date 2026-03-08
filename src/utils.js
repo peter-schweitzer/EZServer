@@ -9,16 +9,15 @@ export const MIME = Object.freeze({ TEXT: 'text/plain;charset=UTF-8', HTML: 'tex
 
 /**
  * @param {ServerResponse} res response from the server
- * @param {string|Buffer|Uint8Array} [chunk=null] data of the response
+ * @param {string|Buffer|Uint8Array|null} [chunk=null] data of the response
  * @param {Object} [options={}] optional options
  * @param {number} [options.code=200] status code of the response
- * @param {string} [options.mime="text/plain;charset=UTF-8"] mime-type of the response
- * todo: add a proper type for headers with all available key value pairs
+ * @param {string|null} [options.mime=null] mime-type of the response
  * @param {LUT<string|number>} [options.headers={}] additional headers ('Content-Type' is overwritten by mime, default is an empty Object)
  * @returns {void}
  */
-export function buildRes(res, chunk = null, { code = 200, mime = MIME.TEXT, headers = {} } = {}) {
-  Object.assign(headers, { 'Content-Type': mime });
+export function buildRes(res, chunk = null, { code = 200, mime = null, headers = {} } = {}) {
+  Object.assign(headers, { 'Content-Type': mime ?? MIME.TEXT });
 
   if (chunk === null || chunk === '') res.writeHead(code, Object.assign(headers, { 'Content-Length': 0 }));
   else {
@@ -49,7 +48,7 @@ export function throw404(req, res) {
  * @param {string} filePath path of the file
  * @param {Object} [options={code: 200, mime: null}]
  * @param {number} [options.code=200] status code of the response (default is 200)
- * @param {string?} [options.mime=null] if set this overwrites the file-extension based lookup
+ * @param {string|null} [options.mime=null] if set this overwrites the file-extension based lookup
  * @returns {Promise<void>}
  */
 export async function serveFromFS(res, filePath, { code, mime } = { code: 200, mime: null }) {
@@ -108,10 +107,8 @@ export async function getBodyJSON(req, obj = {}) {
  * @return {ErrorOr<LUT<string>>}
  */
 export function getCookies(req, obj = {}) {
-  if (!Object.hasOwn(req.headers, 'cookie')) return err('no cookie header present');
-
   const cookies = req.headers.cookie;
-  if (cookies === null) return err('cookie header is null');
+  if (typeof cookies !== 'string') return err('no cookie header present');
 
   /** @type {LUT<string>} */
   const cookie_lut = {};
