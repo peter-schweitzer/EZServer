@@ -74,15 +74,16 @@ export class RingBuffer {
   }
 }
 
+/** @template N */
 export class WildcardQueueNode {
   /** @type {number} */
   i;
-  /** @type {WildcardTreeNode} */
+  /** @type {N} */
   node;
 
   /**
    * @param {number} i
-   * @param {WildcardTreeNode} node
+   * @param {N} node
    */
   constructor(i, node) {
     this.i = i;

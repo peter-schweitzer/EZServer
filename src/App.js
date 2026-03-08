@@ -37,8 +37,10 @@ export class App {
   //#endregion
   //#endregion
 
+  //#region middleware
   /** @type {FalseOr<Middleware[]>} */
   #middleware = false;
+  //#endregion
 
   constructor() {
     this.m_http_server = createServer(async (/**@type {EZIncomingMessage}*/ req, res) => {
@@ -80,8 +82,8 @@ export class App {
         get_endpoint_with_wildcard(this.#endpoints_with_wildcard, req, route);
 
       if (leaf === false) return throw404(req, res);
-      const { fn, middleware } = leaf;
 
+      const { fn, middleware } = leaf;
       if (await handle_middleware(middleware, req, res, query, route)) fn(req, res, new Params(query, route));
       //#endregion
     });
@@ -223,6 +225,7 @@ export class App {
   //#endregion
   //#endregion
 
+  //#region Middleware
   /**
    * @param {Middleware} middleware
    * @returns {this}
@@ -233,4 +236,5 @@ export class App {
     this.#middleware.push(middleware);
     return this;
   }
+  //#endregion
 }
