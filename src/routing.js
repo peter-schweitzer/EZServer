@@ -97,8 +97,22 @@ export function add_endpoint_to_corresponding_lut(lut_without_params, tree_with_
  * @returns {FalseOr<ResolverLeaf>}
  */
 export function get_endpoint(endpoints, { uri }) {
-  if (!Object.hasOwn(endpoints, uri)) return false;
-  else return endpoints[uri];
+  return endpoints[uri] ?? false;
+}
+
+/**
+ * @template {{param?: N, route?: LUT<N>}} N
+ * @param {{i: number, ptr: N}[]} buff
+ * @param {string[]} parts
+ * @param {N} node
+ * @param {number} i
+ */
+function push_helper(buff, parts, { param, route }, i) {
+  if (param !== undefined) buff.push({ ptr: param, i: i + 1 });
+  if (route !== undefined) {
+    const ptr = route[parts[i]];
+    if (ptr !== undefined) buff.push({ ptr, i: i + 1 });
+  }
 }
 
 /**
@@ -108,38 +122,28 @@ export function get_endpoint(endpoints, { uri }) {
  * @returns {FalseOr<ResolverLeaf>}
  */
 export function get_endpoint_with_param(endpoints, { uri, method }, route_params) {
-  if (uri === '/') return endpoints.leaf ?? false;
+  if (uri === '/') return false;
 
   const parts = uri.slice(1).split('/');
   /** @type {{i: number, ptr: TreeNode}[]} */
   const buff = [];
 
-  // @ts-ignore ts(2322) endpoint must have .param
-  if (Object.hasOwn(endpoints, 'param')) buff.push({ ptr: endpoints.param, i: 1 });
-  // @ts-ignore ts(2322) endpoint must have .route[parts[0]]
-  if (Object.hasOwn(endpoints, 'route') && Object.hasOwn(endpoints.route, parts[0])) buff.push({ ptr: endpoints.route[parts[0]], i: 1 });
+  push_helper(buff, parts, endpoints, 0);
 
   while (buff.length > 0) {
+    /** @type {{i: number, ptr: TreeNode}} */
     // @ts-ignore ts(2339) buff is not empty
     const { i, ptr } = buff.pop();
 
     if (i === parts.length) {
-      if (!Object.hasOwn(ptr, 'twig')) continue;
-      const twig = ptr.twig;
-
-      /** @type {TreeLeaf} */
-      let leaf;
-      if (Object.hasOwn(twig, 'rest') && Object.hasOwn(twig.rest, method)) leaf = twig.rest[method];
-      else if (Object.hasOwn(twig, 'fn')) leaf = twig.fn;
-      else continue;
+      const leaf = ptr.leaf;
+      if (leaf === undefined) continue;
 
       for (const [idx, name] of leaf.params) route_params[name] = parts[idx];
       return leaf;
     }
 
-    const next = i + 1;
-    if (Object.hasOwn(ptr, 'param')) buff.push({ ptr: ptr.param, i: next });
-    if (Object.hasOwn(ptr, 'route') && Object.hasOwn(ptr.route, parts[i])) buff.push({ ptr: ptr.route[parts[i]], i: next });
+    push_helper(buff, parts, ptr, i);
   }
 
   return false;
@@ -152,10 +156,11 @@ export function get_endpoint_with_param(endpoints, { uri, method }, route_params
  * @returns {FalseOr<ResolverLeaf>}
  */
 export function get_endpoint_with_wildcard({ depth: n, root }, { uri }, route_params) {
-  if (uri === '/' || n === 0) return false;
+  if (n === 0) return false;
+  if (uri === '/') return root.leaf ?? false;
 
-  const uri_fragments = uri.slice(1).split('/');
-  const max_traversal_depth = uri_fragments.length < n ? uri_fragments.length : n;
+  const uri_parts = uri.slice(1).split('/');
+  const max_traversal_depth = Math.min(uri_parts.length, n);
 
   // heuristic approach to minimize memory usage for long URIs:
   //   the longer the URI, the less likely to have multiple possible paths in the ResolverTree.
@@ -163,32 +168,34 @@ export function get_endpoint_with_wildcard({ depth: n, root }, { uri }, route_pa
   const rbq = new RingBuffer(1 << (max_traversal_depth - (max_traversal_depth > 4 ? (max_traversal_depth - 1) >> 1 : 1)));
   rbq.enqueue(new WildcardQueueNode(0, root));
 
-  /** @type {ResolverLeaf} */
-  let fn;
-  /** @type {[number, string][]} */
-  let params;
+  let leaf;
   let depth = -1;
   while (rbq.length > 0) {
+    /** @type {WildcardQueueNode<WildcardTreeNode>} */
     // @ts-ignore ts(2339) queue is not empty
     const { i, node } = rbq.dequeue();
 
-    if (Object.hasOwn(node, 'leaf')) {
-      fn = node.leaf.fn;
-      params = node.leaf.params;
-      depth = i;
+    if (i > depth) {
+      const l = node.leaf;
+      if (l !== undefined) {
+        leaf = l;
+        depth = i;
+      }
     }
 
-    const uri_fragment = uri_fragments[i];
+    const { route, param } = node;
 
-    if (Object.hasOwn(node, 'param')) rbq.enqueue(new WildcardQueueNode(i + 1, node.param));
-    if (Object.hasOwn(node, 'route') && Object.hasOwn(node.route, uri_fragment)) rbq.enqueue(new WildcardQueueNode(i + 1, node.route[uri_fragment]));
+    if (route !== undefined) {
+      const route_node = route[uri_parts[i]];
+      if (route_node !== undefined) rbq.enqueue(new WildcardQueueNode(i + 1, route_node));
+    }
+
+    if (param !== undefined) rbq.enqueue(new WildcardQueueNode(i + 1, param));
   }
 
-  if (depth === -1) return false;
+  if (leaf === undefined) return false;
 
-  // @ts-ignore ts(2454) params is set
-  for (const [idx, name] of params) route_params[name] = uri_fragments[idx];
-  route_params['*'] = uri_fragments.slice(depth);
-  // @ts-ignore ts(2454) fn is set
-  return fn;
+  for (const [i, p] of leaf.params) route_params[p] = uri_parts[i];
+  route_params['*'] = uri_parts.slice(depth);
+  return leaf;
 }
