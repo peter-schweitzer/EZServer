@@ -5,7 +5,7 @@ import { data, err, ERR, LOG, WRN } from '@peter-schweitzer/ez-utils';
 import { CurryedMiddleware, handle_middleware } from './middleware.js';
 import { Params } from './Params.js';
 import { add_endpoint_to_corresponding_lut, get_endpoint, get_endpoint_with_param, get_endpoint_with_wildcard } from './routing.js';
-import { throw404 } from './utils.js';
+import { inspect_error, throw404 } from './utils.js';
 
 export class App {
   /** @type {Server} */
@@ -174,7 +174,7 @@ export class App {
       uri,
       fn,
     );
-    if (adding_error !== null) return (LOG(`error while adding '${uri}'`), err(`error while adding '${method} ${uri}':\n  ${adding_error}`));
+    if (adding_error !== null) return inspect_error(`error while adding '${method} ${uri}'`, adding_error);
 
     LOG(`added ${method.toLowerCase()}: '${uri}'`);
     return data(new CurryedMiddleware(leaf));
@@ -270,8 +270,9 @@ export class App {
    */
   add(uri, fn) {
     const { err: adding_error, data: leaf } = add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#endpoints_with_wildcard, uri, fn);
-    if (adding_error !== null) return (LOG(`error while adding '${uri}'`), err(`error while adding '${uri}':\n  ${adding_error}`));
-    LOG(`added: '${uri}'`);
+    if (adding_error !== null) return inspect_error(`error while adding '${uri}'`, adding_error);
+
+    LOG(`added '${uri}'`);
     return data(new CurryedMiddleware(leaf));
   }
   //#endregion

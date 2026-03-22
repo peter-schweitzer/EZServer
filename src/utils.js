@@ -8,6 +8,18 @@ import mime_types from '../data/mimeTypes.json' with { type: 'json' };
 export const MIME = Object.freeze({ TEXT: 'text/plain;charset=UTF-8', HTML: 'text/html;charset=UTF-8', JSON: 'application/json' });
 
 /**
+ * @template {string} T
+ * @template {string} A
+ * @param {T} msg
+ * @param {A} additional_error
+ * @param {{}} obj
+ */
+export function inspect_error(msg, additional_error, obj = {}) {
+  ERR(msg);
+  return err(`${msg}:\n  ${additional_error}`, obj);
+}
+
+/**
  * @param {ServerResponse} res response from the server
  * @param {string|Buffer|Uint8Array|null} [chunk=null] data of the response
  * @param {Object} [options={}] optional options
@@ -96,8 +108,7 @@ export async function getBodyJSON(req, obj = {}) {
   try {
     return data(JSON.parse(eo_txt.data), obj);
   } catch (e) {
-    ERR(`${'\x1b[32;1m'}error in getBodyJSON caused by JSON.parse:${'\x1b[0m'}\n  ${e}`);
-    return err(`error while parsing request body: '${typeof e === 'string' ? e : JSON.stringify(e)}'`, obj);
+    return inspect_error(`error while parsing request body`, typeof e === 'string' ? e : JSON.stringify(e), obj);
   }
 }
 
