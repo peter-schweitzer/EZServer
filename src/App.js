@@ -9,17 +9,50 @@ import { throw404 } from './utils.js';
 
 export class App {
   /** @type {Server} */
-  m_http_server;
+  #http_server;
+  get m_http_server() {
+    return this.#http_server;
+  }
 
   //#region endpoints
+  //#region without params
+  /** @type {RestLUT<ResolverLUT>} */
+  #rest_endpoints = {
+    GET: {},
+    HEAD: {},
+    POST: {},
+    PUT: {},
+    DELETE: {},
+    CONNECT: {},
+    OPTIONS: {},
+    TRACE: {},
+    PATCH: {},
+  };
+
   /** @type {ResolverLUT} */
   #endpoints = {};
+  //#endregion
+
+  //#region with params
+  /** @type {RestLUT<TreeNode>} */
+  #rest_endpoints_with_params = {
+    GET: {},
+    HEAD: {},
+    POST: {},
+    PUT: {},
+    DELETE: {},
+    CONNECT: {},
+    OPTIONS: {},
+    TRACE: {},
+    PATCH: {},
+  };
 
   /** @type {TreeNode} */
   #endpoints_with_params = {};
+  //#endregion
 
   //#region with wildcard
-  /** @type {{[x in Methods]: ResolverTreeContainer}} */
+  /** @type {RestLUT<ResolverTreeContainer>} */
   #rest_endpoints_with_wildcard = {
     GET: { depth: 0, root: {} },
     HEAD: { depth: 0, root: {} },
@@ -43,7 +76,7 @@ export class App {
   //#endregion
 
   constructor() {
-    this.m_http_server = createServer(async (/**@type {EZIncomingMessage}*/ req, res) => {
+    this.#http_server = createServer(async (/**@type {EZIncomingMessage}*/ req, res) => {
       //#region variables
       /** @type {LUT<string>} */
       const query = {};
@@ -75,10 +108,13 @@ export class App {
       //#endregion
 
       //#region routing
+      const method = req.method;
       const leaf =
+        get_endpoint(this.#rest_endpoints[method], req) ||
         get_endpoint(this.#endpoints, req) ||
+        get_endpoint_with_param(this.#rest_endpoints_with_params[method], req, route) ||
         get_endpoint_with_param(this.#endpoints_with_params, req, route) ||
-        get_endpoint_with_wildcard(this.#rest_endpoints_with_wildcard[req.method], req, route) ||
+        get_endpoint_with_wildcard(this.#rest_endpoints_with_wildcard[method], req, route) ||
         get_endpoint_with_wildcard(this.#endpoints_with_wildcard, req, route);
 
       if (leaf === false) return throw404(req, res);
@@ -89,20 +125,19 @@ export class App {
     });
   }
 
-  //#region functions
   //#region node:http Server functions
   /**
    * @param {number|string} port port the server will listen on
    * @returns {void}
    */
   listen(port) {
-    this.m_http_server.listen(port, () => LOG(`server listening on port ${port}`));
+    this.#http_server.listen(port, () => LOG(`server listening on port ${port}`));
   }
 
   /** @returns {Promise<boolean>} never rejects; false if the server isn't open when close() is called */
   async close() {
     return new Promise((resolve, _) => {
-      this.m_http_server.close(function (err) {
+      this.#http_server.close(function (err) {
         if (err === undefined) (WRN('server closed'), resolve(true));
         else (ERR(err), WRN("'close()' called, but server is already closed"), resolve(false));
       });
@@ -110,6 +145,21 @@ export class App {
   }
   //#endregion
 
+  //#region Middleware
+  /**
+   * @param {Middleware} middleware
+   * @returns {this}
+   */
+  use(middleware) {
+    if (this.#middleware === false) this.#middleware = [];
+
+    this.#middleware.push(middleware);
+    return this;
+  }
+  //#endregion
+
+  //#region functions
+  //#region rest endpoints
   /**
    * @param {Methods} method
    * @param {string} uri
@@ -117,14 +167,19 @@ export class App {
    * @returns {ErrorOr<CurryedMiddleware>}
    */
   #register_rest_endpoint(method, uri, fn) {
-    const { err: adding_error, data: leaf } = add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#rest_endpoints_with_wildcard[method], uri, fn, method);
+    const { err: adding_error, data: leaf } = add_endpoint_to_corresponding_lut(
+      this.#rest_endpoints[method],
+      this.#rest_endpoints_with_params[method],
+      this.#rest_endpoints_with_wildcard[method],
+      uri,
+      fn,
+    );
     if (adding_error !== null) return (LOG(`error while adding '${uri}'`), err(`error while adding '${method} ${uri}':\n  ${adding_error}`));
 
     LOG(`added ${method.toLowerCase()}: '${uri}'`);
     return data(new CurryedMiddleware(leaf));
   }
 
-  //#region rest endpoints
   /**
    * @param {string} uri uri to resolve
    * @param {ResFunction} fn function for resolve the request
@@ -220,18 +275,5 @@ export class App {
     return data(new CurryedMiddleware(leaf));
   }
   //#endregion
-  //#endregion
-
-  //#region Middleware
-  /**
-   * @param {Middleware} middleware
-   * @returns {this}
-   */
-  use(middleware) {
-    if (this.#middleware === false) this.#middleware = [];
-
-    this.#middleware.push(middleware);
-    return this;
-  }
   //#endregion
 }

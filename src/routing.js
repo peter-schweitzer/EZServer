@@ -3,13 +3,22 @@ import { data, err } from '@peter-schweitzer/ez-utils';
 import { RingBuffer, WildcardQueueNode } from './RingBuffer.js';
 
 /**
+ * @param {ResolverLUT} lut
+ * @param {string} uri
+ * @param {ResFunction} fn
+ * @returns {ResolverLeaf}
+ */
+function add_ResFunction_without_params(lut, uri, fn) {
+  return (lut[uri] = { fn, middleware: false });
+}
+
+/**
  * @param {TreeNode} root
  * @param {string} uri
  * @param {ResFunction} fn
- * @param {Methods | null} [method=null]
- * @returns {ResolverLeaf}
+ * @returns {TreeLeaf}
  */
-function add_ResFunction_with_params(root, uri, fn, method = null) {
+function add_ResFunction_with_params(root, uri, fn) {
   /** @type {TreeNode} */
   let tree_ptr = root;
   /** @type {[number, string][]} */
@@ -25,37 +34,29 @@ function add_ResFunction_with_params(root, uri, fn, method = null) {
     } else tree_ptr = (tree_ptr.route ??= {})[part] ??= {};
   }
 
-  const twig = (tree_ptr.twig ??= {});
-
-  /** @type {TreeLeaf} */
-  const leaf = { fn, middleware: false, params };
-
-  if (method === null) twig.fn = leaf;
-  else (twig.rest ??= {})[method] = leaf;
-
-  return leaf;
+  return (tree_ptr.leaf = { fn, middleware: false, params });
 }
 
 /**
  * @param {ResolverTreeContainer} tree_container
  * @param {string} uri
  * @param {ResFunction} fn
- * @returns {ResolverLeaf}
+ * @returns {TreeLeaf}
  */
 function add_ResFunction_with_wildcard(tree_container, uri, fn) {
   if (uri === '/:*') {
     if (tree_container.depth === 0) tree_container.depth = 1;
-    tree_container.root.leaf = { fn: { fn, middleware: false }, params: [] };
-    return tree_container.root.leaf.fn;
+    tree_container.root.leaf = { fn, middleware: false, params: [] };
+    return tree_container.root.leaf;
   }
 
   const parts = uri.slice(1, -3).split('/');
   const parts_count = parts.length;
-  if (parts_count > tree_container.depth) tree_container.depth = parts_count;
+  tree_container.depth = Math.max(tree_container.depth, parts_count);
 
-  let tree_ptr = tree_container.root;
   /** @type {[number, string][]} */
   const params = [];
+  let tree_ptr = tree_container.root;
 
   for (let i = 0; i < parts_count; i++) {
     const part = parts[i];
@@ -69,8 +70,7 @@ function add_ResFunction_with_wildcard(tree_container, uri, fn) {
     }
   }
 
-  tree_ptr.leaf = { fn: { fn, middleware: false }, params };
-  return tree_ptr.leaf.fn;
+  return (tree_ptr.leaf = { fn, middleware: false, params });
 }
 
 /**
@@ -79,26 +79,16 @@ function add_ResFunction_with_wildcard(tree_container, uri, fn) {
  * @param {ResolverTreeContainer} tree_container_with_wildcard
  * @param {string} uri
  * @param {ResFunction} fn
- * @param {Methods | null} [method=null]
  * @param {Object} [eo_obj={}]
  * @returns {ErrorOr<ResolverLeaf>}
  */
-export function add_endpoint_to_corresponding_lut(lut_without_params, tree_with_params, tree_container_with_wildcard, uri, fn, method = null, eo_obj = {}) {
+export function add_endpoint_to_corresponding_lut(lut_without_params, tree_with_params, tree_container_with_wildcard, uri, fn, eo_obj = {}) {
   // wildcard can only be at the end of the uri
-  if (uri.includes('/:*/')) return err('invalid wildcard symbol, wildcard can only appear at the end of the uri');
+  if (uri.includes('/:*/')) return err('invalid wildcard symbol, wildcard can only appear at the end of the uri', eo_obj);
 
-  if (uri.includes('/:')) {
-    if (!Object.hasOwn(lut_without_params, uri)) lut_without_params[uri] = {};
-    const twig = lut_without_params[uri];
-    /** @type {ResolverLeaf} */
-    const leaf = { fn, middleware: false };
-
-    if (method === null) return data((twig.fn = leaf));
-
-    twig.rest ??= {};
-    return data((twig.rest[method] = leaf));
-  } else if (uri.endsWith('/:*')) return data(add_ResFunction_with_wildcard(tree_container_with_wildcard, uri, fn));
-  else return data(add_ResFunction_with_params(tree_with_params, uri, fn, method));
+  if (!uri.includes('/:')) return data(add_ResFunction_without_params(lut_without_params, uri, fn), eo_obj);
+  else if (!uri.endsWith('/:*')) return data(add_ResFunction_with_params(tree_with_params, uri, fn), eo_obj);
+  else return data(add_ResFunction_with_wildcard(tree_container_with_wildcard, uri, fn), eo_obj);
 }
 
 /**
@@ -106,13 +96,9 @@ export function add_endpoint_to_corresponding_lut(lut_without_params, tree_with_
  * @param {EZIncomingMessage} req
  * @returns {FalseOr<ResolverLeaf>}
  */
-export function get_endpoint(endpoints, { uri, method }) {
+export function get_endpoint(endpoints, { uri }) {
   if (!Object.hasOwn(endpoints, uri)) return false;
-
-  const leaf = endpoints[uri];
-  // @ts-ignore leaf must have .rest[method]
-  if (Object.hasOwn(leaf, 'rest') && Object.hasOwn(leaf.rest, method)) return leaf.rest[method];
-  else return leaf.fn ?? false;
+  else return endpoints[uri];
 }
 
 /**
@@ -122,7 +108,7 @@ export function get_endpoint(endpoints, { uri, method }) {
  * @returns {FalseOr<ResolverLeaf>}
  */
 export function get_endpoint_with_param(endpoints, { uri, method }, route_params) {
-  if (uri === '/') return endpoints?.twig?.fn ?? false;
+  if (uri === '/') return endpoints.leaf ?? false;
 
   const parts = uri.slice(1).split('/');
   /** @type {{i: number, ptr: TreeNode}[]} */
