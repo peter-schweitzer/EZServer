@@ -2,8 +2,9 @@ import { readFile } from 'node:fs/promises';
 
 import { ERR, LOG, WRN, data, err, p2eo } from '@peter-schweitzer/ez-utils';
 
+import _mime_types from '../data/mimeTypes.json' with { type: 'json' };
 /** @type {LUT<string>} */
-import mime_types from '../data/mimeTypes.json' with { type: 'json' };
+const mime_types = _mime_types;
 
 export const MIME = Object.freeze({ TEXT: 'text/plain;charset=UTF-8', HTML: 'text/html;charset=UTF-8', JSON: 'application/json' });
 
@@ -82,7 +83,7 @@ export async function serveFromFS(res, filePath, { code, mime } = { code: 200, m
 
 /**
  * @param {IncomingMessage} req
- * @param {{}} [obj={}] intended to be used for object pooling
+ * @param {EO_Obj} [obj={}] intended to be used for object pooling
  * @return {AsyncErrorOr<string>} - may return empty string
  */
 export function getBodyText(req, obj = {}) {
@@ -97,13 +98,13 @@ export function getBodyText(req, obj = {}) {
 
 /**
  * @param {IncomingMessage} req
- * @param {{}} [obj={}] intended to be used for object pooling
+ * @param {EO_Obj} [obj={}] intended to be used for object pooling
  * @return {AsyncErrorOr<any>}
  */
 export async function getBodyJSON(req, obj = {}) {
   const eo_txt = await getBodyText(req, obj);
   if (eo_txt.err !== null) return eo_txt;
-  if (eo_txt.data === '') return err('request body is empty');
+  if (eo_txt.data === '') return err('request body is empty', obj);
 
   try {
     return data(JSON.parse(eo_txt.data), obj);
@@ -114,12 +115,12 @@ export async function getBodyJSON(req, obj = {}) {
 
 /**
  * @param {IncomingMessage} req
- * @param {{}} [obj={}] intended to be used for object pooling
+ * @param {EO_Obj} [obj={}] intended to be used for object pooling
  * @return {ErrorOr<LUT<string>>}
  */
 export function getCookies(req, obj = {}) {
   const cookies = req.headers.cookie;
-  if (typeof cookies !== 'string') return err('no cookie header present');
+  if (typeof cookies !== 'string') return err('no cookie header present', obj);
 
   /** @type {LUT<string>} */
   const cookie_lut = {};
@@ -127,5 +128,5 @@ export function getCookies(req, obj = {}) {
     const [k, v] = crumb.split('=');
     cookie_lut[k] = v;
   }
-  return data(cookie_lut);
+  return data(cookie_lut, obj);
 }

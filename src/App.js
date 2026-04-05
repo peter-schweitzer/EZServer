@@ -1,10 +1,10 @@
 import { createServer } from 'node:http';
 
-import { data, err, ERR, LOG, WRN } from '@peter-schweitzer/ez-utils';
+import { data, ERR, LOG, WRN } from '@peter-schweitzer/ez-utils';
 
 import { CurryedMiddleware, handle_middleware } from './middleware.js';
 import { Params } from './Params.js';
-import { add_endpoint_to_corresponding_lut, get_endpoint, get_endpoint_with_param, get_endpoint_with_wildcard } from './routing.js';
+import { add_ResLeaf_to_corresponding_lut, get_ResLeaf, get_ResLeaf_with_param, get_ResLeaf_with_wildcard } from './routing.js';
 import { inspect_error, throw404 } from './utils.js';
 
 export class App {
@@ -16,7 +16,7 @@ export class App {
 
   //#region endpoints
   //#region without params
-  /** @type {RestLUT<ResolverLUT>} */
+  /** @type {RestLUT<ResolverLUT<ResolverLeaf>>} */
   #rest_endpoints = {
     GET: {},
     HEAD: {},
@@ -29,12 +29,12 @@ export class App {
     PATCH: {},
   };
 
-  /** @type {ResolverLUT} */
+  /** @type {ResolverLUT<ResolverLeaf>} */
   #endpoints = {};
   //#endregion
 
   //#region with params
-  /** @type {RestLUT<TreeNode>} */
+  /** @type {RestLUT<TreeNode<ResolverLeaf>>} */
   #rest_endpoints_with_params = {
     GET: {},
     HEAD: {},
@@ -47,12 +47,12 @@ export class App {
     PATCH: {},
   };
 
-  /** @type {TreeNode} */
+  /** @type {TreeNode<ResolverLeaf>} */
   #endpoints_with_params = {};
   //#endregion
 
   //#region with wildcard
-  /** @type {RestLUT<ResolverTreeContainer>} */
+  /** @type {RestLUT<ResolverTreeContainer<ResolverLeaf>>} */
   #rest_endpoints_with_wildcard = {
     GET: { depth: 0, root: {} },
     HEAD: { depth: 0, root: {} },
@@ -65,7 +65,7 @@ export class App {
     PATCH: { depth: 0, root: {} },
   };
 
-  /** @type {ResolverTreeContainer} */
+  /** @type {ResolverTreeContainer<ResolverLeaf>} */
   #endpoints_with_wildcard = { depth: 0, root: {} };
   //#endregion
   //#endregion
@@ -103,19 +103,17 @@ export class App {
       }
       //#endregion
 
-      //#region "global" middleware
       if (!(await handle_middleware(this.#middleware, req, res, query, route))) return;
-      //#endregion
 
       //#region routing
       const method = req.method;
       const leaf =
-        get_endpoint(this.#rest_endpoints[method], req) ||
-        get_endpoint(this.#endpoints, req) ||
-        get_endpoint_with_param(this.#rest_endpoints_with_params[method], req, route) ||
-        get_endpoint_with_param(this.#endpoints_with_params, req, route) ||
-        get_endpoint_with_wildcard(this.#rest_endpoints_with_wildcard[method], req, route) ||
-        get_endpoint_with_wildcard(this.#endpoints_with_wildcard, req, route);
+        get_ResLeaf(this.#rest_endpoints[method], req) ||
+        get_ResLeaf(this.#endpoints, req) ||
+        get_ResLeaf_with_param(this.#rest_endpoints_with_params[method], req, route) ||
+        get_ResLeaf_with_param(this.#endpoints_with_params, req, route) ||
+        get_ResLeaf_with_wildcard(this.#rest_endpoints_with_wildcard[method], req, route) ||
+        get_ResLeaf_with_wildcard(this.#endpoints_with_wildcard, req, route);
 
       if (leaf === false) return throw404(req, res);
 
@@ -167,12 +165,15 @@ export class App {
    * @returns {ErrorOr<CurryedMiddleware>}
    */
   #register_rest_endpoint(method, uri, fn) {
-    const { err: adding_error, data: leaf } = add_endpoint_to_corresponding_lut(
+    /** @type {ResolverLeaf} */
+    const l = { fn, middleware: false };
+
+    const { err: adding_error, data: leaf } = add_ResLeaf_to_corresponding_lut(
       this.#rest_endpoints[method],
       this.#rest_endpoints_with_params[method],
       this.#rest_endpoints_with_wildcard[method],
       uri,
-      fn,
+      l,
     );
     if (adding_error !== null) return inspect_error(`error while adding '${method} ${uri}'`, adding_error);
 
@@ -269,7 +270,7 @@ export class App {
    * @returns {ErrorOr<CurryedMiddleware>}
    */
   add(uri, fn) {
-    const { err: adding_error, data: leaf } = add_endpoint_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#endpoints_with_wildcard, uri, fn);
+    const { err: adding_error, data: leaf } = add_ResLeaf_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#endpoints_with_wildcard, uri, { fn, middleware: false });
     if (adding_error !== null) return inspect_error(`error while adding '${uri}'`, adding_error);
 
     LOG(`added '${uri}'`);

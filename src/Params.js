@@ -13,7 +13,6 @@ export class Params {
     this.#route = route;
   }
 
-  //#region getting params
   //#region query
   /**
    * @template {string|null} [T=null]
@@ -21,10 +20,8 @@ export class Params {
    * @param {T} defaultValue
    * @returns {string|T}
    */
-  // @ts-ignore ts(2322)
-  query(name, defaultValue = null) {
-    if (Object.hasOwn(this.#query, name)) return this.#query[name];
-    else return defaultValue;
+  query(name, /** @type {T|null} */ defaultValue = null) {
+    return this.#query[name] ?? defaultValue;
   }
 
   /**
@@ -33,14 +30,15 @@ export class Params {
    * @param {T} defaultValue
    * @returns {number|T}
    */
-  // @ts-ignore ts(2322)
-  queryNumber(name, defaultValue = null) {
-    const str = this.query(name, '');
-    if (!str.length) return defaultValue;
+  queryNumber(name, /** @type {T|null} */ defaultValue = null) {
+    const str = this.query(name);
+    if (str !== null) {
+      const num = Number(str);
+      if (!Number.isNaN(num)) return num;
+    }
 
-    const num = Number(str);
-    if (Number.isNaN(num)) return defaultValue;
-    else return num;
+    // @ts-ignore
+    return defaultValue;
   }
   //#endregion
 
@@ -50,12 +48,11 @@ export class Params {
    * @template {string|null} [T=null]
    * @param {S} name
    * @param {T} defaultValue
-   * @returns {RouteLUT[S] | T}
+   * @returns {(S extends '*' ? string[] : string) | T}
    */
-  // @ts-ignore ts(2322)
-  route(name, defaultValue = null) {
-    if (Object.hasOwn(this.#route, name)) return this.#route[name];
-    else return defaultValue;
+  route(name, /** @type {T|null} */ defaultValue = null) {
+    // @ts-ignore ts(2322) '*' has to be string[]
+    return this.#route[name] ?? defaultValue;
   }
 
   /**
@@ -64,15 +61,15 @@ export class Params {
    * @param {T} defaultValue
    * @returns {number|T}
    */
-  // @ts-ignore ts(2322)
-  routeNumber(name, defaultValue = null) {
+  routeNumber(name, /** @type {T|null} */ defaultValue = null) {
     const str = this.route(name, '');
-    if (!str.length) return defaultValue;
+    if (str !== null) {
+      const num = Number(str);
+      if (!Number.isNaN(num)) return num;
+    }
 
-    const num = Number(str);
-    if (Number.isNaN(num)) return defaultValue;
-    else return num;
+    // @ts-ignore
+    return defaultValue;
   }
-  //#endregion
   //#endregion
 }

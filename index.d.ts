@@ -3,4 +3,4 @@ export { CurryedMiddleware } from './src/middleware.js';
 export { Params } from './src/Params.js';
 export * from './src/utils.js';
 
-export * from './src/types.js';
+export * from './src/types.d.ts';

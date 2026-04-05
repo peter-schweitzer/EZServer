@@ -38,9 +38,9 @@
   },
   "reveal": true,
   "dependencies": {
-    "@peter-schweitzer/ez-utils": "^0.6.2"
+    "@peter-schweitzer/ez-utils": "^0.7.1"
   },
   "devDependencies": {
-    "prettier": "^3.5.3"
+    "prettier": "^3.8.1"
   }
 }
