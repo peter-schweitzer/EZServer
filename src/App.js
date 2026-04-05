@@ -4,7 +4,7 @@ import { data, ERR, LOG, WRN } from '@peter-schweitzer/ez-utils';
 
 import { CurryedMiddleware, handle_middleware } from './middleware.js';
 import { Params } from './Params.js';
-import { add_ResLeaf_to_corresponding_lut, get_ResLeaf, get_ResLeaf_with_param, get_ResLeaf_with_wildcard } from './routing.js';
+import { add_ResLeaf_to_corresponding_lut, get_ResLeaf, get_ResLeaf_with_param, get_ResLeaf_with_wildcard, process_query_params } from './routing.js';
 import { inspect_error, throw404 } from './utils.js';
 
 export class App {
@@ -76,7 +76,7 @@ export class App {
   //#endregion
 
   constructor() {
-    this.#http_server = createServer(async (/**@type {EZIncomingMessage}*/ req, res) => {
+    this.#http_server = createServer(async (msg, res) => {
       //#region variables
       /** @type {LUT<string>} */
       const query = {};
@@ -84,24 +84,7 @@ export class App {
       const route = {};
       //#endregion
 
-      //#region parsing out URL & query parameters
-      const url = req.url;
-      const uri_end_idx = url.indexOf('?');
-      if (uri_end_idx === -1) req.uri = decodeURIComponent(url);
-      else {
-        req.uri = decodeURIComponent(url.slice(0, uri_end_idx));
-
-        //#region parsing out query parameters
-        const query_string = decodeURIComponent(url.slice(uri_end_idx + 1));
-        if (query_string.length !== 0)
-          for (const kv of query_string.split('&')) {
-            const [key, value] = kv.split('=');
-            if (key.length === 0 || value === undefined || value.length === 0) continue;
-            else query[key] = value;
-          }
-        //#endregion
-      }
-      //#endregion
+      const req = process_query_params(msg, query);
 
       if (!(await handle_middleware(this.#middleware, req, res, query, route))) return;
 

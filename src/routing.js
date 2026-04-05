@@ -3,6 +3,36 @@ import { data, err } from '@peter-schweitzer/ez-utils';
 import { RingBuffer, WildcardQueueNode } from './RingBuffer.js';
 
 /**
+ * @param {IncomingMessage} r
+ * @param {LUT<string>} query
+ * @returns {EZIncomingMessage}
+ */
+export function process_query_params(r, query) {
+  /** @type {EZIncomingMessage} */
+  // @ts-ignore
+  const req = r;
+
+  const url = req.url;
+  const uri_end_idx = url.indexOf('?');
+  if (uri_end_idx === -1) req.uri = decodeURIComponent(url);
+  else {
+    req.uri = decodeURIComponent(url.slice(0, uri_end_idx));
+
+    //#region parsing out query parameters
+    const query_string = decodeURIComponent(url.slice(uri_end_idx + 1));
+    if (query_string.length !== 0)
+      for (const kv of query_string.split('&')) {
+        const [key, value] = kv.split('=');
+        if (key.length === 0 || value === undefined || value.length === 0) continue;
+        else query[key] = value;
+      }
+    //#endregion
+  }
+
+  return req;
+}
+
+/**
  * @template {ResLeaf} L
  * @param {L} leaf
  * @returns {TreeLeaf<L>}
