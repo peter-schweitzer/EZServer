@@ -1,11 +1,11 @@
 import { createServer } from 'node:http';
 
-import { data, ERR, LOG, WRN } from '@peter-schweitzer/ez-utils';
+import { ERR, LOG, WRN } from '@peter-schweitzer/ez-utils';
 
 import { CurryedMiddleware, handle_middleware } from './middleware.js';
 import { Params } from './Params.js';
 import { add_ResLeaf_to_corresponding_lut, get_ResLeaf, get_ResLeaf_with_param, get_ResLeaf_with_wildcard, process_query_params } from './routing.js';
-import { inspect_error, throw404 } from './utils.js';
+import { throw404 } from './utils.js';
 import { WS_AVAILABLE, WSHandler } from './WSHandler.js';
 
 export class App {
@@ -86,7 +86,7 @@ export class App {
 
   constructor() {
     this.#http_server = createServer(async (msg, res) => {
-      //#region variables
+      //#region Params variables
       /** @type {LUT<string>} */
       const query = {};
       /**@type {RouteLUT}*/
@@ -156,29 +156,23 @@ export class App {
    * @param {Methods} method
    * @param {string} uri
    * @param {ResFunction} fn
-   * @returns {ErrorOr<CurryedMiddleware>}
+   * @returns {CurryedMiddleware}
    */
   #register_rest_endpoint(method, uri, fn) {
     /** @type {ResolverLeaf} */
-    const l = { fn, middleware: false };
+    const leaf = { fn, middleware: false };
 
-    const { err: adding_error, data: leaf } = add_ResLeaf_to_corresponding_lut(
-      this.#rest_endpoints[method],
-      this.#rest_endpoints_with_params[method],
-      this.#rest_endpoints_with_wildcard[method],
-      uri,
-      l,
-    );
-    if (adding_error !== null) return inspect_error(`error while adding '${method} ${uri}'`, adding_error);
+    const adding_error = add_ResLeaf_to_corresponding_lut(this.#rest_endpoints[method], this.#rest_endpoints_with_params[method], this.#rest_endpoints_with_wildcard[method], uri, leaf).err;
+    if (adding_error !== null) ERR(`error while adding '${method} ${uri}':\n  ${adding_error}`);
+    else LOG(`added ${method.toLowerCase()}: '${uri}'`);
 
-    LOG(`added ${method.toLowerCase()}: '${uri}'`);
-    return data(new CurryedMiddleware(leaf));
+    return new CurryedMiddleware(leaf);
   }
 
   /**
    * @param {string} uri uri to resolve
    * @param {ResFunction} fn function for resolve the request
-   * @returns {ErrorOr<CurryedMiddleware>}
+   * @returns {CurryedMiddleware}
    */
   get(uri, fn) {
     return this.#register_rest_endpoint('GET', uri, fn);
@@ -187,7 +181,7 @@ export class App {
   /**
    * @param {string} uri uri to resolve
    * @param {ResFunction} fn function for resolve the request
-   * @returns {ErrorOr<CurryedMiddleware>}
+   * @returns {CurryedMiddleware}
    */
   head(uri, fn) {
     return this.#register_rest_endpoint('HEAD', uri, fn);
@@ -196,7 +190,7 @@ export class App {
   /**
    * @param {string} uri uri to resolve
    * @param {ResFunction} fn function for resolve the request
-   * @returns {ErrorOr<CurryedMiddleware>}
+   * @returns {CurryedMiddleware}
    */
   post(uri, fn) {
     return this.#register_rest_endpoint('POST', uri, fn);
@@ -205,7 +199,7 @@ export class App {
   /**
    * @param {string} uri uri to resolve
    * @param {ResFunction} fn function for resolve the request
-   * @returns {ErrorOr<CurryedMiddleware>}
+   * @returns {CurryedMiddleware}
    */
   put(uri, fn) {
     return this.#register_rest_endpoint('PUT', uri, fn);
@@ -214,7 +208,7 @@ export class App {
   /**
    * @param {string} uri uri to resolve
    * @param {ResFunction} fn function for resolve the request
-   * @returns {ErrorOr<CurryedMiddleware>}
+   * @returns {CurryedMiddleware}
    */
   delete(uri, fn) {
     return this.#register_rest_endpoint('DELETE', uri, fn);
@@ -223,7 +217,7 @@ export class App {
   /**
    * @param {string} uri uri to resolve
    * @param {ResFunction} fn function for resolve the request
-   * @returns {ErrorOr<CurryedMiddleware>}
+   * @returns {CurryedMiddleware}
    */
   connect(uri, fn) {
     return this.#register_rest_endpoint('CONNECT', uri, fn);
@@ -232,7 +226,7 @@ export class App {
   /**
    * @param {string} uri uri to resolve
    * @param {ResFunction} fn function for resolve the request
-   * @returns {ErrorOr<CurryedMiddleware>}
+   * @returns {CurryedMiddleware}
    */
   options(uri, fn) {
     return this.#register_rest_endpoint('OPTIONS', uri, fn);
@@ -241,7 +235,7 @@ export class App {
   /**
    * @param {string} uri uri to resolve
    * @param {ResFunction} fn function for resolve the request
-   * @returns {ErrorOr<CurryedMiddleware>}
+   * @returns {CurryedMiddleware}
    */
   trace(uri, fn) {
     return this.#register_rest_endpoint('TRACE', uri, fn);
@@ -250,7 +244,7 @@ export class App {
   /**
    * @param {string} uri uri to resolve
    * @param {ResFunction} fn function for resolve the request
-   * @returns {ErrorOr<CurryedMiddleware>}
+   * @returns {CurryedMiddleware}
    */
   patch(uri, fn) {
     return this.#register_rest_endpoint('PATCH', uri, fn);
@@ -261,14 +255,17 @@ export class App {
   /**
    * @param {string} uri uri to resolve
    * @param {ResFunction} fn function for resolve the request
-   * @returns {ErrorOr<CurryedMiddleware>}
+   * @returns {CurryedMiddleware}
    */
   add(uri, fn) {
-    const { err: adding_error, data: leaf } = add_ResLeaf_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#endpoints_with_wildcard, uri, { fn, middleware: false });
-    if (adding_error !== null) return inspect_error(`error while adding '${uri}'`, adding_error);
+    /** @type {ResolverLeaf} */
+    const leaf = { fn, middleware: false };
 
-    LOG(`added '${uri}'`);
-    return data(new CurryedMiddleware(leaf));
+    const adding_error = add_ResLeaf_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#endpoints_with_wildcard, uri, leaf).err;
+    if (adding_error !== null) ERR(`error while trying to add '${uri}':\n  ${adding_error}`);
+    else LOG(`added '${uri}'`);
+
+    return new CurryedMiddleware(leaf);
   }
   //#endregion
   //#endregion
@@ -278,7 +275,7 @@ export class App {
    * @param {WSResFunction} fn
    */
   ws(uri, fn) {
-    if (WS_AVAILABLE) this.#ws_handler.ws(uri, fn);
-    else ERR('ws is not installed; WebSocket support unavailable');
+    if (!WS_AVAILABLE) ERR('ws is not installed; WebSocket support unavailable');
+    else return this.#ws_handler.ws(uri, fn);
   }
 }

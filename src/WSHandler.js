@@ -1,8 +1,7 @@
-import { data, ERR, LOG, p2eo } from '@peter-schweitzer/ez-utils';
+import { ERR, LOG, p2eo } from '@peter-schweitzer/ez-utils';
 
 import { Params } from './Params.js';
 import { add_ResLeaf_to_corresponding_lut, get_ResLeaf, get_ResLeaf_with_param, get_ResLeaf_with_wildcard, process_query_params } from './routing.js';
-import { inspect_error } from './utils.js';
 
 const { err: ws_err, data: WS } = await p2eo(import('ws'));
 if (ws_err !== null) LOG("ws is not installed, WebSocket support won't be available");
@@ -33,7 +32,7 @@ export class WSHandler {
 
     const wss = new WS.WebSocketServer({ noServer: true });
     server.on('upgrade', (msg, socket, head) => {
-      //#region variables
+      //#region Params variables
       /** @type {LUT<string>} */
       const query = {};
       /**@type {RouteLUT}*/
@@ -58,7 +57,7 @@ export class WSHandler {
    */
   ws(uri, fn) {
     const adding_error = add_ResLeaf_to_corresponding_lut(this.#endpoints, this.#endpoints_with_params, this.#endpoints_with_wildcard, uri, { fn }).err;
-    if (adding_error !== null) return inspect_error(`error while adding '${uri}'`, adding_error);
-    return data(LOG(`ws added: '${uri}'`));
+    if (adding_error !== null) ERR(`error while adding '${uri}':\n  ${adding_error}`);
+    else LOG(`ws added: '${uri}'`);
   }
 }

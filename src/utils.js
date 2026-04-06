@@ -1,24 +1,12 @@
 import { readFile } from 'node:fs/promises';
 
-import { ERR, LOG, WRN, data, err, p2eo } from '@peter-schweitzer/ez-utils';
+import { LOG, WRN, data, err, p2eo } from '@peter-schweitzer/ez-utils';
 
 import _mime_types from '../data/mimeTypes.json' with { type: 'json' };
 /** @type {LUT<string>} */
 const mime_types = _mime_types;
 
 export const MIME = Object.freeze({ TEXT: 'text/plain;charset=UTF-8', HTML: 'text/html;charset=UTF-8', JSON: 'application/json' });
-
-/**
- * @template {string} T
- * @template {string} A
- * @param {T} msg
- * @param {A} additional_error
- * @param {{}} obj
- */
-export function inspect_error(msg, additional_error, obj = {}) {
-  ERR(msg);
-  return err(`${msg}:\n  ${additional_error}`, obj);
-}
 
 /**
  * @param {ServerResponse} res response from the server
