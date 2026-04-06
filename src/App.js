@@ -6,13 +6,22 @@ import { CurryedMiddleware, handle_middleware } from './middleware.js';
 import { Params } from './Params.js';
 import { add_ResLeaf_to_corresponding_lut, get_ResLeaf, get_ResLeaf_with_param, get_ResLeaf_with_wildcard, process_query_params } from './routing.js';
 import { inspect_error, throw404 } from './utils.js';
+import { WS_AVAILABLE, WSHandler } from './WSHandler.js';
 
 export class App {
+  //#region underlying servers
   /** @type {Server} */
   #http_server;
   get m_http_server() {
     return this.#http_server;
   }
+
+  /** @type {WSHandler} */
+  #ws_handler;
+  get m_ws_server() {
+    return this.#ws_handler.m_ws_server;
+  }
+  //#endregion
 
   //#region endpoints
   //#region without params
@@ -104,6 +113,8 @@ export class App {
       if (await handle_middleware(middleware, req, res, query, route)) fn(req, res, new Params(query, route));
       //#endregion
     });
+
+    this.#ws_handler = new WSHandler(this.#http_server);
   }
 
   //#region node:http Server functions
@@ -261,4 +272,13 @@ export class App {
   }
   //#endregion
   //#endregion
+
+  /**
+   * @param {string} uri
+   * @param {WSResFunction} fn
+   */
+  ws(uri, fn) {
+    if (WS_AVAILABLE) this.#ws_handler.ws(uri, fn);
+    else ERR('ws is not installed; WebSocket support unavailable');
+  }
 }

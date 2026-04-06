@@ -1,5 +1,7 @@
 import { IncomingMessage as _IncomingMessage, Server as _Server, ServerResponse as _ServerResponse } from 'node:http';
 
+import { WebSocket, WebSocketServer } from 'ws';
+
 import { Params as _Params } from './Params.js';
 
 export declare global {
@@ -9,6 +11,9 @@ export declare global {
   type ServerResponse = _ServerResponse;
 
   type Params = _Params;
+
+  type ws_WebSocket = WebSocket;
+  type ws_WebSocketServer = WebSocketServer;
   //#endregion
 
   //#region ============================== types ===============================
@@ -23,7 +28,10 @@ export declare global {
   type ResFunction = (req: EZIncomingMessage, res: ServerResponse, params: Params) => void;
   type ResolverLeaf = { fn: ResFunction; middleware: FalseOr<Middleware[]> };
 
-  type ResLeaf = ResolverLeaf;
+  type WSResFunction = (ws: ws_WebSocket, request: EZIncomingMessage, params: Params) => void;
+  type WSResolverLeaf = { fn: WSResFunction };
+
+  type ResLeaf = ResolverLeaf | WSResolverLeaf;
   type ResolverLUT<L extends ResLeaf> = LUT<L>;
 
   type TreeLeaf<L extends ResLeaf> = L & { params: [number, string][] };

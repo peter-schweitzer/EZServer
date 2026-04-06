@@ -27,7 +27,8 @@
     "rest-api",
     "server-side",
     "backend",
-    "framework"
+    "framework",
+    "WebSockets"
   ],
   "scripts": {
     "example": "cd example && node .",
@@ -39,6 +40,14 @@
   "reveal": true,
   "dependencies": {
     "@peter-schweitzer/ez-utils": "~0.7.1"
+  },
+  "peerDependencies": {
+    "ws": "^8.20.0"
+  },
+  "peerDependenciesMeta": {
+    "ws": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "prettier": "^3.8.1"
