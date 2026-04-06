@@ -1,8 +1,15 @@
 export class Params {
   /**@type {LUT<string>} */
   #query;
+  get queryLUT() {
+    return this.#query;
+  }
+
   /**@type {RouteLUT} */
   #route;
+  get routeLUT() {
+    return this.#route;
+  }
 
   /**
    * @param {LUT<string>} query
