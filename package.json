@@ -39,7 +39,7 @@
   },
   "reveal": true,
   "dependencies": {
-    "@peter-schweitzer/ez-utils": "~0.7.1"
+    "@peter-schweitzer/ez-utils": "~0.8.0"
   },
   "peerDependencies": {
     "ws": "^8.20.0"
