@@ -90,15 +90,14 @@ export function getBodyText(req, obj = {}) {
  * @return {AsyncErrorOr<any>}
  */
 export async function getBodyJSON(req, obj = {}) {
-  const eo_txt = await getBodyText(req, obj);
-  if (eo_txt.err !== null) return eo_txt;
-  if (eo_txt.data === '') return err('request body is empty', obj);
+  const { data: txt, err: txt_err } = await getBodyText(req, obj);
+  if (txt_err !== null) return err(`error while getting request body:\n  ${txt_err}`, obj);
+  else if (txt === '') return err('request body is empty', obj);
 
-  try {
-    return data(JSON.parse(eo_txt.data), obj);
-  } catch (e) {
-    return inspect_error(`error while parsing request body`, typeof e === 'string' ? e : JSON.stringify(e), obj);
-  }
+  const { data: json, err: json_err } = await p2eo(JSON.parse(txt), obj);
+  if (json_err !== null) return err(`error while parsing request body:\n  ${json_err}`, obj);
+
+  return data(json, obj);
 }
 
 /**
